@@ -1,31 +1,32 @@
-import Vue from "vue"
-import VueRouter, {RouteConfig} from "vue-router"
+import Vue from 'vue'
+import VueRouter, { RouteConfig } from 'vue-router'
 
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
   {
+    path: "/login",
+    name: "login",
+    component: () => import("@/views/home/login.vue")
+  },
+  {
     path: "/",
-    name: "",
+    name: "home",
+    meta: {needLogin: true},
     component: () => import("@/views/home/home.vue"),
     children: [
       {
-        path: "",
-        name: "home",
-        component: () => import("@/views/home/content.vue")
-      },
-      {
-        path: "/files",
-        name: "files",
+        path: "/user",
+        name: "user",
         meta: {needLogin: true},
-        component: () => import("@/views/files/files.vue")
+        component: () => import("@/views/user/user.vue")
       }
     ]
   },
   {
     path: "/404",
     name: "notFound",
-    redirect: {name: "home"}
+    redirect: {name: "login"}
   },
   {
     path: "*",
@@ -49,7 +50,7 @@ router.beforeEach((to, from, next) => {
     next();
     return;
   } else {
-    next({path: "/"});
+    next({path: "/login"});
     return;
   }
 })
