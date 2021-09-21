@@ -1,4 +1,4 @@
-package http
+package kits
 
 import (
 	"crypto/sha256"
@@ -9,7 +9,7 @@ import (
 	"math/rand"
 )
 
-func sortUsersByUserID(users []*model.User, order []string) ([]*model.User, error) {
+func SortUsersByUserID(users []*model.User, order []string) ([]*model.User, error) {
 	if len(users) != len(order) {
 		return nil, errors.New(fmt.Sprintf("unmatched users amount, users %d, orders %d", len(users), len(order)))
 	}
@@ -41,7 +41,7 @@ func sortUsersByUserID(users []*model.User, order []string) ([]*model.User, erro
 
 const str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-func randomString(length int) string {
+func RandomString(length int) string {
 	bytes := make([]byte, length)
 	for i := range bytes {
 		bytes[i] = str[rand.Intn(len(str))]
@@ -50,12 +50,12 @@ func randomString(length int) string {
 	return string(bytes)
 }
 
-// verifyUserPassword calc sha256('input'+'salt'), and compare it with 'pwd' from db
-func verifyUserPassword(pwd string, input string, salt string) bool {
-	return pwd == calcPassword(input, salt)
+// VerifyUserPassword calc sha256('input'+'salt'), and compare it with 'pwd' from db
+func VerifyUserPassword(pwd string, input string, salt string) bool {
+	return pwd == CalcPassword(input, salt)
 }
 
-func calcPassword(text string, salt string) string {
+func CalcPassword(text string, salt string) string {
 	hash := sha256.New()
 	hash.Reset()
 	hash.Write([]byte(text + salt))
