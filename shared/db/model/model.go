@@ -49,25 +49,6 @@ type ThinkingNote struct {
 	Common
 }
 
-type Game struct {
-	GameID string `pg:",unique,notnull"`
-	Name   string `pg:",notnull"`          // display name
-	IsOpen bool   `pg:",use_zero,notnull"` // open for play
-
-	Common
-}
-
-type GameResult struct {
-	ResultID string        `pg:",unique,notnull"`
-	GameID   string        `pg:",notnull"`
-	Player   string        `pg:",notnull"`          // user id
-	Duration time.Duration `pg:",use_zero,notnull"` // unit: second
-	Result   string        `pg:",notnull"`          // json string
-	Remark   string        // for extend
-
-	Common
-}
-
 func NewCommon() Common {
 	currTime := time.Duration(time.Now().Unix())
 

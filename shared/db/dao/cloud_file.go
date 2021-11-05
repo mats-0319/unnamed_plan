@@ -2,7 +2,7 @@ package dao
 
 import (
 	"github.com/go-pg/pg/v10/orm"
-	"github.com/mats9693/unnamed_plan/admin_data/db/model"
+	"github.com/mats9693/unnamed_plan/shared/db/model"
 	"github.com/mats9693/utils/toy_server/db"
 	"time"
 )

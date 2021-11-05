@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/go-pg/pg/v10"
-	"github.com/mats9693/unnamed_plan/admin_data/db/model"
 	"github.com/mats9693/unnamed_plan/admin_data/utils"
+	"github.com/mats9693/unnamed_plan/shared/db/model"
 	"github.com/mats9693/utils/toy_server/utils"
 	"github.com/mats9693/utils/uuid"
 	"log"
