@@ -1,0 +1,42 @@
+{
+  "package_name": "api",
+  "files": [
+    {
+      "file_name": "user",
+      "api_list": [
+        {
+          "name": "Login",
+          "uri": "/login"
+        },
+        {
+          "name": "ListUser",
+          "uri": "/user/list"
+        },
+        {
+          "name": "CreateUser",
+          "uri": "/user/create"
+        },
+        {
+          "name": "LockUser",
+          "uri": "/user/lock"
+        },
+        {
+          "name": "UnlockUser",
+          "uri": "/user/unlock"
+        },
+        {
+          "name": "ModifyInfo",
+          "uri": "/user/modify-info"
+        },
+        {
+          "name": "AdjustPermission",
+          "uri": "/user/adjust-permission"
+        },
+        {
+          "name": "Authenticate",
+          "uri": "/user/authenticate"
+        }
+      ]
+    }
+  ]
+}
