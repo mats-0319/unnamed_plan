@@ -36,9 +36,11 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 	_user.Nickname = field.NewString(tableName, "nickname")
 	_user.Password = field.NewString(tableName, "password")
 	_user.Salt = field.NewString(tableName, "salt")
+	_user.TotpKey = field.NewString(tableName, "totp_key")
 	_user.IsLocked = field.NewBool(tableName, "is_locked")
 	_user.Permission = field.NewUint8(tableName, "permission")
-	_user.CreatedBy = field.NewUint(tableName, "created_by")
+	_user.Creator = field.NewString(tableName, "creator")
+	_user.LastLogin = field.NewInt64(tableName, "last_login")
 
 	_user.fillFieldMap()
 
@@ -57,9 +59,11 @@ type user struct {
 	Nickname   field.String
 	Password   field.String
 	Salt       field.String
+	TotpKey    field.String
 	IsLocked   field.Bool
 	Permission field.Uint8
-	CreatedBy  field.Uint
+	Creator    field.String
+	LastLogin  field.Int64
 
 	fieldMap map[string]field.Expr
 }
@@ -84,9 +88,11 @@ func (u *user) updateTableName(table string) *user {
 	u.Nickname = field.NewString(table, "nickname")
 	u.Password = field.NewString(table, "password")
 	u.Salt = field.NewString(table, "salt")
+	u.TotpKey = field.NewString(table, "totp_key")
 	u.IsLocked = field.NewBool(table, "is_locked")
 	u.Permission = field.NewUint8(table, "permission")
-	u.CreatedBy = field.NewUint(table, "created_by")
+	u.Creator = field.NewString(table, "creator")
+	u.LastLogin = field.NewInt64(table, "last_login")
 
 	u.fillFieldMap()
 
@@ -111,7 +117,7 @@ func (u *user) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (u *user) fillFieldMap() {
-	u.fieldMap = make(map[string]field.Expr, 11)
+	u.fieldMap = make(map[string]field.Expr, 13)
 	u.fieldMap["id"] = u.ID
 	u.fieldMap["created_at"] = u.CreatedAt
 	u.fieldMap["updated_at"] = u.UpdatedAt
@@ -120,9 +126,11 @@ func (u *user) fillFieldMap() {
 	u.fieldMap["nickname"] = u.Nickname
 	u.fieldMap["password"] = u.Password
 	u.fieldMap["salt"] = u.Salt
+	u.fieldMap["totp_key"] = u.TotpKey
 	u.fieldMap["is_locked"] = u.IsLocked
 	u.fieldMap["permission"] = u.Permission
-	u.fieldMap["created_by"] = u.CreatedBy
+	u.fieldMap["creator"] = u.Creator
+	u.fieldMap["last_login"] = u.LastLogin
 }
 
 func (u user) clone(db *gorm.DB) user {

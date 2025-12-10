@@ -35,7 +35,7 @@ func newCloudFile(db *gorm.DB, opts ...gen.DOOption) cloudFile {
 	_cloudFile.FileID = field.NewString(tableName, "file_id")
 	_cloudFile.Name = field.NewString(tableName, "name")
 	_cloudFile.Extension = field.NewString(tableName, "extension")
-	_cloudFile.Uploader = field.NewUint(tableName, "uploader")
+	_cloudFile.Uploader = field.NewString(tableName, "uploader")
 	_cloudFile.Size = field.NewInt64(tableName, "size")
 	_cloudFile.Hash = field.NewString(tableName, "hash")
 	_cloudFile.IsDeleted = field.NewBool(tableName, "is_deleted")
@@ -56,7 +56,7 @@ type cloudFile struct {
 	FileID    field.String
 	Name      field.String
 	Extension field.String
-	Uploader  field.Uint
+	Uploader  field.String
 	Size      field.Int64
 	Hash      field.String
 	IsDeleted field.Bool
@@ -83,7 +83,7 @@ func (c *cloudFile) updateTableName(table string) *cloudFile {
 	c.FileID = field.NewString(table, "file_id")
 	c.Name = field.NewString(table, "name")
 	c.Extension = field.NewString(table, "extension")
-	c.Uploader = field.NewUint(table, "uploader")
+	c.Uploader = field.NewString(table, "uploader")
 	c.Size = field.NewInt64(table, "size")
 	c.Hash = field.NewString(table, "hash")
 	c.IsDeleted = field.NewBool(table, "is_deleted")
