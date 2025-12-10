@@ -3,7 +3,7 @@
 // Code   : github.com/mats0319/study/go/gocts
 // Version: gocts v1.0.0
 
-import { ResBase, Pagination } from "./common.go"
+import { Pagination } from "./common.go"
 
 export class LoginReq {
     user_name: string = "";
@@ -12,8 +12,10 @@ export class LoginReq {
 }
 
 export class LoginRes {
-    res: ResBase = new ResBase();
-    token: string = "";
+    nickname: string = "";
+    permission: number = 0;
+    is_success: boolean = false;
+    err: string = "";
 }
 
 export class User {
@@ -22,6 +24,7 @@ export class User {
     updated_at: number = 0;
     name: string = "";
     nickname: string = "";
+    totp_key: string = "";
     is_locked: boolean = false;
     permission: number = 0;
     creator: string = "";
@@ -35,10 +38,11 @@ export class ListUserReq {
 }
 
 export class ListUserRes {
-    res: ResBase = new ResBase();
     user_amount: number = 0;
     list_amount: number = 0;
     users: Array<User> = new Array<User>();
+    is_success: boolean = false;
+    err: string = "";
 }
 
 export class CreateUserReq {
@@ -49,7 +53,8 @@ export class CreateUserReq {
 }
 
 export class CreateUserRes {
-    res: ResBase = new ResBase();
+    is_success: boolean = false;
+    err: string = "";
 }
 
 export class LockUserReq {
@@ -57,7 +62,8 @@ export class LockUserReq {
 }
 
 export class LockUserRes {
-    res: ResBase = new ResBase();
+    is_success: boolean = false;
+    err: string = "";
 }
 
 export class UnlockUserReq {
@@ -65,7 +71,8 @@ export class UnlockUserReq {
 }
 
 export class UnlockUserRes {
-    res: ResBase = new ResBase();
+    is_success: boolean = false;
+    err: string = "";
 }
 
 export class ModifyInfoReq {
@@ -77,7 +84,8 @@ export class ModifyInfoReq {
 }
 
 export class ModifyInfoRes {
-    res: ResBase = new ResBase();
+    is_success: boolean = false;
+    err: string = "";
 }
 
 export class AdjustPermissionReq {
@@ -87,7 +95,8 @@ export class AdjustPermissionReq {
 }
 
 export class AdjustPermissionRes {
-    res: ResBase = new ResBase();
+    is_success: boolean = false;
+    err: string = "";
 }
 
 export class AuthenticateReq {
@@ -96,5 +105,6 @@ export class AuthenticateReq {
 }
 
 export class AuthenticateRes {
-    res: ResBase = new ResBase();
+    is_success: boolean = false;
+    err: string = "";
 }

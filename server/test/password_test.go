@@ -1,29 +1,21 @@
 package test
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"math/rand/v2"
 	"testing"
+
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 func TestPasswordWithSalt(t *testing.T) {
 	salt := string(generateRandomBytes(10))
 	password := "123456"
-	password = CalcSHA256(password)
-	password = CalcSHA256(password + salt)
+	password = utils.CalcSHA256(password)
+	t.Log("pwd 1:", password)
 
-	t.Log("pwd :", password)
-	t.Log("salt:", salt)
-}
-
-func CalcSHA256(text string) string {
-	hash := sha256.New()
-	hash.Reset()
-	hash.Write([]byte(text))
-	bytes := hash.Sum(nil)
-
-	return hex.EncodeToString(bytes)
+	password = utils.CalcSHA256(password + salt)
+	t.Log("pwd 2:", password)
+	t.Log("salt :", salt)
 }
 
 const CharactersLibrary = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"

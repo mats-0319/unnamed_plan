@@ -9,8 +9,9 @@ type LoginReq struct {
 }
 
 type LoginRes struct {
-	Res   ResBase `json:"res"`
-	Token string  `json:"token"`
+	ResBase
+	Nickname   string `json:"nickname"`
+	Permission uint8  `json:"permission"`
 }
 
 const URI_ListUser = "/user/list"
@@ -21,7 +22,7 @@ type User struct {
 	UpdatedAt  int64  `json:"updated_at"`
 	Name       string `json:"name"`     // login name
 	Nickname   string `json:"nickname"` // display name
-	TotpKey    string `json:":16"`      // 允许为空，需要设置后启动
+	TotpKey    string `json:"totp_key"` // 允许为空，需要设置后启动
 	IsLocked   bool   `json:"is_locked"`
 	Permission uint8  `json:"permission"` // 权限等级
 	Creator    string `json:"creator"`    // 创建人，user.name
@@ -36,10 +37,10 @@ type ListUserReq struct {
 }
 
 type ListUserRes struct {
-	Res        ResBase `json:"res"`
-	UserAmount int     `json:"user_amount"` // 用户表总数
-	ListAmount int     `json:"list_amount"` // 符合查询条件的用户数
-	Users      []User  `json:"users"`
+	ResBase
+	UserAmount int    `json:"user_amount"` // 用户表总数
+	ListAmount int    `json:"list_amount"` // 符合查询条件的用户数
+	Users      []User `json:"users"`
 }
 
 const URI_CreateUser = "/user/create"
@@ -52,7 +53,7 @@ type CreateUserReq struct {
 }
 
 type CreateUserRes struct {
-	Res ResBase `json:"res"`
+	ResBase
 }
 
 const URI_LockUser = "/user/lock"
@@ -62,7 +63,7 @@ type LockUserReq struct {
 }
 
 type LockUserRes struct {
-	Res ResBase `json:"res"`
+	ResBase
 }
 
 const URI_UnlockUser = "/user/unlock"
@@ -72,7 +73,7 @@ type UnlockUserReq struct {
 }
 
 type UnlockUserRes struct {
-	Res ResBase `json:"res"`
+	ResBase
 }
 
 const URI_ModifyInfo = "/user/modify-info"
@@ -87,7 +88,7 @@ type ModifyInfoReq struct {
 }
 
 type ModifyInfoRes struct {
-	Res ResBase `json:"res"`
+	ResBase
 }
 
 const URI_AdjustPermission = "/user/adjust-permission"
@@ -99,7 +100,7 @@ type AdjustPermissionReq struct {
 }
 
 type AdjustPermissionRes struct {
-	Res ResBase `json:"res"`
+	ResBase
 }
 
 const URI_Authenticate = "/user/authenticate"
@@ -110,5 +111,5 @@ type AuthenticateReq struct {
 }
 
 type AuthenticateRes struct {
-	Res ResBase `json:"res"`
+	ResBase
 }
