@@ -18,7 +18,6 @@ func main() {
 
 	models := []interface{}{
 		&model.User{},
-		&model.CloudFile{},
 	}
 
 	// gorm新增记录，如果一组记录中的某一个已经存在，则后续记录不会处理，所以每次更新测试数据时我们会删除表并重建
@@ -36,31 +35,24 @@ func main() {
 
 var defaultUsers = []*model.User{
 	{
-		Name:       "mats0319",
-		Nickname:   "Mario",
-		Password:   "15549caf9adafbe5543a26d51bcadba9029bbe5c871e8f195627a1a5fd77673c",
-		Salt:       "9gIAEwTUge",
-		TotpKey:    "5SSFNNEJUENPCCKP",
-		IsLocked:   false,
-		Permission: 10,
-		Creator:    "",
+		Name:     "mats0319",
+		Nickname: "Mario",
+		Password: "15549caf9adafbe5543a26d51bcadba9029bbe5c871e8f195627a1a5fd77673c",
+		Salt:     "9gIAEwTUge",
+		TotpKey:  "5SSFNNEJUENPCCKP",
+		IsAdmin:  true,
 	}, {
-		Name:       "admin",
-		Nickname:   "admin",
-		Password:   "a797a2163a2186de1d45e633b2e3a58bbb0eb3eb323fac22034fa27c067685cf",
-		Salt:       "HGxHMnVXJS",
-		TotpKey:    "",
-		IsLocked:   false,
-		Permission: 5,
-		Creator:    "",
+		Name:     "admin",
+		Nickname: "admin",
+		Password: "a797a2163a2186de1d45e633b2e3a58bbb0eb3eb323fac22034fa27c067685cf",
+		Salt:     "HGxHMnVXJS",
+		TotpKey:  "",
+		IsAdmin:  true,
 	}, {
-		Name:       "user",
-		Nickname:   "user",
-		Password:   "68ecd7703f2cb36105a51e42947d8cd000e101123b1f07133fe593557ebf1b22",
-		Salt:       "3rWYu5vMNI",
-		TotpKey:    "",
-		IsLocked:   false,
-		Permission: 0,
-		Creator:    "",
+		Name:     "user",
+		Nickname: "user",
+		Password: "68ecd7703f2cb36105a51e42947d8cd000e101123b1f07133fe593557ebf1b22",
+		Salt:     "3rWYu5vMNI",
+		TotpKey:  "",
 	},
 }

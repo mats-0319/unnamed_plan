@@ -56,6 +56,87 @@
         },
         "security": []
       }
+    },
+    "/api/user/list": {
+      "post": {
+        "summary": "list",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "Unnamed-Plan-User-ID",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "{{user_id}}",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Unnamed-Plan-Access-Token",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "{{access_token}}",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "page": {
+                    "type": "object",
+                    "properties": {
+                      "size": {
+                        "type": "number"
+                      },
+                      "num": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "size",
+                      "num"
+                    ]
+                  }
+                },
+                "required": [
+                  "page"
+                ]
+              },
+              "example": {
+                "page": {
+                  "size": 10,
+                  "num": 1
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
     }
   },
   "components": {

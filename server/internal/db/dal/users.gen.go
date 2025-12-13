@@ -37,9 +37,7 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 	_user.Password = field.NewString(tableName, "password")
 	_user.Salt = field.NewString(tableName, "salt")
 	_user.TotpKey = field.NewString(tableName, "totp_key")
-	_user.IsLocked = field.NewBool(tableName, "is_locked")
-	_user.Permission = field.NewUint8(tableName, "permission")
-	_user.Creator = field.NewString(tableName, "creator")
+	_user.IsAdmin = field.NewBool(tableName, "is_admin")
 	_user.LastLogin = field.NewInt64(tableName, "last_login")
 
 	_user.fillFieldMap()
@@ -50,20 +48,18 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 type user struct {
 	userDo userDo
 
-	ALL        field.Asterisk
-	ID         field.Uint
-	CreatedAt  field.Int64
-	UpdatedAt  field.Int64
-	DeletedAt  field.Field
-	Name       field.String
-	Nickname   field.String
-	Password   field.String
-	Salt       field.String
-	TotpKey    field.String
-	IsLocked   field.Bool
-	Permission field.Uint8
-	Creator    field.String
-	LastLogin  field.Int64
+	ALL       field.Asterisk
+	ID        field.Uint
+	CreatedAt field.Int64
+	UpdatedAt field.Int64
+	DeletedAt field.Field
+	Name      field.String
+	Nickname  field.String
+	Password  field.String
+	Salt      field.String
+	TotpKey   field.String
+	IsAdmin   field.Bool
+	LastLogin field.Int64
 
 	fieldMap map[string]field.Expr
 }
@@ -89,9 +85,7 @@ func (u *user) updateTableName(table string) *user {
 	u.Password = field.NewString(table, "password")
 	u.Salt = field.NewString(table, "salt")
 	u.TotpKey = field.NewString(table, "totp_key")
-	u.IsLocked = field.NewBool(table, "is_locked")
-	u.Permission = field.NewUint8(table, "permission")
-	u.Creator = field.NewString(table, "creator")
+	u.IsAdmin = field.NewBool(table, "is_admin")
 	u.LastLogin = field.NewInt64(table, "last_login")
 
 	u.fillFieldMap()
@@ -117,7 +111,7 @@ func (u *user) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (u *user) fillFieldMap() {
-	u.fieldMap = make(map[string]field.Expr, 13)
+	u.fieldMap = make(map[string]field.Expr, 11)
 	u.fieldMap["id"] = u.ID
 	u.fieldMap["created_at"] = u.CreatedAt
 	u.fieldMap["updated_at"] = u.UpdatedAt
@@ -127,9 +121,7 @@ func (u *user) fillFieldMap() {
 	u.fieldMap["password"] = u.Password
 	u.fieldMap["salt"] = u.Salt
 	u.fieldMap["totp_key"] = u.TotpKey
-	u.fieldMap["is_locked"] = u.IsLocked
-	u.fieldMap["permission"] = u.Permission
-	u.fieldMap["creator"] = u.Creator
+	u.fieldMap["is_admin"] = u.IsAdmin
 	u.fieldMap["last_login"] = u.LastLogin
 }
 

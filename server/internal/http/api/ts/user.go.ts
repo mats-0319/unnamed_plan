@@ -1,19 +1,21 @@
 // Generate File, Should Not Edit.
 // Author : mario. github.com/mats0319
 // Code   : github.com/mats0319/study/go/gocts
-// Version: gocts v1.0.0
+// Version: gocts v0.2.0
 
-import { Pagination } from "./common.go"
+import {Pagination} from "./common.go"
 
 export class LoginReq {
     user_name: string = "";
-    password: string = "";
+    password: string = ""; // hex(sha256('text'))
     totp_code: string = "";
 }
 
 export class LoginRes {
+    user_id: number = 0;
+    user_name: string = "";
     nickname: string = "";
-    permission: number = 0;
+    is_admin: boolean = false;
     is_success: boolean = false;
     err: string = "";
 }
@@ -22,34 +24,27 @@ export class User {
     id: number = 0;
     created_at: number = 0;
     updated_at: number = 0;
-    name: string = "";
-    nickname: string = "";
-    totp_key: string = "";
-    is_locked: boolean = false;
-    permission: number = 0;
-    creator: string = "";
-    last_login: number = 0;
+    name: string = ""; // login name
+    nickname: string = ""; // display name
+    totp_key: string = ""; // 允许为空，需要设置后启动
+    last_login: number = 0; // timestamp, unit: milli
 }
 
+// ListUserReq 考虑添加按照字段查询、按照字段排序
 export class ListUserReq {
-    operator: number = 0;
     page: Pagination = new Pagination();
-    see_locked: boolean = false;
 }
 
 export class ListUserRes {
-    user_amount: number = 0;
-    list_amount: number = 0;
+    amount: number = 0; // 符合查询条件的用户总数
     users: Array<User> = new Array<User>();
     is_success: boolean = false;
     err: string = "";
 }
 
 export class CreateUserReq {
-    operator: number = 0;
-    user_name: string = "";
-    password: string = "";
-    permission: number = 0;
+    user_name: string = ""; // nickname is same, user can modify later
+    password: string = ""; // hex(sha256('text')), server generate 'salt' and save it
 }
 
 export class CreateUserRes {
@@ -57,51 +52,21 @@ export class CreateUserRes {
     err: string = "";
 }
 
-export class LockUserReq {
-    operator: number = 0;
-}
-
-export class LockUserRes {
-    is_success: boolean = false;
-    err: string = "";
-}
-
-export class UnlockUserReq {
-    operator: number = 0;
-}
-
-export class UnlockUserRes {
-    is_success: boolean = false;
-    err: string = "";
-}
-
-export class ModifyInfoReq {
-    operator: number = 0;
+// ModifyUserReq 属性字段为空，视为不修改对应字段，有专属的bool变量标识是否修改的字段不适用该默认规则
+// 例如totp key字段，flag为true且key字段为空，视为禁用totp 2fa
+export class ModifyUserReq {
     nickname: string = "";
-    password: string = "";
-    modify_tk_flag: boolean = false;
-    totp_key: string = "";
+    password: string = ""; // hex(sha256('text')), check: can't be same
+    modify_tk_flag: boolean = false; // if modify totp key
+    totp_key: string = ""; // length: 16
 }
 
-export class ModifyInfoRes {
-    is_success: boolean = false;
-    err: string = "";
-}
-
-export class AdjustPermissionReq {
-    operator: number = 0;
-    user_id: number = 0;
-    permission: number = 0;
-}
-
-export class AdjustPermissionRes {
+export class ModifyUserRes {
     is_success: boolean = false;
     err: string = "";
 }
 
 export class AuthenticateReq {
-    user_id: number = 0;
-    password: string = "";
 }
 
 export class AuthenticateRes {

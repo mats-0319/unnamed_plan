@@ -9,3 +9,10 @@ const (
 const (
 	ServerName_User = "user"
 )
+
+const (
+	HttpHeader_UserID      = "Unnamed-Plan-User-ID"
+	HttpHeader_AccessToken = "Unnamed-Plan-Access-Token"
+)
+
+var HttpHeaderList = []string{HttpHeader_UserID, HttpHeader_AccessToken}

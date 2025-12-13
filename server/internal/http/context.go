@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 
+	mconst "github.com/mats0319/unnamed_plan/server/internal/const"
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 )
@@ -13,19 +15,46 @@ type Context struct {
 	Writer  http.ResponseWriter
 	Request *http.Request
 
-	ResData any // allow: errStr/error/struct
+	UserID      uint
+	AccessToken string // 登录成功获得，后续请求均需要在请求头带上该参数
 
-	noResponse bool // forward req will use 'io.copy' instead of 'ctx.response'
+	ResData    any               // allow: errStr/error/struct/[]byte
+	ResHeaders map[string]string // header - value
 }
 
 func NewContext(w http.ResponseWriter, r *http.Request) *Context {
+	userIDStr := r.Header.Get(mconst.HttpHeader_UserID)
+	userID, _ := strconv.Atoi(userIDStr)
+	token := r.Header.Get(mconst.HttpHeader_AccessToken)
+
 	return &Context{
-		Writer:  w,
-		Request: r,
+		Writer:      w,
+		Request:     r,
+		UserID:      uint(userID),
+		AccessToken: token,
+		ResHeaders:  make(map[string]string),
 	}
 }
 
-func (ctx *Context) Bind(obj any) error {
+func (ctx *Context) response() {
+	for header, value := range ctx.ResHeaders {
+		ctx.Writer.Header().Set(header, value)
+	}
+
+	resBytes, err := serializeRes(ctx.ResData)
+	if err != nil {
+		mlog.Log("serialize res failed", mlog.Field("error", err))
+		return
+	}
+
+	_, err = ctx.Writer.Write(resBytes)
+	if err != nil {
+		mlog.Log("response failed", mlog.Field("error", err))
+		return
+	}
+}
+
+func (ctx *Context) ParseParams(obj any) error {
 	bodyBytes, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
 		mlog.Log("read req body failed", mlog.Field("error", err))
@@ -41,41 +70,16 @@ func (ctx *Context) Bind(obj any) error {
 	return nil
 }
 
-func (ctx *Context) response() {
-	if ctx.noResponse {
-		return
-	}
-
-	var obj any
-	switch v := ctx.ResData.(type) {
-	case string:
-		if len(v) > 0 {
-			obj = &api.ResBase{Err: v}
-		}
-	case error:
-		obj = &api.ResBase{Err: v.Error()}
-	default:
-		obj = v
-	}
-
-	jsonBytes, err := json.Marshal(obj)
-	if err != nil {
-		mlog.Log("serialize handlers res to json failed", mlog.Field("error", err))
-	}
-
-	_, err = ctx.Writer.Write(jsonBytes)
-	if err != nil {
-		mlog.Log("handlers res failed", mlog.Field("error", err))
-		return
-	}
-}
-
-func (ctx *Context) Forward(newHost string) error {
-	url := "http://" + newHost + ctx.Request.RequestURI
-	req, err := http.NewRequest("POST", url, ctx.Request.Body)
+func (ctx *Context) Forward(url string, r io.Reader) error {
+	req, err := http.NewRequest("POST", url, r)
 	if err != nil {
 		mlog.Log("new req failed", mlog.Field("error", err))
 		return err
+	}
+
+	for _, header := range mconst.HttpHeaderList { // forward our own http header
+		value := ctx.Request.Header.Get(header)
+		req.Header.Add(header, value)
 	}
 
 	res, err := http.DefaultClient.Do(req)
@@ -87,13 +91,46 @@ func (ctx *Context) Forward(newHost string) error {
 		_ = res.Body.Close()
 	}()
 
-	_, err = io.Copy(ctx.Writer, res.Body)
+	headers := make(map[string]string)
+	for header, value := range res.Header {
+		for _, v := range mconst.HttpHeaderList { // 记录我们自定义的'header'
+			if header == v {
+				headers[header] = value[0]
+			}
+		}
+	}
+
+	// 这里我们希望统一使用ctx.response设置响应头和返回值，所以不使用io.copy直接复制res.body
+	bodyBytes, err := io.ReadAll(res.Body)
 	if err != nil {
-		mlog.Log("return res to web failed", mlog.Field("error", err))
+		mlog.Log("read res body failed", mlog.Field("error", err))
 		return err
 	}
 
-	ctx.noResponse = true
+	ctx.ResHeaders = headers
+	ctx.ResData = bodyBytes
 
 	return nil
+}
+
+func serializeRes(obj any) ([]byte, error) {
+	switch v := obj.(type) {
+	case string: // err str
+		if len(v) > 0 {
+			obj = &api.ResBase{Err: v}
+		}
+	case error:
+		obj = &api.ResBase{Err: v.Error()}
+	case []byte: // forward res, no marshal
+		return v, nil
+	default: // struct
+	}
+
+	jsonBytes, err := json.Marshal(obj)
+	if err != nil {
+		mlog.Log("serialize handlers res to json failed", mlog.Field("error", err))
+		return nil, err
+	}
+
+	return jsonBytes, nil
 }

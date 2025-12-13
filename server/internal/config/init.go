@@ -1,4 +1,4 @@
-package mconf
+package mconfig
 
 import (
 	"encoding/json"
