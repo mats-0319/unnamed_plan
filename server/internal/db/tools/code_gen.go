@@ -14,7 +14,6 @@ func main() {
 
 	g.ApplyBasic(
 		model.User{},
-		model.CloudFile{},
 	)
 
 	g.Execute()

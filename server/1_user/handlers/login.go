@@ -1,12 +1,12 @@
 package handlers
 
 import (
-	"context"
-	"errors"
 	"fmt"
+	"time"
 
-	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
-	"github.com/mats0319/unnamed_plan/server/internal/db/model"
+	"github.com/mats0319/unnamed_plan/server/1_user/db"
+	"github.com/mats0319/unnamed_plan/server/1_user/middleware"
+	mconst "github.com/mats0319/unnamed_plan/server/internal/const"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
@@ -15,14 +15,13 @@ import (
 
 func Login(ctx *mhttp.Context) {
 	req := &api.LoginReq{}
-
-	if err := ctx.Bind(req); err != nil {
-		mlog.Log("bind params failed", mlog.Field("error", err))
+	if err := ctx.ParseParams(req); err != nil {
+		mlog.Log("parse params failed", mlog.Field("error", err))
 		ctx.ResData = err
 		return
 	}
 
-	user, err := getUserByName(req.UserName)
+	user, err := db.GetUser(req.UserName)
 	if err != nil {
 		mlog.Log("get user failed", mlog.Field("error", err))
 		ctx.ResData = err
@@ -42,26 +41,23 @@ func Login(ctx *mhttp.Context) {
 
 	// todo: token use handlers head
 
+	user.LastLogin = time.Now().UnixMilli()
+	if err = db.UpdateUser(user); err != nil {
+		mlog.Log("update user failed", mlog.Field("error", err))
+		ctx.ResData = err
+		return
+	}
+
+	token := string(utils.GenerateRandomBytes(10))
+	middleware.SetToken(user.ID, token)
+
+	ctx.ResHeaders[mconst.HttpHeader_AccessToken] = token
+
 	ctx.ResData = &api.LoginRes{
-		ResBase:    api.ResBase{IsSuccess: true},
-		Nickname:   user.Nickname,
-		Permission: user.Permission,
+		ResBase:  api.ResBase{IsSuccess: true},
+		UserID:   user.ID,
+		UserName: user.Name,
+		Nickname: user.Nickname,
+		IsAdmin:  user.IsAdmin,
 	}
-}
-
-func getUserByName(userName string) (*model.User, error) {
-	qu := dal.Q.User
-	res, err := qu.WithContext(context.TODO()).Where(qu.Name.Eq(userName)).Find()
-	if err != nil {
-		mlog.Log("query user failed", mlog.Field("error", err))
-		return nil, err
-	}
-
-	if len(res) < 1 {
-		str := "no record for user name: " + userName
-		mlog.Log("query user failed", str)
-		return nil, errors.New(str)
-	}
-
-	return res[0], nil
 }

@@ -18,12 +18,16 @@ func newHandler() *mhttp.Handler {
 	h := &mhttp.Handler{}
 
 	register("/api/login", mconst.ServerName_User, h)
+	register("/api/user/list", mconst.ServerName_User, h)
+	register("/api/user/create", mconst.ServerName_User, h)
+	register("/api/user/modify", mconst.ServerName_User, h)
+	register("/api/user/authenticate", mconst.ServerName_User, h)
 
 	return h
 }
 
-func register(uri string, server string, h *mhttp.Handler) {
-	serverNames[uri] = server
+func register(uri string, serverName string, h *mhttp.Handler) {
+	serverNames[uri] = serverName
 	h.AddHandler(uri, forward)
 }
 
@@ -39,13 +43,15 @@ func forward(ctx *mhttp.Context) {
 
 	if !ok || len(newHost) < 1 {
 		str := fmt.Sprintf("unknown req uri or server name: %s, %s", uri, v)
-		mlog.Log("no valid server", str)
+		mlog.Log("get server failed", str)
 		ctx.ResData = str
 		return
 	}
 
-	if err := ctx.Forward(newHost); err != nil {
-		mlog.Log("forward handlers req failed", mlog.Field("error", err))
+	url := "http://" + newHost + uri
+	err := ctx.Forward(url, ctx.Request.Body)
+	if err != nil {
+		mlog.Log("forward http req failed", mlog.Field("error", err))
 		ctx.ResData = err
 		return
 	}

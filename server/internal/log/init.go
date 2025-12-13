@@ -1,11 +1,12 @@
 package mlog
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
 
-	mconf "github.com/mats0319/unnamed_plan/server/internal/config"
+	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -39,6 +40,28 @@ func init() {
 	Log("> Log init.")
 }
 
+func Field(msg string, value any) string {
+	res := ""
+
+	switch v := value.(type) {
+	case error:
+		res = fmt.Sprintf("%s - %s", msg, v.Error())
+	case string:
+		res = fmt.Sprintf("%s: %s", msg, v)
+	case bool:
+		res = fmt.Sprintf("%s: %t", msg, v)
+	case float32, float64:
+		res = fmt.Sprintf("%s: %.2f", msg, value)
+	case int, int8, int16, int32, int64,
+		uint, uint8, uint16, uint32, uint64:
+		res = fmt.Sprintf("%s: %d", msg, v)
+	default: // regard as struct
+		res = fmt.Sprintf("%s. type: %T, value: %+v", msg, value, value)
+	}
+
+	return res
+}
+
 func logWriteSyncer() (zapcore.WriteSyncer, error) {
 	file, err := os.OpenFile("log.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
@@ -70,7 +93,7 @@ func logEncoder() zapcore.Encoder {
 
 func logLevel() zapcore.Level {
 	var level zapcore.Level
-	switch mconf.GetLevel() {
+	switch mconfig.GetLevel() {
 	case "dev":
 		level = zap.DebugLevel
 	// maybe more levels?

@@ -17,20 +17,8 @@
           "uri": "/user/create"
         },
         {
-          "name": "LockUser",
-          "uri": "/user/lock"
-        },
-        {
-          "name": "UnlockUser",
-          "uri": "/user/unlock"
-        },
-        {
-          "name": "ModifyInfo",
-          "uri": "/user/modify-info"
-        },
-        {
-          "name": "AdjustPermission",
-          "uri": "/user/adjust-permission"
+          "name": "ModifyUser",
+          "uri": "/user/modify"
         },
         {
           "name": "Authenticate",

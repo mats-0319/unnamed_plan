@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	mconf "github.com/mats0319/unnamed_plan/server/internal/config"
+	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
 	mconst "github.com/mats0319/unnamed_plan/server/internal/const"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
@@ -20,13 +20,13 @@ type config struct {
 }
 
 func init() {
-	conf, err := getDBConfig()
+	configIns, err := getDBConfig()
 	if err != nil {
 		mlog.Log("get db config failed", mlog.Field("error", err))
 		os.Exit(1)
 	}
 
-	db, err := gorm.Open(postgres.Open(conf.DSN), &gorm.Config{
+	db, err := gorm.Open(postgres.Open(configIns.DSN), &gorm.Config{
 		Logger:                 logger.Default.LogMode(logger.Silent),
 		SkipDefaultTransaction: true,
 	})
@@ -41,8 +41,8 @@ func init() {
 		os.Exit(1)
 	}
 
-	sqlDB.SetMaxIdleConns(conf.MaxIdleConns)
-	sqlDB.SetMaxOpenConns(conf.MaxOpenConns)
+	sqlDB.SetMaxIdleConns(configIns.MaxIdleConns)
+	sqlDB.SetMaxOpenConns(configIns.MaxOpenConns)
 
 	dal.SetDefault(db)
 
@@ -50,7 +50,7 @@ func init() {
 }
 
 func getDBConfig() (*config, error) {
-	bytes := mconf.GetConfigItem(mconst.UID_DB)
+	bytes := mconfig.GetConfigItem(mconst.UID_DB)
 
 	conf := &config{}
 	if err := json.Unmarshal(bytes, conf); err != nil {
