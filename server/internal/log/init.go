@@ -13,16 +13,6 @@ import (
 
 var zLog *zap.Logger
 
-// Log todo: optimize - log level check
-func Log(msg string, fields ...string) {
-	fs := make([]zap.Field, len(fields))
-	for i := range fields {
-		fs[i] = zap.String("", fields[i])
-	}
-
-	zLog.Info(msg, fs...)
-}
-
 func init() {
 	ws, err := logWriteSyncer()
 	if err != nil {
@@ -34,10 +24,19 @@ func init() {
 	coreSlice = append(coreSlice, zapcore.NewCore(logEncoder(), os.Stdout, logLevel()))
 
 	core := zapcore.NewTee(coreSlice...)
-	zLog = zap.New(core, zap.AddCaller())
+	zLog = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 
 	Log("> Config init.")
 	Log("> Log init.")
+}
+
+func Log(msg string, fields ...string) {
+	fs := make([]zap.Field, len(fields))
+	for i := range fields {
+		fs[i] = zap.String("", fields[i])
+	}
+
+	zLog.Info(msg, fs...)
 }
 
 func Field(msg string, value any) string {

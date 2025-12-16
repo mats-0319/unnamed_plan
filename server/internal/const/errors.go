@@ -1,39 +1,38 @@
 package mconst
 
-import (
-	"fmt"
-)
-
-type Error struct {
-	Typ    ErrorType
-	Detail ErrorDetail
-	Params string
-}
-
-func NewError(typ ErrorType, detail ErrorDetail, params string) error {
-	return &Error{
-		Typ:    typ,
-		Detail: detail,
-		Params: params,
-	}
-}
-
-func (e *Error) Error() string {
-	return fmt.Sprintf("error type: %s, detail: %s, param(s): %s", e.Typ, e.Detail, e.Params)
-}
-
 type ErrorType string
 
 const (
-	ET_InitError           ErrorType = "Init Error"
-	ET_ServerInternalError ErrorType = "Server Internal Error" // 程序内部逻辑错误
+	ET_ServerInternalError ErrorType = "Server Internal Error"
 	ET_DBError             ErrorType = "DB Error"
-	ET_HttpError           ErrorType = "Http Error"
+	ET_ParamsError         ErrorType = "Params Error"
 )
 
 type ErrorDetail string
 
 const (
-	ED_UnsupportedURI ErrorDetail = "Unsupported Request URI"
-	ED_ExecMiddleware ErrorDetail = "Exec Middleware Failed"
+	// normal
+	ED_UnsupportedURI         ErrorDetail = "Unsupported Request URI"
+	ED_UnknownURIOrServerName ErrorDetail = "Unknown URI or Server Name"
+	ED_InvalidHttpRequest     ErrorDetail = "Invalid Http Request"
+	ED_HttpInvoke             ErrorDetail = "Http Invoke Failed"
+	ED_IORead                 ErrorDetail = "IO Read Failed"
+	ED_JsonMarshal            ErrorDetail = "Json Marshal Failed"
+	ED_JsonUnmarshal          ErrorDetail = "Json Unmarshal Failed"
+
+	// business
+	ED_NeedAdmin       ErrorDetail = "Need Admin"
+	ED_InvalidPwd      ErrorDetail = "Invalid User Name or Password"
+	ED_InvalidTotpCode ErrorDetail = "Invalid Totp Code"
+	ED_Base32Decode    ErrorDetail = "Base32 Decode Failed"
+	ED_InvalidTotpKey  ErrorDetail = "Invalid Totp Key"
+	ED_SamePwd         ErrorDetail = "Can't User Same Password When Re-set"
+
+	// middleware
+	ED_InvalidUserIDOrToken ErrorDetail = "Invalid User ID or Token"
+	ED_TokenExpired         ErrorDetail = "Token Expired"
+
+	// db
+	ED_Operate         ErrorDetail = "Operate Failed"
+	ED_DuplicateCreate ErrorDetail = "Duplicate Create"
 )

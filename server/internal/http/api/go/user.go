@@ -35,8 +35,9 @@ type ListUserReq struct {
 
 type ListUserRes struct {
 	ResBase
-	Amount int64   `json:"amount"` // 符合查询条件的用户总数
-	Users  []*User `json:"users"`
+	Amount int64      `json:"amount"` // 符合查询条件的用户总数
+	Page   Pagination `json:"page"`
+	Users  []*User    `json:"users"`
 }
 
 const URI_CreateUser = "/user/create"

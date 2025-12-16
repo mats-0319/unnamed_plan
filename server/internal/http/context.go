@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	mconst "github.com/mats0319/unnamed_plan/server/internal/const"
+	. "github.com/mats0319/unnamed_plan/server/internal/const"
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 )
@@ -23,9 +23,9 @@ type Context struct {
 }
 
 func NewContext(w http.ResponseWriter, r *http.Request) *Context {
-	userIDStr := r.Header.Get(mconst.HttpHeader_UserID)
+	userIDStr := r.Header.Get(HttpHeader_UserID)
 	userID, _ := strconv.Atoi(userIDStr)
-	token := r.Header.Get(mconst.HttpHeader_AccessToken)
+	token := r.Header.Get(HttpHeader_AccessToken)
 
 	return &Context{
 		Writer:      w,
@@ -54,38 +54,45 @@ func (ctx *Context) response() {
 	}
 }
 
-func (ctx *Context) ParseParams(obj any) error {
+func (ctx *Context) ParseParams(obj any) bool {
 	bodyBytes, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
-		mlog.Log("read req body failed", mlog.Field("error", err))
-		return err
+		e := NewError(ET_ServerInternalError, ED_IORead).WithCause(err)
+		mlog.Log(e.String())
+		ctx.ResData = e
+		return false
 	}
 
 	err = json.Unmarshal(bodyBytes, obj)
 	if err != nil {
-		mlog.Log("parse req body failed", mlog.Field("error", err))
-		return err
+		e := NewError(ET_ParamsError, ED_JsonUnmarshal).WithCause(err)
+		mlog.Log(e.String())
+		ctx.ResData = e
+		return false
 	}
 
-	return nil
+	return true
 }
 
-func (ctx *Context) Forward(url string, r io.Reader) error {
+func (ctx *Context) Forward(url string, r io.Reader) {
 	req, err := http.NewRequest("POST", url, r)
 	if err != nil {
-		mlog.Log("new req failed", mlog.Field("error", err))
-		return err
+		e := NewError(ET_ServerInternalError, ED_InvalidHttpRequest).WithCause(err)
+		mlog.Log(e.String())
+		ctx.ResData = e
+		return
 	}
 
-	for _, header := range mconst.HttpHeaderList { // forward our own http header
+	for _, header := range HttpHeaderList { // forward our own http header
 		value := ctx.Request.Header.Get(header)
 		req.Header.Add(header, value)
 	}
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		mlog.Log("handlers invoke failed", mlog.Field("error", err))
-		return err
+		e := NewError(ET_ServerInternalError, ED_HttpInvoke).WithCause(err)
+		mlog.Log(e.String())
+		return
 	}
 	defer func() {
 		_ = res.Body.Close()
@@ -93,7 +100,7 @@ func (ctx *Context) Forward(url string, r io.Reader) error {
 
 	headers := make(map[string]string)
 	for header, value := range res.Header {
-		for _, v := range mconst.HttpHeaderList { // 记录我们自定义的'header'
+		for _, v := range HttpHeaderList { // 记录我们自定义的'header'
 			if header == v {
 				headers[header] = value[0]
 			}
@@ -103,14 +110,15 @@ func (ctx *Context) Forward(url string, r io.Reader) error {
 	// 这里我们希望统一使用ctx.response设置响应头和返回值，所以不使用io.copy直接复制res.body
 	bodyBytes, err := io.ReadAll(res.Body)
 	if err != nil {
-		mlog.Log("read res body failed", mlog.Field("error", err))
-		return err
+		e := NewError(ET_ServerInternalError, ED_IORead).WithCause(err)
+		mlog.Log(e.String())
+		return
 	}
 
 	ctx.ResHeaders = headers
 	ctx.ResData = bodyBytes
 
-	return nil
+	return
 }
 
 func serializeRes(obj any) ([]byte, error) {

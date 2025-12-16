@@ -15,8 +15,8 @@ func newHandler() *mhttp.Handler {
 	h := &mhttp.Handler{}
 
 	h.AddHandler("/api/login", handlers.Login)
+	h.AddHandler("/api/user/create", handlers.CreateUser)
 	h.AddHandler("/api/user/list", handlers.ListUser, middleware.VerifyToken)
-	h.AddHandler("/api/user/create", handlers.CreateUser, middleware.VerifyToken)
 	h.AddHandler("/api/user/modify", handlers.ModifyUser, middleware.VerifyToken)
 	h.AddHandler("/api/user/authenticate", handlers.Authenticate, middleware.VerifyToken)
 
