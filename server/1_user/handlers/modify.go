@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"encoding/base32"
+
 	"github.com/mats0319/unnamed_plan/server/1_user/db"
+	. "github.com/mats0319/unnamed_plan/server/internal/const"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
@@ -10,15 +13,12 @@ import (
 
 func ModifyUser(ctx *mhttp.Context) {
 	req := &api.ModifyUserReq{}
-	if err := ctx.ParseParams(req); err != nil {
-		mlog.Log("parse params failed", mlog.Field("error", err))
-		ctx.ResData = err
+	if !ctx.ParseParams(req) {
 		return
 	}
 
 	operator, err := db.GetUser(ctx.UserID)
 	if err != nil {
-		mlog.Log("get user failed", mlog.Field("error", err))
 		ctx.ResData = err
 		return
 	}
@@ -27,21 +27,30 @@ func ModifyUser(ctx *mhttp.Context) {
 		operator.Nickname = req.Nickname
 	}
 	if len(req.Password) > 0 {
-		if utils.CalcSHA256(req.Password+operator.Salt) == operator.Password {
-			mlog.Log("new password can't be same with the old")
-			ctx.ResData = "try to reset same password"
+		newPassword := utils.CalcSHA256(req.Password, operator.Salt)
+		if newPassword == operator.Password {
+			e := NewError(ET_ParamsError, ED_SamePwd)
+			mlog.Log(e.String())
+			ctx.ResData = e
 			return
 		}
 
-		operator.Password = req.Password
+		operator.Password = newPassword
 	}
 	if req.ModifyTkFlag {
+		bytes, err := base32.StdEncoding.DecodeString(req.TotpKey)
+		if err != nil || len(bytes) > 10 {
+			e := NewError(ET_ParamsError, ED_InvalidTotpKey).WithParam("totp key", req.TotpKey).WithCause(err)
+			mlog.Log(e.String())
+			ctx.ResData = e
+			return
+		}
+
 		operator.TotpKey = req.TotpKey
 	}
 
 	err = db.UpdateUser(operator)
 	if err != nil {
-		mlog.Log("update user failed", mlog.Field("error", err))
 		ctx.ResData = err
 		return
 	}

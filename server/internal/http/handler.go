@@ -23,38 +23,33 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	writer.Header().Set("Access-Control-Allow-Headers", "*")
 	writer.Header().Set("Access-Control-Expose-Headers", "*")
 
-	mlog.Log(fmt.Sprintf("| %s | %s |", time.Now().String(), request.URL.String()))
-	// todo: log res
+	mlog.Log(fmt.Sprintf("| %s | %s |", request.URL.String(), time.Now().String()))
 
 	ctx := NewContext(writer, request)
+	defer ctx.response()
 
 	if ctx.Request.Method != http.MethodPost { // only accept 'post' req
-		ctx.response()
 		return
 	}
 
 	handlerItemIns, ok := h.handlers[request.RequestURI]
 	if !ok {
-		ctx.ResData = NewError(ET_ServerInternalError, ED_UnsupportedURI, request.RequestURI)
-		mlog.Log("get handler failed", mlog.Field("error", ctx.ResData))
-		ctx.response()
+		err := NewError(ET_ServerInternalError, ED_UnsupportedURI).WithParam("uri", request.RequestURI)
+		mlog.Log(err.String())
+		ctx.ResData = err
 		return
 	}
 
 	// middlewares
 	for i := range handlerItemIns.Middlewares {
 		err := handlerItemIns.Middlewares[i](ctx)
-		if err != nil {
-			ctx.ResData = NewError(ET_ServerInternalError, ED_ExecMiddleware, err.Error())
-			mlog.Log("exec middleware failed", mlog.Field("error", ctx.ResData))
-			ctx.response()
+		if err != nil { // log in middleware
+			ctx.ResData = err
 			return
 		}
 	}
 
 	handlerItemIns.Func(ctx)
-
-	ctx.response()
 }
 
 func (h *Handler) AddHandler(uri string, handlerFunc func(ctx *Context), middlewares ...func(ctx *Context) error) {

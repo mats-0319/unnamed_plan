@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"errors"
 	"time"
 
+	. "github.com/mats0319/unnamed_plan/server/internal/const"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
+	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 )
 
 type accessToken struct {
@@ -24,11 +25,16 @@ func SetToken(id uint, token string) {
 func VerifyToken(ctx *mhttp.Context) error {
 	t, ok := accessTokens[ctx.UserID]
 	if !ok || t.Token != ctx.AccessToken {
-		return errors.New("invalid user id or token")
+		err := NewError(ET_ServerInternalError, ED_InvalidUserIDOrToken).
+			WithParam("user id", ctx.UserID).WithParam("token", ctx.AccessToken)
+		mlog.Log(err.String())
+		return err
 	}
 
 	if t.ExpireTime < time.Now().UnixMilli() {
-		return errors.New("token expired")
+		err := NewError(ET_ServerInternalError, ED_TokenExpired).WithParam("expire time", t.ExpireTime)
+		mlog.Log(err.String())
+		return err
 	}
 
 	return nil
