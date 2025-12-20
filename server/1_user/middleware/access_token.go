@@ -25,14 +25,14 @@ func SetToken(id uint, token string) {
 func VerifyToken(ctx *mhttp.Context) error {
 	t, ok := accessTokens[ctx.UserID]
 	if !ok || t.Token != ctx.AccessToken {
-		err := NewError(ET_ServerInternalError, ED_InvalidUserIDOrToken).
+		err := NewError(ET_AuthenticateError, ED_InvalidUserIDOrToken).
 			WithParam("user id", ctx.UserID).WithParam("token", ctx.AccessToken)
 		mlog.Log(err.String())
 		return err
 	}
 
 	if t.ExpireTime < time.Now().UnixMilli() {
-		err := NewError(ET_ServerInternalError, ED_TokenExpired).WithParam("expire time", t.ExpireTime)
+		err := NewError(ET_AuthenticateError, ED_TokenExpired).WithParam("expire time", t.ExpireTime)
 		mlog.Log(err.String())
 		return err
 	}

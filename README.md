@@ -12,7 +12,7 @@
 主要技术：
 - go 1.25
 - vue3 (html+ts+less)
-- node xx
+- node 24 (pnpm)
 
 ## 使用
 

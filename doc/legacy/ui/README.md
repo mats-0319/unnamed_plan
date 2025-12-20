@@ -1,0 +1,14 @@
+# ui
+
+recommend: 
+1. node: 24 pnpm
+
+base: vue3+vite
+
+style: element plus
+
+others: 
+1. vue-router
+2. vuex
+3. less
+4. axios

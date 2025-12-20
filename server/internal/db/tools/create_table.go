@@ -31,6 +31,8 @@ func main() {
 	}
 
 	db.Create(defaultUsers)
+
+	log.Println("Create table and pre-set data done.")
 }
 
 var defaultUsers = []*model.User{

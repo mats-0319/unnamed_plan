@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/mats0319/unnamed_plan/server/1_user/db"
+	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
@@ -24,7 +24,7 @@ func CreateUser(ctx *mhttp.Context) {
 		Salt:     salt,
 	}
 
-	err := db.CreateUser(user)
+	err := dal.CreateUser(user)
 	if err != nil {
 		ctx.ResData = err
 		return

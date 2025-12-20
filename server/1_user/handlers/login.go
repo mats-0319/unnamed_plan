@@ -6,11 +6,12 @@ import (
 	"encoding/base32"
 	"fmt"
 	"math"
+	"strconv"
 	"time"
 
-	"github.com/mats0319/unnamed_plan/server/1_user/db"
 	"github.com/mats0319/unnamed_plan/server/1_user/middleware"
 	. "github.com/mats0319/unnamed_plan/server/internal/const"
+	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
@@ -23,7 +24,7 @@ func Login(ctx *mhttp.Context) {
 		return
 	}
 
-	user, err := db.GetUser(req.UserName)
+	user, err := dal.GetUser(req.UserName)
 	if err != nil {
 		ctx.ResData = err
 		return
@@ -45,7 +46,7 @@ func Login(ctx *mhttp.Context) {
 	}
 
 	user.LastLogin = time.Now().UnixMilli()
-	if err = db.UpdateUser(user); err != nil {
+	if err = dal.UpdateUser(user); err != nil {
 		mlog.Log("update user failed", mlog.Field("error", err))
 		ctx.ResData = err
 		return
@@ -55,6 +56,7 @@ func Login(ctx *mhttp.Context) {
 	token := string(utils.GenerateRandomBytes(10))
 	middleware.SetToken(user.ID, token)
 
+	ctx.ResHeaders[HttpHeader_UserID] = strconv.Itoa(int(user.ID))
 	ctx.ResHeaders[HttpHeader_AccessToken] = token
 
 	ctx.ResData = &api.LoginRes{
@@ -100,7 +102,7 @@ func verifyTotpCode(code string, totpKey string) error {
 	}
 
 	if !existFlag {
-		e := NewError(ET_ParamsError, ED_InvalidTotpKey).WithParam("code", code)
+		e := NewError(ET_ParamsError, ED_InvalidTotpCode).WithParam("code", code)
 		mlog.Log(e.String())
 		return e
 	}

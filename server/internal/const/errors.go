@@ -6,6 +6,7 @@ const (
 	ET_ServerInternalError ErrorType = "Server Internal Error"
 	ET_DBError             ErrorType = "DB Error"
 	ET_ParamsError         ErrorType = "Params Error"
+	ET_AuthenticateError   ErrorType = "Authentication Error"
 )
 
 type ErrorDetail string
@@ -33,6 +34,6 @@ const (
 	ED_TokenExpired         ErrorDetail = "Token Expired"
 
 	// db
-	ED_Operate         ErrorDetail = "Operate Failed"
-	ED_DuplicateCreate ErrorDetail = "Duplicate Create"
+	ED_Operate         ErrorDetail = "DB Operate Failed"
+	ED_DuplicateCreate ErrorDetail = "User Already Exist"
 )

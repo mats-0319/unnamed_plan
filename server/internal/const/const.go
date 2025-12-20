@@ -11,7 +11,7 @@ const (
 )
 
 const (
-	HttpHeader_UserID      = "Unnamed-Plan-User-ID"
+	HttpHeader_UserID      = "Unnamed-Plan-User-Id"
 	HttpHeader_AccessToken = "Unnamed-Plan-Access-Token"
 )
 

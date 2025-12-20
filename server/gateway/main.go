@@ -3,6 +3,7 @@ package main
 import (
 	. "github.com/mats0319/unnamed_plan/server/internal/const"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
+	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 )
 
@@ -15,11 +16,11 @@ func main() {
 func newHandler() *mhttp.Handler {
 	h := &mhttp.Handler{}
 
-	register("/api/login", ServerName_User, h)
-	register("/api/user/list", ServerName_User, h)
-	register("/api/user/create", ServerName_User, h)
-	register("/api/user/modify", ServerName_User, h)
-	register("/api/user/authenticate", ServerName_User, h)
+	register("/api"+api.URI_Login, ServerName_User, h)
+	register("/api"+api.URI_CreateUser, ServerName_User, h)
+	register("/api"+api.URI_ListUser, ServerName_User, h)
+	register("/api"+api.URI_ModifyUser, ServerName_User, h)
+	register("/api"+api.URI_Authenticate, ServerName_User, h)
 
 	return h
 }

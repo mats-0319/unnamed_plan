@@ -103,6 +103,7 @@ func (ctx *Context) Forward(url string, r io.Reader) {
 		for _, v := range HttpHeaderList { // 记录我们自定义的'header'
 			if header == v {
 				headers[header] = value[0]
+				break
 			}
 		}
 	}

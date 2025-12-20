@@ -18,7 +18,7 @@ var _ error = (*Error)(nil)
 
 func NewError(typ ErrorType, detail ErrorDetail) *Error {
 	var stack [32]uintptr
-	n := runtime.Callers(2, stack[:]) // skip 'caller' and 'new'
+	n := runtime.Callers(2, stack[:]) // skip 'runtime.caller' and 'NewError'
 
 	return &Error{
 		Typ:    typ,
@@ -42,7 +42,7 @@ func (e *Error) String() string {
 
 	paramStr := ""
 	if len(e.Params) > 0 {
-		paramStr = fmt.Sprintf("params: %+v\n", e.Params)
+		paramStr = fmt.Sprintf(", params: %+v\n", e.Params)
 	}
 
 	return fmt.Sprintf("error type: %s, detail: %s%s%sstack trace: %s\n",
