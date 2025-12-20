@@ -3,8 +3,8 @@ package handlers
 import (
 	"encoding/base32"
 
-	"github.com/mats0319/unnamed_plan/server/1_user/db"
 	. "github.com/mats0319/unnamed_plan/server/internal/const"
+	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
@@ -17,7 +17,7 @@ func ModifyUser(ctx *mhttp.Context) {
 		return
 	}
 
-	operator, err := db.GetUser(ctx.UserID)
+	operator, err := dal.GetUser(ctx.UserID)
 	if err != nil {
 		ctx.ResData = err
 		return
@@ -49,7 +49,7 @@ func ModifyUser(ctx *mhttp.Context) {
 		operator.TotpKey = req.TotpKey
 	}
 
-	err = db.UpdateUser(operator)
+	err = dal.UpdateUser(operator)
 	if err != nil {
 		ctx.ResData = err
 		return
