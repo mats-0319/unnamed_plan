@@ -16,13 +16,18 @@ type Error struct {
 
 var _ error = (*Error)(nil)
 
-func NewError(typ ErrorType, detail ErrorDetail) *Error {
+func NewError(typ ErrorType, detail ...ErrorDetail) *Error {
+	errDetail := ED_Empty
+	if len(detail) > 0 {
+		errDetail = detail[0]
+	}
+
 	var stack [32]uintptr
 	n := runtime.Callers(2, stack[:]) // skip 'runtime.caller' and 'NewError'
 
 	return &Error{
 		Typ:    typ,
-		Detail: detail,
+		Detail: errDetail,
 		Params: make(map[string]any),
 		Stack:  stack[:n],
 	}
@@ -30,23 +35,33 @@ func NewError(typ ErrorType, detail ErrorDetail) *Error {
 
 // Error simple return to web
 func (e *Error) Error() string {
-	return fmt.Sprintf("error type: %s, detail: %s", e.Typ, e.Detail)
+	detailStr := ""
+	if len(e.Detail) > 0 {
+		detailStr = fmt.Sprintf(", detail: %s", e.Detail)
+	}
+
+	return fmt.Sprintf("error type: %s%s", e.Typ, detailStr)
 }
 
 // String print all details, use in dev
 func (e *Error) String() string {
+	detailStr := ""
+	if len(e.Detail) > 0 {
+		detailStr = fmt.Sprintf(", detail: %s", e.Detail)
+	}
+
 	errStr := ""
 	if e.Cause != nil {
-		errStr = fmt.Sprintf(", err: %v\n", e.Cause)
+		errStr = fmt.Sprintf("\nerr: %v", e.Cause)
 	}
 
 	paramStr := ""
 	if len(e.Params) > 0 {
-		paramStr = fmt.Sprintf(", params: %+v\n", e.Params)
+		paramStr = fmt.Sprintf("\nparams: %#v", e.Params)
 	}
 
-	return fmt.Sprintf("error type: %s, detail: %s%s%sstack trace: %s\n",
-		e.Typ, e.Detail, errStr, paramStr, e.stackTrace())
+	return fmt.Sprintf("error type: %s%s%s%s\nstack trace: \n%s\n",
+		e.Typ, detailStr, errStr, paramStr, e.stackTrace())
 }
 
 func (e *Error) WithCause(err error) *Error {

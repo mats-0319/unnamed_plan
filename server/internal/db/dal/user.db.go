@@ -24,7 +24,7 @@ func GetUser[T uint | string](value T) (*model.User, error) {
 
 	res, err := sql.First()
 	if err != nil {
-		e := NewError(ET_DBError, ED_Operate).WithCause(err)
+		e := NewError(ET_ServerInternalError).WithCause(err)
 		mlog.Log(e.String())
 		return nil, e
 	}
@@ -37,9 +37,9 @@ func CreateUser(user *model.User) error {
 	if err != nil {
 		var e *Error
 		if strings.Contains(err.Error(), "violates unique constraint") {
-			e = NewError(ET_DBError, ED_DuplicateCreate).WithCause(err)
+			e = NewError(ET_ParamsError, ED_UserExist).WithCause(err)
 		} else {
-			e = NewError(ET_DBError, ED_Operate).WithCause(err)
+			e = NewError(ET_ServerInternalError).WithCause(err)
 		}
 
 		mlog.Log(e.String())
@@ -53,7 +53,7 @@ func UpdateUser(user *model.User) error {
 	qu := Q.User
 	err := qu.WithContext(context.TODO()).Where(qu.ID.Eq(user.ID)).Save(user)
 	if err != nil {
-		e := NewError(ET_DBError, ED_Operate).WithCause(err)
+		e := NewError(ET_ServerInternalError).WithCause(err)
 		mlog.Log(e.String())
 		return e
 	}
@@ -67,14 +67,14 @@ func ListUsers(page api.Pagination) (int64, []*model.User, error) {
 
 	amount, err := sql.Count()
 	if err != nil {
-		e := NewError(ET_DBError, ED_Operate).WithCause(err)
+		e := NewError(ET_ServerInternalError).WithCause(err)
 		mlog.Log(e.String())
 		return 0, nil, err
 	}
 
 	res, err := sql.Order(qu.LastLogin.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
 	if err != nil {
-		e := NewError(ET_DBError, ED_Operate).WithCause(err)
+		e := NewError(ET_ServerInternalError).WithCause(err)
 		mlog.Log(e.String())
 		return 0, nil, err
 	}

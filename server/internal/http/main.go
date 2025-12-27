@@ -11,19 +11,21 @@ import (
 )
 
 type config struct {
-	Port string `json:"port"`
+	Port           string   `json:"port"`
+	AllowedOrigins []string `json:"allowed_origins"`
 }
 
 // StartServer is blocked
 func StartServer(handler *Handler) {
-	configIns := getConfig()
+	handler.config = getConfig()
 
 	handler.supportedUri()
 
-	addr := "127.0.0.1:" + configIns.Port
+	addr := "127.0.0.1:" + handler.config.Port
 	mlog.Log("> Listening at: " + addr)
 
-	if err := http.ListenAndServe(addr, handler); err != nil {
+	err := http.ListenAndServe(addr, handler)
+	if err != nil {
 		log.Fatalln("handlers listen and serve failed", err)
 	}
 }

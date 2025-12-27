@@ -5,6 +5,8 @@ import (
 	"encoding/hex"
 	"math/rand/v2"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 // CalcSHA256 calc sha256('text'[+'extension'])
@@ -44,4 +46,15 @@ func GenerateRandomBytes(length int) []byte {
 	}
 
 	return b
+}
+
+// Uuid return uuid v4 string,
+// with same 'data', it will return same string,
+// without 'data', it will return random string.
+func Uuid[T string | []byte](data ...T) string {
+	if len(data) < 1 {
+		return uuid.NewString()
+	}
+
+	return uuid.NewHash(sha256.New(), uuid.Nil, []byte(data[0]), 4).String()
 }

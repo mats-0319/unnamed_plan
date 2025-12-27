@@ -34,9 +34,9 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import("@/views/personal_center/modify_user.vue"),
             },
             {
-                path: "create-note",
-                name: "pCreateNote",
-                component: () => import("@/views/personal_center/create_note.vue"),
+                path: "note",
+                name: "pNote",
+                component: ()=>import("@/views/personal_center/my_note.vue"),
             }
         ]
     },

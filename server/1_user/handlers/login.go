@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/mats0319/unnamed_plan/server/1_user/middleware"
 	. "github.com/mats0319/unnamed_plan/server/internal/const"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
@@ -46,21 +45,19 @@ func Login(ctx *mhttp.Context) {
 	}
 
 	user.LastLogin = time.Now().UnixMilli()
-	if err = dal.UpdateUser(user); err != nil {
-		mlog.Log("update user failed", mlog.Field("error", err))
+
+	err = dal.UpdateUser(user)
+	if err != nil {
 		ctx.ResData = err
 		return
 	}
 
 	// token
-	token := string(utils.GenerateRandomBytes(10))
-	middleware.SetToken(user.ID, token)
-
 	ctx.ResHeaders[HttpHeader_UserID] = strconv.Itoa(int(user.ID))
-	ctx.ResHeaders[HttpHeader_AccessToken] = token
+	ctx.ResHeaders[HttpHeader_AccessToken] = string(utils.GenerateRandomBytes(10))
 
 	ctx.ResData = &api.LoginRes{
-		ResBase:  api.ResBase{IsSuccess: true},
+		ResBase:  api.ResBaseSuccess,
 		UserID:   user.ID,
 		UserName: user.UserName,
 		Nickname: user.Nickname,
@@ -79,7 +76,7 @@ func verifyTotpCode(code string, totpKey string) error {
 	key := make([]byte, 10)
 	n, err := base32.StdEncoding.Decode(key, []byte(totpKey))
 	if err != nil {
-		e := NewError(ET_ParamsError, ED_Base32Decode).WithCause(err)
+		e := NewError(ET_ServerInternalError).WithCause(err)
 		mlog.Log(e.String())
 		return e
 	}

@@ -18,8 +18,8 @@ type Context struct {
 	UserID      uint
 	AccessToken string // 登录成功获得，后续请求均需要在请求头带上该参数
 
-	ResData    any               // allow: errStr/error/struct/[]byte
 	ResHeaders map[string]string // header - value
+	ResData    any               // allow: errStr/error/struct/[]byte
 }
 
 func NewContext(w http.ResponseWriter, r *http.Request) *Context {
@@ -36,28 +36,17 @@ func NewContext(w http.ResponseWriter, r *http.Request) *Context {
 	}
 }
 
-func (ctx *Context) response() {
-	for header, value := range ctx.ResHeaders {
-		ctx.Writer.Header().Set(header, value)
+func (ctx *Context) ParseParams(obj any, r ...io.Reader) bool {
+	var reader io.Reader
+	if len(r) > 0 {
+		reader = r[0]
+	} else {
+		reader = ctx.Request.Body
 	}
 
-	resBytes, err := serializeRes(ctx.ResData)
+	bodyBytes, err := io.ReadAll(reader)
 	if err != nil {
-		mlog.Log("serialize res failed", mlog.Field("error", err))
-		return
-	}
-
-	_, err = ctx.Writer.Write(resBytes)
-	if err != nil {
-		mlog.Log("response failed", mlog.Field("error", err))
-		return
-	}
-}
-
-func (ctx *Context) ParseParams(obj any) bool {
-	bodyBytes, err := io.ReadAll(ctx.Request.Body)
-	if err != nil {
-		e := NewError(ET_ServerInternalError, ED_IORead).WithCause(err)
+		e := NewError(ET_ServerInternalError).WithCause(err)
 		mlog.Log(e.String())
 		ctx.ResData = e
 		return false
@@ -74,72 +63,51 @@ func (ctx *Context) ParseParams(obj any) bool {
 	return true
 }
 
-func (ctx *Context) Forward(url string, r io.Reader) {
-	req, err := http.NewRequest("POST", url, r)
+func (ctx *Context) response() {
+	for header, value := range ctx.ResHeaders {
+		ctx.Writer.Header().Set(header, value)
+	}
+
+	code, resBytes, err := serializeRes(ctx.ResData)
 	if err != nil {
-		e := NewError(ET_ServerInternalError, ED_InvalidHttpRequest).WithCause(err)
-		mlog.Log(e.String())
-		ctx.ResData = e
+		mlog.Log("serialize res failed", mlog.Field("error", err))
 		return
 	}
 
-	for _, header := range HttpHeaderList { // forward our own http header
-		value := ctx.Request.Header.Get(header)
-		req.Header.Add(header, value)
+	if code != http.StatusOK {
+		ctx.Writer.WriteHeader(code)
 	}
 
-	res, err := http.DefaultClient.Do(req)
+	_, err = ctx.Writer.Write(resBytes)
 	if err != nil {
-		e := NewError(ET_ServerInternalError, ED_HttpInvoke).WithCause(err)
-		mlog.Log(e.String())
+		mlog.Log("response failed", mlog.Field("error", err))
 		return
 	}
-	defer func() {
-		_ = res.Body.Close()
-	}()
-
-	headers := make(map[string]string)
-	for header, value := range res.Header {
-		for _, v := range HttpHeaderList { // 记录我们自定义的'header'
-			if header == v {
-				headers[header] = value[0]
-				break
-			}
-		}
-	}
-
-	// 这里我们希望统一使用ctx.response设置响应头和返回值，所以不使用io.copy直接复制res.body
-	bodyBytes, err := io.ReadAll(res.Body)
-	if err != nil {
-		e := NewError(ET_ServerInternalError, ED_IORead).WithCause(err)
-		mlog.Log(e.String())
-		return
-	}
-
-	ctx.ResHeaders = headers
-	ctx.ResData = bodyBytes
-
-	return
 }
 
-func serializeRes(obj any) ([]byte, error) {
+func serializeRes(obj any) (int, []byte, error) {
+	code := http.StatusOK
+
 	switch v := obj.(type) {
-	case string: // err str
-		if len(v) > 0 {
-			obj = &api.ResBase{Err: v}
-		}
-	case error:
+	case *Error:
 		obj = &api.ResBase{Err: v.Error()}
+
+		switch v.Typ {
+		case ET_ServerInternalError:
+			code = http.StatusInternalServerError
+		case ET_UnauthorizedError:
+			code = http.StatusUnauthorized
+		}
 	case []byte: // forward res, no marshal
-		return v, nil
+		return code, v, nil
 	default: // struct
 	}
 
 	jsonBytes, err := json.Marshal(obj)
 	if err != nil {
 		mlog.Log("serialize handlers res to json failed", mlog.Field("error", err))
-		return nil, err
+		return code, nil, err
 	}
 
-	return jsonBytes, nil
+	return code, jsonBytes, nil
 }

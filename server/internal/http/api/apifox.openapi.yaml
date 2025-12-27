@@ -1,0 +1,389 @@
+openapi: 3.0.1
+info:
+  title: 默认模块
+  description: ''
+  version: 1.0.0
+tags: []
+paths:
+  /api/note/create:
+    post:
+      summary: create
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: Unnamed-Plan-User-ID
+          in: header
+          description: ''
+          required: false
+          example: '{{user_id}}'
+          schema:
+            type: string
+        - name: Unnamed-Plan-Access-Token
+          in: header
+          description: ''
+          required: false
+          example: '{{access_token}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_anonymous:
+                  type: boolean
+                title:
+                  type: string
+                content:
+                  type: string
+              required:
+                - is_anonymous
+                - title
+                - content
+            example:
+              is_anonymous: false
+              title: test note title 1
+              content: test note content 1
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      security: []
+  /api/note/modify:
+    post:
+      summary: modify
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: Unnamed-Plan-User-ID
+          in: header
+          description: ''
+          required: false
+          example: '{{user_id}}'
+          schema:
+            type: string
+        - name: Unnamed-Plan-Access-Token
+          in: header
+          description: ''
+          required: false
+          example: '{{access_token}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                is_anonymous:
+                  type: boolean
+                title:
+                  type: string
+                content:
+                  type: string
+              required:
+                - is_anonymous
+                - id
+                - title
+                - content
+            example:
+              id: 3
+              is_anonymous: true
+              title: after modify
+              content: after modify
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      security: []
+  /api/note/list:
+    post:
+      summary: list
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: Unnamed-Plan-User-ID
+          in: header
+          description: ''
+          required: false
+          example: '{{user_id}}'
+          schema:
+            type: string
+        - name: Unnamed-Plan-Access-Token
+          in: header
+          description: ''
+          required: false
+          example: '{{access_token}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                page:
+                  type: object
+                  properties:
+                    size:
+                      type: integer
+                    num:
+                      type: integer
+                  required:
+                    - size
+                    - num
+              required:
+                - page
+            example:
+              page:
+                size: 10
+                num: 1
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      security: []
+  /api/note/delete:
+    post:
+      summary: delete
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: Unnamed-Plan-User-ID
+          in: header
+          description: ''
+          required: false
+          example: '{{user_id}}'
+          schema:
+            type: string
+        - name: Unnamed-Plan-Access-Token
+          in: header
+          description: ''
+          required: false
+          example: '{{access_token}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+              required:
+                - id
+            example:
+              id: 3
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      security: []
+  /api/user/modify:
+    post:
+      summary: modify
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: Unnamed-Plan-User-ID
+          in: header
+          description: ''
+          required: false
+          example: '{{user_id}}'
+          schema:
+            type: string
+        - name: Unnamed-Plan-Access-Token
+          in: header
+          description: ''
+          required: false
+          example: '{{access_token}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+            example:
+              nickname: '123'
+              password: '123'
+              modify_tk_flag: true
+              totp_key: UMHHKYV2
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      security: []
+  /api/user/list:
+    post:
+      summary: list
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: Unnamed-Plan-User-ID
+          in: header
+          description: ''
+          required: false
+          example: '{{user_id}}'
+          schema:
+            type: string
+        - name: Unnamed-Plan-Access-Token
+          in: header
+          description: ''
+          required: false
+          example: '{{access_token}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                page:
+                  type: object
+                  properties:
+                    size:
+                      type: number
+                    num:
+                      type: number
+                  required:
+                    - size
+                    - num
+              required:
+                - page
+            example:
+              page:
+                size: 10
+                num: 1
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      security: []
+  /api/register:
+    post:
+      summary: register
+      deprecated: false
+      description: ''
+      tags: []
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+            example:
+              user_name: test_create_user_1
+              password: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      security: []
+  /api/login:
+    post:
+      summary: login
+      deprecated: false
+      description: ''
+      tags: []
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_name:
+                  type: string
+                password:
+                  type: string
+              required:
+                - user_name
+                - password
+            examples:
+              '1':
+                value:
+                  user_name: admin
+                  password: >-
+                    8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92
+                summary: 示例 1
+              '2':
+                value:
+                  user_name: admin
+                  password: >-
+                    8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92
+                summary: 示例 2
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      security: []
+components:
+  schemas: {}
+  responses: {}
+  securitySchemes: {}
+servers:
+  - url: http://127.0.0.1:10319
+    description: 测试环境
+security: []

@@ -55,7 +55,5 @@ func ModifyUser(ctx *mhttp.Context) {
 		return
 	}
 
-	ctx.ResData = &api.ModifyUserRes{
-		ResBase: api.ResBase{IsSuccess: true},
-	}
+	ctx.ResData = &api.ModifyUserRes{ResBase: api.ResBaseSuccess}
 }

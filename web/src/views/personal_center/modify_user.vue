@@ -1,7 +1,7 @@
 <template>
   <el-form class="modify-user" v-model="modifyUserReq" label-width="20%">
     <el-form-item label="用户名">
-      {{ userStore.user.name }}
+      {{ userStore.user.user_name }}
     </el-form-item>
 
     <el-form-item label="昵称">
@@ -22,7 +22,7 @@
     </el-form-item>
 
     <el-form-item>
-      <up-button
+      <outlined-button
           details="密码为空表示不修改<br/>
           修改TOTP密钥且新值为空，表示关闭TOTP功能<br/><br/>
           昵称、密码、TOTP均无修改时，不可提交"
@@ -30,7 +30,7 @@
           @click="modifyUser()"
       >
         修改个人信息
-      </up-button>
+      </outlined-button>
     </el-form-item>
   </el-form>
 </template>
@@ -39,7 +39,7 @@
 import {ModifyUserReq} from "@/axios/ts/user.go.ts";
 import {onMounted, ref, watch} from "vue";
 import {useUserStore} from "@/pinia/user.ts";
-import UpButton from "@/components/up_button.vue";
+import OutlinedButton from "@/components/outlined_button.vue";
 
 let userStore = useUserStore();
 

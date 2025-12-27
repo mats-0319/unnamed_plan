@@ -8,3 +8,9 @@ type Model struct {
 	UpdatedAt int64          `gorm:"autoUpdateTime:milli"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
+
+// ModelList use for gorm tools
+var ModelList = []any{
+	&User{},
+	&Note{},
+}

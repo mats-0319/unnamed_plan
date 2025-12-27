@@ -3,37 +3,40 @@ package mconst
 type ErrorType string
 
 const (
+	// change http status code
 	ET_ServerInternalError ErrorType = "Server Internal Error"
-	ET_DBError             ErrorType = "DB Error"
-	ET_ParamsError         ErrorType = "Params Error"
-	ET_AuthenticateError   ErrorType = "Authentication Error"
+	ET_UnauthorizedError   ErrorType = "Authentication Error"
+
+	ET_ParamsError   ErrorType = "Params Error"
+	ET_OperatorError ErrorType = "Operator Error"
 )
 
 type ErrorDetail string
 
 const (
-	// normal
-	ED_UnsupportedURI         ErrorDetail = "Unsupported Request URI"
-	ED_UnknownURIOrServerName ErrorDetail = "Unknown URI or Server Name"
-	ED_InvalidHttpRequest     ErrorDetail = "Invalid Http Request"
-	ED_HttpInvoke             ErrorDetail = "Http Invoke Failed"
-	ED_IORead                 ErrorDetail = "IO Read Failed"
-	ED_JsonMarshal            ErrorDetail = "Json Marshal Failed"
-	ED_JsonUnmarshal          ErrorDetail = "Json Unmarshal Failed"
+	// empty
+	ED_Empty ErrorDetail = ""
 
-	// business
-	ED_NeedAdmin       ErrorDetail = "Need Admin"
-	ED_InvalidPwd      ErrorDetail = "Invalid User Name or Password"
-	ED_InvalidTotpCode ErrorDetail = "Invalid Totp Code"
-	ED_Base32Decode    ErrorDetail = "Base32 Decode Failed"
-	ED_InvalidTotpKey  ErrorDetail = "Invalid Totp Key"
-	ED_SamePwd         ErrorDetail = "Can't User Same Password When Re-set"
-
-	// middleware
+	// unauthorized
 	ED_InvalidUserIDOrToken ErrorDetail = "Invalid User ID or Token"
 	ED_TokenExpired         ErrorDetail = "Token Expired"
 
+	// params
+	ED_JsonMarshal   ErrorDetail = "Json Marshal Failed"
+	ED_JsonUnmarshal ErrorDetail = "Json Unmarshal Failed"
+
+	// business-user
+	ED_NeedAdmin       ErrorDetail = "Need Admin"
+	ED_InvalidPwd      ErrorDetail = "Invalid UserName or Password"
+	ED_InvalidTotpCode ErrorDetail = "Invalid TOTP Code"
+	ED_InvalidTotpKey  ErrorDetail = "Invalid TOTP Key"
+	ED_SamePwd         ErrorDetail = "Can't User Same Password When Re-set"
+
+	// business-note
+	ED_NeedOwner     ErrorDetail = "Not Owner of Data"
+	ED_ModifyNothing ErrorDetail = "No Changes"
+
 	// db
-	ED_Operate         ErrorDetail = "DB Operate Failed"
-	ED_DuplicateCreate ErrorDetail = "User Already Exist"
+	ED_UserExist ErrorDetail = "User Already Exist"
+	ED_NoteExist ErrorDetail = "Note Already Exist"
 )
