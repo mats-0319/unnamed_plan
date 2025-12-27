@@ -27,8 +27,33 @@
 }
 
 .el-dialog {
+  background-color: rgb(240, 239, 226);
+
   .el-dialog__body {
-    width: 50%;
+    width: 60%;
     margin: 5% auto;
   }
+}
+
+.el-table {
+  --el-table-bg-color: rgb(240, 239, 226) !important;
+  --el-table-header-bg-color: rgb(240, 239, 226) !important;
+  --el-table-tr-bg-color: rgb(240, 239, 226) !important;
+  --el-table-row-hover-bg-color: rgba(210, 209, 186, 0.5) !important;
+
+  .el-table__expanded-cell {
+    background-color: rgba(210, 209, 186, 0.7) !important;
+  }
+}
+
+.el-pagination {
+  --el-color-primary: rgb(240, 239, 226) !important;
+  --el-color-white: black !important;
+}
+
+.el-descriptions {
+  background-color: rgba(210, 209, 186, 0.5) !important;
+  --el-fill-color-light: rgba(210, 209, 186, 0.5) !important;
+  --el-descriptions-item-bordered-label-background: rgba(210, 209, 186, 0.5) !important;
+
 }

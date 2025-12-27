@@ -22,7 +22,7 @@ func ListUser(ctx *mhttp.Context) {
 	}
 
 	if !operator.IsAdmin {
-		e := NewError(ET_AuthenticateError, ED_NeedAdmin).WithParam("operator", operator.UserName)
+		e := NewError(ET_OperatorError, ED_NeedAdmin).WithParam("operator", operator.UserName)
 		mlog.Log(e.String())
 		ctx.ResData = e
 		return
@@ -35,7 +35,7 @@ func ListUser(ctx *mhttp.Context) {
 	}
 
 	ctx.ResData = &api.ListUserRes{
-		ResBase: api.ResBase{IsSuccess: true},
+		ResBase: api.ResBaseSuccess,
 		Amount:  count,
 		Users:   usersFromDBToHttp(users),
 	}
@@ -48,7 +48,7 @@ func usersFromDBToHttp(users []*model.User) []*api.User {
 			ID:        v.ID,
 			CreatedAt: v.CreatedAt,
 			UpdatedAt: v.UpdatedAt,
-			Name:      v.UserName,
+			UserName:  v.UserName,
 			Nickname:  v.Nickname,
 			TotpKey:   v.TotpKey,
 			IsAdmin:   v.IsAdmin,

@@ -13,7 +13,7 @@
         </div>
 
         <div class="tc-item center-hv">
-          <up-button v-show="!userStore.isLogin()" @click="beforeOpenLoginDialog()">登录</up-button>
+          <outlined-button v-show="!userStore.isLogin()" @click="beforeOpenLoginDialog()">登录</outlined-button>
           <div v-show="userStore.isLogin()">
             <el-dropdown placement="bottom-end">
               <template #default>
@@ -39,7 +39,7 @@
     </div>
   </div>
 
-  <el-dialog v-model="showLoginDialog" title="登录" class="color-bg-1">
+  <el-dialog v-model="showLoginDialog" title="登录">
     <el-form v-model="loginReq" label-width="20%">
       <el-form-item label="用户名">
         <el-input v-model="loginReq.user_name"/>
@@ -54,9 +54,9 @@
       </el-form-item>
 
       <el-form-item>
-        <up-button details="请输入用户名和密码后点击注册" :disabled="!canLoginFlag" @click="register">
+        <outlined-button details="请输入用户名和密码后点击注册" :disabled="!canLoginFlag" @click="register">
           注册新用户
-        </up-button>
+        </outlined-button>
       </el-form-item>
     </el-form>
 
@@ -71,7 +71,7 @@
 import {useUserStore} from "@/pinia/user.ts";
 import {ref, watch} from "vue";
 import {useFlagStore} from "@/pinia/flag.ts";
-import UpButton from "@/components/up_button.vue";
+import OutlinedButton from "@/components/outlined_button.vue";
 import {routerLink} from "@/ts/util.ts";
 import {LoginReq} from "@/axios/ts/user.go.ts";
 
@@ -108,7 +108,7 @@ function exitLogin(): void {
   sessionStorage.removeItem("login_data")
 }
 
-watch(loginReq, (newValue, oldValue) => {
+watch(loginReq, (newValue, _) => {
   canLoginFlag.value = newValue.user_name.length > 0 && newValue.password.length > 0
 }, {deep: true})
 </script>
@@ -151,6 +151,7 @@ watch(loginReq, (newValue, oldValue) => {
 
       a {
         color: black;
+        text-decoration-line: none;
       }
 
       .el-dropdown {

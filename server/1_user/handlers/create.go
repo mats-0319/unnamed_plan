@@ -8,8 +8,8 @@ import (
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-func CreateUser(ctx *mhttp.Context) {
-	req := &api.CreateUserReq{}
+func Register(ctx *mhttp.Context) {
+	req := &api.RegisterReq{}
 	if !ctx.ParseParams(req) {
 		return
 	}
@@ -23,14 +23,10 @@ func CreateUser(ctx *mhttp.Context) {
 		Password: pwd,
 		Salt:     salt,
 	}
-
-	err := dal.CreateUser(user)
-	if err != nil {
+	if err := dal.CreateUser(user); err != nil {
 		ctx.ResData = err
 		return
 	}
 
-	ctx.ResData = &api.CreateUserRes{
-		ResBase: api.ResBase{IsSuccess: true},
-	}
+	ctx.ResData = &api.RegisterRes{ResBase: api.ResBaseSuccess}
 }

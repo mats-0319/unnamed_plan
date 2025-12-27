@@ -76,7 +76,7 @@ export let useUserStore = defineStore("user", () => {
     function loginResToUser(res: LoginRes): User {
         let userIns = new User()
         userIns.id = res.user_id
-        userIns.name = res.user_name
+        userIns.user_name = res.user_name
         userIns.nickname = res.nickname
         userIns.is_admin = res.is_admin
 
@@ -84,7 +84,7 @@ export let useUserStore = defineStore("user", () => {
     }
 
     function isLogin(): boolean {
-        return user.value.name.length > 0
+        return user.value.user_name.length > 0
     }
 
     function exitLogin(): void {

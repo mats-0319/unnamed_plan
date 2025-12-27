@@ -25,6 +25,27 @@
           "uri": "/user/authenticate"
         }
       ]
+    },
+    {
+      "file_name": "note",
+      "api_list": [
+        {
+          "name": "CreateNote",
+          "uri": "/note/create"
+        },
+        {
+          "name": "ListNote",
+          "uri": "/note/list"
+        },
+        {
+          "name": "ModifyNote",
+          "uri": "/note/modify"
+        },
+        {
+          "name": "DeleteNote",
+          "uri": "/note/delete"
+        }
+      ]
     }
   ]
 }

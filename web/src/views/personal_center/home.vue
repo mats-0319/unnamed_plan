@@ -1,21 +1,21 @@
 <template>
   <div class="personal-center color-bg-0">
     <div class="p-left">
-      <div
+      <elevated_button
+          class="pl-item"
           v-if="userStore.user.is_admin"
-          class="pl-item color-bg-1 center-hv"
           @click="routerLink('pListUser')"
       >
         查看用户
-      </div>
+      </elevated_button>
 
-      <div class="pl-item color-bg-1 center-hv" @click="routerLink('pModifyUser')">
+      <elevated_button class="pl-item" @click="routerLink('pModifyUser')">
         修改个人信息
-      </div>
+      </elevated_button>
 
-      <div class="pl-item  color-bg-1 center-hv" @click="routerLink('pCreateNote')">
-        编辑小纸条
-      </div>
+      <elevated_button class="pl-item" @click="routerLink('pNote')">
+        我的小纸条
+      </elevated_button>
     </div>
 
     <el-divider direction="vertical"></el-divider>
@@ -29,6 +29,7 @@
 <script lang="ts" setup>
 import {routerLink} from "@/ts/util.ts";
 import {useUserStore} from "@/pinia/user.ts";
+import Elevated_button from "@/components/elevated_button.vue";
 
 let userStore = useUserStore()
 </script>
@@ -44,14 +45,7 @@ let userStore = useUserStore()
     font-size: 1.4rem;
 
     .pl-item {
-      width: 10vw;
-      margin: 1.5rem auto;
-      padding: 0.5rem 0;
-      border-radius: 1rem;
-    }
-    .pl-item:hover {
-      cursor: pointer;
-      text-decoration-line: underline;
+      margin: 2rem auto;
     }
   }
 

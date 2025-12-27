@@ -8,6 +8,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
@@ -16,8 +17,6 @@ import (
 	"gorm.io/gen/field"
 
 	"gorm.io/plugin/dbresolver"
-
-	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 )
 
 func newUser(db *gorm.DB, opts ...gen.DOOption) user {

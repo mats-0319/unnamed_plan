@@ -10,6 +10,7 @@ import (
 )
 
 type Handler struct {
+	config   *config
 	handlers map[string]*HandlerItem // uri - handler func
 }
 
@@ -19,22 +20,28 @@ type HandlerItem struct {
 }
 
 func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	writer.Header().Set("Access-Control-Allow-Origin", "*")
-	writer.Header().Set("Access-Control-Allow-Headers", "*")
-	writer.Header().Set("Access-Control-Expose-Headers", "*")
-
-	mlog.Log(fmt.Sprintf("| %s | %s |", request.URL.String(), time.Now().String()))
-
 	ctx := NewContext(writer, request)
 	defer ctx.response()
 
-	if ctx.Request.Method != http.MethodPost { // only accept 'post' req
+	origin := request.Header.Get("Origin")
+	if !h.isValidOrigin(origin) {
+		ctx.ResData = NewError(ET_ServerInternalError).WithParam("origin", origin)
 		return
 	}
 
+	writer.Header().Set("Access-Control-Allow-Origin", origin)
+	writer.Header().Set("Access-Control-Allow-Headers", "*")
+	writer.Header().Set("Access-Control-Expose-Headers", "*")
+
+	if request.Method != http.MethodPost { // return after set header
+		return
+	}
+
+	mlog.Log(fmt.Sprintf("| %s | %s |", request.URL.String(), time.Now().String()))
+
 	handlerItemIns, ok := h.handlers[request.RequestURI]
 	if !ok {
-		err := NewError(ET_ServerInternalError, ED_UnsupportedURI).WithParam("uri", request.RequestURI)
+		err := NewError(ET_ServerInternalError).WithParam("uri", request.RequestURI)
 		mlog.Log(err.String())
 		ctx.ResData = err
 		return
@@ -67,4 +74,16 @@ func (h *Handler) supportedUri() {
 	for k := range h.handlers {
 		mlog.Log(fmt.Sprintf("| Http Registered: %s", k))
 	}
+}
+
+func (h *Handler) isValidOrigin(origin string) bool {
+	containsFlag := false
+	for _, v := range h.config.AllowedOrigins {
+		if origin == v || v == "*" {
+			containsFlag = true
+			break
+		}
+	}
+
+	return containsFlag
 }

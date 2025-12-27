@@ -1,4 +1,4 @@
-import { ElNotification } from "element-plus";
+import {ElNotification} from "element-plus";
 
 // Log print to console and display in webpage
 class Log {
@@ -19,6 +19,22 @@ class Log {
             type: "error",
             customClass: "color-bg-1",
         });
+    }
+
+    httpError(code: number): void {
+        let str = "Unknown Http Status Code: " + code
+        if (code == 401) {
+            str = "Unauthorized"
+        } else if (code == 500) {
+            str = "Server Internal Error"
+        }
+
+        console.log("> " + str + ".")
+        ElNotification({
+            title: str,
+            type: "error",
+            customClass: "color-bg-1",
+        })
     }
 }
 

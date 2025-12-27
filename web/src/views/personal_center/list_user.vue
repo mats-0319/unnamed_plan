@@ -1,6 +1,6 @@
 <template>
-  <el-table class="table color-bg-1" :data="users" height="80%">
-    <el-table-column label="用户名" prop="name"/>
+  <el-table :data="users" height="80%">
+    <el-table-column label="用户名" prop="user_name"/>
 
     <el-table-column label="昵称" prop="nickname"/>
 
@@ -18,7 +18,6 @@
   </el-table>
 
   <el-pagination
-      class="pagination"
       layout="prev,pager,next,->,total"
       :total="amount"
       background
@@ -34,8 +33,8 @@ import {displayTimestamp} from "@/ts/util.ts";
 
 let userStore = useUserStore()
 
-let amount = ref<Number>(0);
-let users = ref<Array<User>>(new Array<User>());
+let amount = ref<Number>(0)
+let users = ref<Array<User>>(new Array<User>())
 
 onMounted(() => {
   listUser()
@@ -50,17 +49,7 @@ function listUser(pageNum: number = 1): void {
 </script>
 
 <style lang="less" scoped>
-.table {
-  --el-table-bg-color: rgb(240, 239, 226);
-  --el-table-header-bg-color: rgb(240, 239, 226);
-  --el-table-tr-bg-color: rgb(240, 239, 226);
-  --el-table-row-hover-bg-color: rgba(210, 209, 186, 0.5);
-}
-
-.pagination {
+.el-pagination {
   height: 20%;
-
-  --el-color-primary: rgb(240, 239, 226);
-  --el-color-white: black;
 }
 </style>

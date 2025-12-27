@@ -1,7 +1,7 @@
 // Generate File, Should Not Edit.
 // Author : mario. github.com/mats0319
 // Code   : github.com/mats0319/study/go/gocts
-// Version: gocts v0.2.0
+// Version: gocts v0.2.1
 
 import { Pagination } from "./common.go"
 
@@ -20,11 +20,21 @@ export class LoginRes {
     err: string = "";
 }
 
+export class RegisterReq {
+    user_name: string = ""; // nickname is same, user can modify later
+    password: string = ""; // hex(sha256('text')), server generate 'salt' and save it
+}
+
+export class RegisterRes {
+    is_success: boolean = false;
+    err: string = "";
+}
+
 export class User {
     id: number = 0;
     created_at: number = 0;
     updated_at: number = 0;
-    name: string = ""; // login name
+    user_name: string = ""; // login name
     nickname: string = ""; // display name
     totp_key: string = ""; // 允许为空，需要设置后启动
     is_admin: boolean = false;
@@ -38,24 +48,13 @@ export class ListUserReq {
 
 export class ListUserRes {
     amount: number = 0; // 符合查询条件的用户总数
-    page: Pagination = new Pagination();
     users: Array<User> = new Array<User>();
     is_success: boolean = false;
     err: string = "";
 }
 
-export class CreateUserReq {
-    user_name: string = ""; // nickname is same, user can modify later
-    password: string = ""; // hex(sha256('text')), server generate 'salt' and save it
-}
-
-export class CreateUserRes {
-    is_success: boolean = false;
-    err: string = "";
-}
-
 // ModifyUserReq 属性字段为空，视为不修改对应字段，有专属的bool变量标识是否修改的字段不适用该默认规则
-// 例如totp key字段，flag为true且key字段为空，视为禁用totp 2fa
+// 例如totp key字段，flag为true且key字段为空，视为禁用totp
 export class ModifyUserReq {
     nickname: string = "";
     password: string = ""; // hex(sha256('text')), check: can't be same
@@ -68,9 +67,14 @@ export class ModifyUserRes {
     err: string = "";
 }
 
+// AuthenticateReq 相当于使用token的登录
 export class AuthenticateReq {}
 
 export class AuthenticateRes {
+    user_id: number = 0;
+    user_name: string = "";
+    nickname: string = "";
+    is_admin: boolean = false;
     is_success: boolean = false;
     err: string = "";
 }

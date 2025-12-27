@@ -1,11 +1,11 @@
 // Generate File, Should Not Edit.
 // Author : mario. github.com/mats0319
 // Code   : github.com/mats0319/study/go/gocts
-// Version: gocts v0.2.0
+// Version: gocts v0.2.1
 
 import { axiosWrapper } from "./config"
 import { AxiosResponse } from "axios"
-import { LoginRes, LoginReq, ListUserRes, ListUserReq, CreateUserRes, CreateUserReq, ModifyUserRes, ModifyUserReq, AuthenticateRes } from "./user.go"
+import { LoginRes, LoginReq, RegisterRes, RegisterReq, ListUserRes, ListUserReq, ModifyUserRes, ModifyUserReq, AuthenticateRes } from "./user.go"
 import { Pagination } from "./common.go"
 
 class UserAxios {
@@ -19,21 +19,21 @@ class UserAxios {
         return axiosWrapper.post("/login", req)
     }
 
+    public register(user_name: string, password: string): Promise<AxiosResponse<RegisterRes>> {
+        let req: RegisterReq = {
+            user_name: user_name,
+            password: password,
+        }
+
+        return axiosWrapper.post("/register", req)
+    }
+
     public listUser(page: Pagination): Promise<AxiosResponse<ListUserRes>> {
         let req: ListUserReq = {
             page: page,
         }
 
         return axiosWrapper.post("/user/list", req)
-    }
-
-    public createUser(user_name: string, password: string): Promise<AxiosResponse<CreateUserRes>> {
-        let req: CreateUserReq = {
-            user_name: user_name,
-            password: password,
-        }
-
-        return axiosWrapper.post("/user/create", req)
     }
 
     public modifyUser(nickname: string, password: string, modify_tk_flag: boolean, totp_key: string): Promise<AxiosResponse<ModifyUserRes>> {
@@ -47,7 +47,7 @@ class UserAxios {
         return axiosWrapper.post("/user/modify", req)
     }
 
-    public Authenticate(): Promise<AxiosResponse<AuthenticateRes>> {
+    public authenticate(): Promise<AxiosResponse<AuthenticateRes>> {
         return axiosWrapper.post("/user/authenticate")
     }
 }

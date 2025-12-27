@@ -8,7 +8,7 @@ import 'element-plus/dist/index.css'
 import "./index.less"
 
 // axios init interceptors
-import {initInterceptors} from "@/axios/ts/config.ts";
+import {initInterceptors} from "@/axios/ts/config_extend.ts";
 
 initInterceptors((): void => {
     router.replace({name: "home", params: {v: "1"}}) // distinguish 'login error' router to 'home' with others

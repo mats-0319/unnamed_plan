@@ -25,7 +25,8 @@ func init() {
 		log.Fatalln("> Read config file failed, path: 'config.json', error: ", err)
 	}
 
-	if err = json.Unmarshal(confBytes, conf); err != nil {
+	err = json.Unmarshal(confBytes, conf)
+	if err != nil {
 		log.Fatalln("> Json unmarshal failed, error: ", err)
 	}
 }
