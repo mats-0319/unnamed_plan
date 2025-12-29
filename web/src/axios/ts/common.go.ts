@@ -4,11 +4,11 @@
 // Version: gocts v0.2.1
 
 export class Pagination {
-    size: number = 0;
-    num: number = 0;
+	size: number = 0
+	num: number = 0
 }
 
 export class ResBase {
-    is_success: boolean = false;
-    err: string = "";
+	is_success: boolean = false
+	err: string = ""
 }

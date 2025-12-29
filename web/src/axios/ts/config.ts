@@ -3,14 +3,14 @@
 // Code   : github.com/mats0319/study/go/gocts
 // Version: gocts v0.2.1
 
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance } from "axios"
 
 export const axiosWrapper: AxiosInstance = axios.create({
-    baseURL: import.meta.env.Vite_axios_base_url,
-    timeout: 3000,
-});
+	baseURL: import.meta.env.Vite_axios_base_url,
+	timeout: 3000
+})
 
-// generate '.env.development' file in root path, 
+// generate '.env.development' file in root path,
 // with content 'Vite_axios_base_url = "http://127.0.0.1:10319/api"'
 //
 // generate '.env.production' file in root path,
