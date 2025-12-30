@@ -9,28 +9,21 @@ import (
 )
 
 func Test(t *testing.T) {
-
-	url := "http://127.0.0.1:10319/api/user/list"
-	method := "POST"
+	uri := "/login"
 
 	payload := strings.NewReader(`{
-    "page": {
-        "size": 10,
-        "num": 1
-    }
-}`)
+		"user_name": "mats0319",
+		"password": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92"
+	}`)
 
-	client := &http.Client{}
-	req, err := http.NewRequest(method, url, payload)
-
+	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:10319/api"+uri, payload)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	req.Header.Set("Unnamed-Plan-User-ID", "1")
-	req.Header.Set("Unnamed-Plan-Access-Token", "GhLOJFslvh")
+	req.Header.Add("Content-Type", "application/json")
 
-	res, err := client.Do(req)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		fmt.Println(err)
 		return

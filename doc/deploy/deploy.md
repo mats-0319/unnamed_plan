@@ -1,91 +1,102 @@
 # 在公网上部署应用
 
-> 服务器系统：CentOS 8
+> 服务器系统：Ubuntu 24.04
 
-## 设置使用私钥登录并禁用密码登录
+## 数据库(pg)
 
-### 生成密钥对
+ubuntu系统自带一个pg数据库的指定版本快照，如果想要安装指定版本，参考[官方文档](https://www.postgresql.org/download/linux/ubuntu/)
 
-`ssh-keygen`
-
-1. 默认在`/root/.ssh/`目录下，生成`id_rsa`和`id_rsa.pub`文件
-2. 相同目录下，新建文件`authorized_keys`，内容与**公钥文件**相同
-3. 下载私钥文件到本地
-
-### 启用秘钥登录与禁用密码登录
-
-config file: `/etc/ssh/sshd_config`
-
-1. `PubkeyAuthentication`，设置为`true`
-2. `PasswordAuthentication`，设置为`false`
-
-`service sshd restart`
-
-## nginx
-
-### 下载与安装
-
-[reference](https://nginx.org/en/linux_packages.html#RHEL-CentOS)
-
-参考nginx官网提供的下载与安装过程
-
-### 编辑反向代理规则
-
-见同目录下，`nginx`配置文件
-
-### 自签证书
-
-> 使用openssl
-
-`openssl genrsa -out server.key 2048`
-`openssl req -new -key server.key -out server.csr`
-`openssl x509 -req -in server.csr -out server.crt -signkey server.key -days 3650`
-
-1. `server.crt`证书格式为`pem`
-2. 第二步会以问答的形式，要求我们输入一些信息，包括**域名**在内的一些关键信息就是在此处提供的
-
-## postgresql
-
-### 下载与安装
-
-> 使用dnf，centos默认的包管理工具
-
-[reference](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-centos-8)
-
-参考上方链接，下载与安装postgresql数据库，以下为命令与注释：
-
-```shell 
-dnf module list postgresql // 查看可用的版本
-sudo dnf module enable postgresql:13 // 选择想要安装的版本
-sudo dnf install postgresql-server // 安装 优先安装enabled版本
-sudo postgresql-setup --initdb // 初始化
-
-sudo systemctl start postgresql // 启动
-sudo systemctl enable postgresql // 设置开机自启动
-```
-
-### 设置允许外部地址访问
-
-config file: `/var/lib/pgsql/data/postgresql.conf`
-
-add: `listen_address: '*'`
-
-config file: `/var/lib/pgsql/data/pg_hba.conf`
-
-add: `host all all 0.0.0.0/0 md5`
+- `apt install postgresql`
 
 ### 创建用户/数据库
+
+> 记得在云服务器厂商的控制台，编辑网络策略：允许访问5432端口（如果你使用了非默认的端口号，这里相应修改）
 
 ```cmd 
 su - postgres // 切换linux用户
 psql
 
-create user [user name] with password '[password]'; // 注意分号
+create user [user name] with password '[password]'; // 注意分号、单引号
 create database [db name] owner [user name];
 grant all on database [db name] to [user name];
-\q // 退出
+
+\du+ // 查看用户
+\l   // 查看数据库
 ```
 
-## 设置开机自启动
+### 设置允许外部地址访问
 
-在`/etc/rc.d/rc.local`中，编辑想要在开机时执行的代码
+config file: `/etc/postgresql/16/main/postgresql.conf`(注意版本号)
+add: `listen_address: '*'`
+
+config file: `/etc/postgresql/16/main/pg_hba.conf`
+add: `host all all 0.0.0.0/0 md5`
+
+重启服务：`sudo systemctl restart postgresql`
+
+## nginx
+
+### 下载与安装
+
+可以使用包管理工具下载，或参考[nginx官网](https://nginx.org/en/linux_packages.html#Ubuntu)提供的下载与安装过程
+
+- `sudo apt install nginx`
+- `sudo systemctl start nginx`
+- `curl http://127.0.0.1` // 验证安装结果
+
+### 编辑反向代理规则
+
+配置文件路径：`/etc/nginx/nginx.conf`
+日志文件路径：`/var/log/nginx/access.log`（配置文件内可修改）
+
+默认配置包含`/etc/nginx/conf.d/*.conf`
+
+详细配置，见本文档同目录下，`*.conf`配置文件
+
+- 如果想要使用https访问，可以使用自签证书（生成方式见下一节）
+
+nginx常用命令：
+
+- `nginx -t`：测试配置文件的语法是否正确
+- `nginx -s reload`：重启nginx，更新并应用新的配置文件
+
+### 自签证书
+
+> 目的是允许使用https访问
+
+生成http证书：
+
+- `openssl genrsa -out server.key 2048`
+- `openssl req -new -key server.key -out server.csr`
+    - 会以问答的形式，要求我们输入一些信息，包括**域名**(Common Name)在内的一些关键信息就是在此处提供的
+- `openssl x509 -req -in server.csr -out server.crt -signkey server.key -days 3650`
+
+## 服务器设置
+
+### 设置使用密钥登录
+
+- `ssh-keygen`生成密钥对
+    - 默认在`/root/.ssh/`目录生成`id_ed25519`和`id_ed25519.pub`文件
+    - 将没有后缀名的私钥下载到本地
+- 设置公钥：`cat ./id_ed25519.pub >> ./authorized_keys`(注意切换路径)
+    - 将`id_ed25519.pub`复制并改名为`authorized_keys`
+- 本地验证公钥的有效性：`ssh -i ./id_ed25519 localhost`
+    - 修改ssh服务器安全策略：`sudo vim /etc/ssh/sshd_config`
+        - 找到以下配置项并修改为对应值
+          ```txt
+          PermitRootLogin without-password
+          PubkeyAuthentication yes
+          PasswordAuthentication no // 禁用密码登录
+          ```
+        - 测试语法是否正确：`sudo ssh -t`
+        - 重启并检查ssh服务状态：`sudo systemctl restart/status ssh`
+
+### 设置开机自启动
+
+在`/etc/rc.local`中，编辑想要在开机时执行的代码
+
+```txt
+#!/bin/sh -e
+[.exe path] &
+exit 0
+```

@@ -1,0 +1,25 @@
+{
+  "level": "dev",
+  "items": [
+    {
+      "id": "658e06f7-71d5-4ada-b715-8c1a4489e5d2",
+      "name": "db",
+      "json": {
+        "dsn": "host=127.0.0.1 user=mario password=123456 dbname=cloud port=5432 sslmode=disable",
+        "max_idle_conns": 10,
+        "max_open_conns": 100
+      }
+    },
+    {
+      "id": "22c4db2e-06d3-4d6a-b43f-c42aa6f57d15",
+      "name": "http",
+      "json": {
+        "port": "10320",
+        "allowed_origins": [
+          "127.0.0.1:10319",
+          "127.0.0.1:10321"
+        ]
+      }
+    }
+  ]
+}

@@ -44,5 +44,5 @@ func main() {
 	}
 
 	db.Create(defaultUsers)
-	db.Create(testNotes)
+	//db.Create(testNotes)
 }
