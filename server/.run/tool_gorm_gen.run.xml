@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="tool_gorm_gen" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="unnamed_plan" />
+    <working_directory value="$PROJECT_DIR$/server/internal/db/tool_gorm_gen/" />
+    <kind value="PACKAGE" />
+    <package value="github.com/mats0319/unnamed_plan/server/internal/db/tool_gorm_gen/" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/server/internal/db/tools/code_gen.go" />
+    <method v="2" />
+  </configuration>
+</component>

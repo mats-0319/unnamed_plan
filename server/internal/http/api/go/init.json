@@ -1,0 +1,51 @@
+{
+  "package_name": "api",
+  "files": [
+    {
+      "file_name": "user",
+      "api_list": [
+        {
+          "name": "Login",
+          "uri": "/login"
+        },
+        {
+          "name": "ListUser",
+          "uri": "/user/list"
+        },
+        {
+          "name": "CreateUser",
+          "uri": "/user/create"
+        },
+        {
+          "name": "ModifyUser",
+          "uri": "/user/modify"
+        },
+        {
+          "name": "Authenticate",
+          "uri": "/user/authenticate"
+        }
+      ]
+    },
+    {
+      "file_name": "note",
+      "api_list": [
+        {
+          "name": "CreateNote",
+          "uri": "/note/create"
+        },
+        {
+          "name": "ListNote",
+          "uri": "/note/list"
+        },
+        {
+          "name": "ModifyNote",
+          "uri": "/note/modify"
+        },
+        {
+          "name": "DeleteNote",
+          "uri": "/note/delete"
+        }
+      ]
+    }
+  ]
+}

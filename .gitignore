@@ -2,8 +2,8 @@
 *.log
 *.exe
 
-services/build/
+build/
 
-services/2_cloud_file/files/
-
-services/go.sum
+server/gateway/gateway
+server/1_user/1_user
+server/2_note/2_note

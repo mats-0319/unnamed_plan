@@ -1,0 +1,15 @@
+{
+  "level": "dev",
+  "items": [
+    {
+      "id": "22c4db2e-06d3-4d6a-b43f-c42aa6f57d15",
+      "name": "http",
+      "json": {
+        "port": "10319",
+        "allowed_origins": [
+          "*"
+        ]
+      }
+    }
+  ]
+}

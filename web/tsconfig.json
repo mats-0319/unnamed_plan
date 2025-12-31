@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noEmit": true, // 和下一条一起，允许在import ts文件的时候，添加'.ts'扩展名
+    "allowImportingTsExtensions": true,
+    "module": "esnext",
+    "target": "esnext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "types": [
+      "node"
+    ],
+    "composite": true,
+  },
+  "include": [
+    "src/**/*",
+    "src/**/*.vue",
+    "vite.config.ts",
+    "eslint.config.js"
+  ]
+}
