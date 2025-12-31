@@ -6,9 +6,16 @@
 import axios, { AxiosInstance } from "axios"
 
 export const axiosWrapper: AxiosInstance = axios.create({
-	baseURL: import.meta.env.Vite_axios_base_url,
+	baseURL: getBaseUrl(),
 	timeout: 3000
 })
+
+export function getBaseUrl(): string {
+	let url = import.meta.env.Vite_axios_base_url
+	let localIP = window.location.hostname
+
+	return import.meta.env.DEV ? url.replace("127.0.0.1", localIP) : url
+}
 
 // generate '.env.development' file in root path,
 // with content 'Vite_axios_base_url = "http://127.0.0.1:10319/api"'

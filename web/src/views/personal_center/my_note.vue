@@ -44,7 +44,7 @@
 			</el-form-item>
 
 			<el-form-item label="内容">
-				<el-input v-model="createNoteReq.content" />
+				<el-input v-model="createNoteReq.content" type="textarea" :rows="4" />
 			</el-form-item>
 
 			<el-form-item label="是否匿名发布">
@@ -68,7 +68,7 @@
 			</el-form-item>
 
 			<el-form-item label="内容">
-				<el-input v-model="modifyNoteReq.content" />
+				<el-input v-model="modifyNoteReq.content" type="textarea" :rows="4" />
 			</el-form-item>
 
 			<el-form-item label="是否匿名发布">

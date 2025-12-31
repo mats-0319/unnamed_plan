@@ -59,7 +59,7 @@ function nextNote(): void {
 	}
 
 	// 如果当前已经是列表的最后一个小纸条了，则获取下一页
-	if (currentIndex > 0 && currentIndex == notes.value.length - 1) {
+	if (currentIndex >= 0 && currentIndex == notes.value.length - 1) {
 		if (currentNum.value >= amount.value) {
 			listNote()
 			currentNum.value = 0
@@ -136,7 +136,7 @@ function listNote(pageNum: number = 1): void {
 
 		position: absolute;
 		right: 1rem;
-		bottom: 7rem;
+		bottom: 3rem;
 	}
 }
 </style>

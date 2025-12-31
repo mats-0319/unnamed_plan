@@ -15,6 +15,7 @@ import (
 type Context struct {
 	Writer  http.ResponseWriter
 	Request *http.Request
+	Origin  string // when forward, set http req header 'Origin'
 
 	UserID      uint
 	AccessToken string // 登录成功获得，后续请求均需要在请求头带上该参数
@@ -23,7 +24,7 @@ type Context struct {
 	ResData    any               // allow: errStr/error/struct/[]byte
 }
 
-func NewContext(w http.ResponseWriter, r *http.Request) *Context {
+func NewContext(w http.ResponseWriter, r *http.Request, origin string) *Context {
 	userIDStr := r.Header.Get(mconst.HttpHeader_UserID)
 	userID, _ := strconv.Atoi(userIDStr)
 	token := r.Header.Get(mconst.HttpHeader_AccessToken)
@@ -31,6 +32,7 @@ func NewContext(w http.ResponseWriter, r *http.Request) *Context {
 	return &Context{
 		Writer:      w,
 		Request:     r,
+		Origin:      origin,
 		UserID:      uint(userID),
 		AccessToken: token,
 		ResHeaders:  make(map[string]string),

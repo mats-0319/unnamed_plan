@@ -1,4 +1,5 @@
 import { fileURLToPath, URL } from "node:url"
+import os from "os"
 
 import { defineConfig } from "vite"
 import vue from "@vitejs/plugin-vue"
@@ -22,8 +23,22 @@ export default defineConfig({
 	resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
 	clearScreen: false,
 	server: {
-		host: "127.0.0.1",
+		host: getLocalIP(),
 		port: 20319,
 		open: true
 	}
 })
+
+export function getLocalIP(): string {
+	const networks = os.networkInterfaces()
+	for (let key in networks) {
+		// @ts-ignore
+		for (let ins of networks[key]) {
+			if (ins.family === "IPv4" && !ins.internal) {
+				return ins.address
+			}
+		}
+	}
+
+	return "127.0.0.1"
+}

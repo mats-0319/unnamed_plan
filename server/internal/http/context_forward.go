@@ -17,7 +17,7 @@ func (ctx *Context) Forward(url string) (*http.Response, error) {
 	}
 
 	// set req header(s)
-	req.Header.Add("Origin", ctx.Request.Host)
+	req.Header.Add("Origin", ctx.Origin)
 	for _, header := range mconst.HttpHeaderList {
 		value := ctx.Request.Header.Get(header)
 		req.Header.Add(header, value)

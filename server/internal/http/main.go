@@ -2,6 +2,7 @@ package mhttp
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -21,7 +22,7 @@ func StartServer(handler *Handler) {
 
 	handler.supportedUri()
 
-	addr := "127.0.0.1:" + handler.config.Port
+	addr := fmt.Sprintf("%s:%s", "0.0.0.0", handler.config.Port)
 	mlog.Log("> Listening at: " + addr)
 
 	err := http.ListenAndServe(addr, handler)

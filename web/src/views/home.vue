@@ -45,13 +45,13 @@ import Bottom from "@/components/bottom.vue"
 			@media (min-width: 1280px) {
 				font-size: 1.6rem;
 			}
-			font-size: 1rem;
+			font-size: 1.4rem;
 
 			.hci-en {
 				@media (min-width: 1280px) {
 					font-size: 1.2rem;
 				}
-				font-size: 0.8rem;
+				font-size: 1rem;
 			}
 		}
 

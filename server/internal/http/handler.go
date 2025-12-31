@@ -20,7 +20,7 @@ type HandlerItem struct {
 }
 
 func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	ctx := NewContext(writer, request)
+	ctx := NewContext(writer, request, "127.0.0.1:"+h.config.Port)
 	defer ctx.response()
 
 	origin := request.Header.Get("Origin")

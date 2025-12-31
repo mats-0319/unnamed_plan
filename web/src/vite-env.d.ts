@@ -5,6 +5,7 @@ interface ViteTypeOptions {
 }
 
 interface ImportMetaEnv {
+	DEV: boolean
 	readonly Vite_axios_base_url: string
 }
 
