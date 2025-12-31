@@ -1,11 +1,11 @@
 package handlers
 
 import (
-	. "github.com/mats0319/unnamed_plan/server/internal/const"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
+	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 func ModifyNote(ctx *mhttp.Context) {

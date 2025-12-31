@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	. "github.com/mats0319/unnamed_plan/server/internal/const"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
+	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 type Handler struct {

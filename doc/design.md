@@ -15,6 +15,8 @@
     - css实现方式：`@media (min-width: 1280px) {}`
 - 业务服务仅接受网关转发的请求
     - 网关转发请求时，将自身的host写到请求头`Origin`，业务服务读取并判断该请求头
+    - 网关会同步转发前端的自定义请求头(req headers)和业务服务的自定义响应头(res headers)
+    - 网关层保存和验证用户登录`token`
 
 ## 用户服务
 
@@ -22,7 +24,7 @@
 - 密码不使用明文，界面上输入密码后执行一次hash放入请求体、服务端保存的则是密码hash加盐之后的hash
     - req: `hex(hash('password text'))`
     - db: `hex(hash('pwd hash'+'salt'))`
-    - hash: `sha256`
+    - hash algorithm: `sha256`
     - 前端执行hash的目的是，即使恶意攻击窃取了http请求参数，也无法恢复出密码明文，进而攻击者无法使用我们的ui；
       后端执行hash的目的是，即使恶意攻击窃取了数据库数据，也无法恢复出密码hash，进而无法调用接口。
 - 使用服务端保存`token`的方式管理用户登录状态

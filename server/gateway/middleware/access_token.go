@@ -3,9 +3,9 @@ package middleware
 import (
 	"time"
 
-	. "github.com/mats0319/unnamed_plan/server/internal/const"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
+	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 type accessToken struct {

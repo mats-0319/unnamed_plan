@@ -1,4 +1,4 @@
-package mconst
+package utils
 
 import (
 	"fmt"

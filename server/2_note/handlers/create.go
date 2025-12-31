@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/mats0319/unnamed_plan/server/2_note/config"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	"github.com/mats0319/unnamed_plan/server/internal/db/model"
@@ -15,14 +17,18 @@ func CreateNote(ctx *mhttp.Context) {
 		return
 	}
 
-	reader, err := ctx.Forward("http://" + config.ConfigIns.Address + "/api" + api.URI_Authenticate)
+	url := fmt.Sprintf("http://%s/api%s", config.ConfigIns.Address, api.URI_Authenticate)
+	res, err := ctx.Forward(url)
 	if err != nil {
 		ctx.ResData = err
 		return
 	}
 
 	auth := &api.AuthenticateRes{}
-	if !ctx.ParseParams(auth, reader) {
+	if !ctx.ParseParams(auth, res.Body) || !auth.IsSuccess {
+		if !auth.IsSuccess {
+			ctx.ResData = auth
+		}
 		return
 	}
 

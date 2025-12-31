@@ -1,11 +1,11 @@
-package mconst
+package utils
 
 type ErrorType string
 
 const (
 	// change http status code
 	ET_ServerInternalError ErrorType = "Server Internal Error"
-	ET_UnauthorizedError   ErrorType = "Authentication Error"
+	ET_UnauthorizedError   ErrorType = "Unauthorized Error"
 
 	ET_ParamsError   ErrorType = "Params Error"
 	ET_OperatorError ErrorType = "Operator Error"

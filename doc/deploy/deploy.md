@@ -4,7 +4,7 @@
 
 ## 数据库(pg)
 
-ubuntu系统自带一个pg数据库的指定版本快照，如果想要安装指定版本，参考[官方文档](https://www.postgresql.org/download/linux/ubuntu/)
+ubuntu系统自带一个pg数据库的指定版本快照，如果想要安装其他版本，参考[官方文档](https://www.postgresql.org/download/linux/ubuntu/)
 
 - `apt install postgresql`
 
@@ -30,9 +30,14 @@ config file: `/etc/postgresql/16/main/postgresql.conf`(注意版本号)
 add: `listen_address: '*'`
 
 config file: `/etc/postgresql/16/main/pg_hba.conf`
-add: `host all all 0.0.0.0/0 md5`
+add: 
+```txt
+host cloud all 127.0.0.1/32 md5     // 允许本机连接cloud数据库
+host cloud all 0.0.0.0/0    reject  // 不允许其他连接访问cloud
+host all   all 0.0.0.0/0    md5     // 允许所有远程连接
+```
 
-重启服务：`sudo systemctl restart postgresql`
+重启/重载服务：`sudo systemctl restart/reload postgresql`
 
 ## nginx
 
@@ -79,7 +84,7 @@ nginx常用命令：
     - 默认在`/root/.ssh/`目录生成`id_ed25519`和`id_ed25519.pub`文件
     - 将没有后缀名的私钥下载到本地
 - 设置公钥：`cat ./id_ed25519.pub >> ./authorized_keys`(注意切换路径)
-    - 将`id_ed25519.pub`复制并改名为`authorized_keys`
+    - 将`id_ed25519.pub`写入`authorized_keys`
 - 本地验证公钥的有效性：`ssh -i ./id_ed25519 localhost`
     - 修改ssh服务器安全策略：`sudo vim /etc/ssh/sshd_config`
         - 找到以下配置项并修改为对应值

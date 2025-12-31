@@ -32,8 +32,8 @@ var defaultUsers = []*model.User{
 var testNotes = []*model.Note{
 	{
 		NoteID:      utils.Uuid[string](),
-		WriterID:    1002,
-		WriterName:  "admin",
+		WriterID:    1001,
+		WriterName:  "mats0319",
 		IsAnonymous: false,
 		Title:       "对上暗号的微妙感",
 		Content: "一次坐公交的时候，听到喇叭播放：“尊老爱幼是中华民族的传统美德......”，最开始没当回事，" +
@@ -46,8 +46,8 @@ var testNotes = []*model.Note{
 	},
 	{
 		NoteID:      utils.Uuid[string](),
-		WriterID:    1002,
-		WriterName:  "admin",
+		WriterID:    1001,
+		WriterName:  "mats0319",
 		IsAnonymous: false,
 		Title:       "当你认为身边的人都是傻子的时候，你应当想一想，是不是在周边人眼中你才是那个傻子，而他们形成了某种默契在哄着你玩。",
 		Content: "小学3、4年级的时候，网络游戏天龙八部正火，而我家里当时连电脑都没有，我又想显得合群，就谎称自己也在玩，" +

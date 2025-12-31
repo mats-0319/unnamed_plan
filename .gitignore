@@ -3,7 +3,6 @@
 *.exe
 
 build/
-doc/legacy/
 
 server/gateway/gateway
 server/1_user/1_user

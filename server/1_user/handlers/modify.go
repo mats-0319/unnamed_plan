@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/base32"
 
-	. "github.com/mats0319/unnamed_plan/server/internal/const"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
@@ -29,7 +28,7 @@ func ModifyUser(ctx *mhttp.Context) {
 	if len(req.Password) > 0 {
 		newPassword := utils.CalcSHA256(req.Password, operator.Salt)
 		if newPassword == operator.Password {
-			e := NewError(ET_ParamsError, ED_SamePwd)
+			e := utils.NewError(utils.ET_ParamsError, utils.ED_SamePwd)
 			mlog.Log(e.String())
 			ctx.ResData = e
 			return
@@ -40,7 +39,7 @@ func ModifyUser(ctx *mhttp.Context) {
 	if req.ModifyTkFlag {
 		bytes, err := base32.StdEncoding.DecodeString(req.TotpKey)
 		if err != nil || len(bytes) > 10 {
-			e := NewError(ET_ParamsError, ED_InvalidTotpKey).WithParam("totp key", req.TotpKey).WithCause(err)
+			e := utils.NewError(utils.ET_ParamsError, utils.ED_InvalidTotpKey).WithParam("totp key", req.TotpKey).WithCause(err)
 			mlog.Log(e.String())
 			ctx.ResData = e
 			return

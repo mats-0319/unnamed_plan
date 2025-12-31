@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	. "github.com/mats0319/unnamed_plan/server/internal/const"
+	mconst "github.com/mats0319/unnamed_plan/server/internal/const"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
@@ -30,7 +30,7 @@ func Login(ctx *mhttp.Context) {
 	}
 
 	if utils.CalcSHA256(req.Password, user.Salt) != user.Password {
-		e := NewError(ET_ParamsError, ED_InvalidPwd).WithParam("user name", req.UserName)
+		e := utils.NewError(utils.ET_ParamsError, utils.ED_InvalidPwd).WithParam("user name", req.UserName)
 		mlog.Log(e.String())
 		ctx.ResData = e
 		return
@@ -53,8 +53,8 @@ func Login(ctx *mhttp.Context) {
 	}
 
 	// token
-	ctx.ResHeaders[HttpHeader_UserID] = strconv.Itoa(int(user.ID))
-	ctx.ResHeaders[HttpHeader_AccessToken] = string(utils.GenerateRandomBytes(10))
+	ctx.ResHeaders[mconst.HttpHeader_UserID] = strconv.Itoa(int(user.ID))
+	ctx.ResHeaders[mconst.HttpHeader_AccessToken] = string(utils.GenerateRandomBytes(10))
 
 	ctx.ResData = &api.LoginRes{
 		ResBase:  api.ResBaseSuccess,
@@ -68,7 +68,7 @@ func Login(ctx *mhttp.Context) {
 // verifyTotpCode totpKey is base32 encoded
 func verifyTotpCode(code string, totpKey string) error {
 	if len(code) != 6 {
-		e := NewError(ET_ParamsError, ED_InvalidTotpCode).WithParam("code", code)
+		e := utils.NewError(utils.ET_ParamsError, utils.ED_InvalidTotpCode).WithParam("code", code)
 		mlog.Log(e.String())
 		return e
 	}
@@ -76,7 +76,7 @@ func verifyTotpCode(code string, totpKey string) error {
 	key := make([]byte, 10)
 	n, err := base32.StdEncoding.Decode(key, []byte(totpKey))
 	if err != nil {
-		e := NewError(ET_ServerInternalError).WithCause(err)
+		e := utils.NewError(utils.ET_ServerInternalError).WithCause(err)
 		mlog.Log(e.String())
 		return e
 	}
@@ -99,7 +99,7 @@ func verifyTotpCode(code string, totpKey string) error {
 	}
 
 	if !existFlag {
-		e := NewError(ET_ParamsError, ED_InvalidTotpCode).WithParam("code", code)
+		e := utils.NewError(utils.ET_ParamsError, utils.ED_InvalidTotpCode).WithParam("code", code)
 		mlog.Log(e.String())
 		return e
 	}
