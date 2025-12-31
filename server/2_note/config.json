@@ -22,9 +22,9 @@
     },
     {
       "id": "90d6a34a-adfa-4c9b-afad-d80d66e24467",
-      "name": "user server",
+      "name": "note",
       "json": {
-        "address": "127.0.0.1:10320"
+        "user_server_addr": "127.0.0.1:10320"
       }
     }
   ]

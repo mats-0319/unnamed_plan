@@ -17,12 +17,13 @@ func CreateNote(ctx *mhttp.Context) {
 		return
 	}
 
-	url := fmt.Sprintf("http://%s/api%s", config.ConfigIns.Address, api.URI_Authenticate)
+	url := fmt.Sprintf("http://%s/api%s", config.ConfigIns.UserServerAddr, api.URI_Authenticate)
 	res, err := ctx.Forward(url)
 	if err != nil {
 		ctx.ResData = err
 		return
 	}
+	defer res.Body.Close()
 
 	auth := &api.AuthenticateRes{}
 	if !ctx.ParseParams(auth, res.Body) || !auth.IsSuccess {

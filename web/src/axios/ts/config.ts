@@ -10,7 +10,7 @@ export const axiosWrapper: AxiosInstance = axios.create({
 	timeout: 3000
 })
 
-export function getBaseUrl(): string {
+function getBaseUrl(): string {
 	let url = import.meta.env.Vite_axios_base_url
 	let localIP = window.location.hostname
 

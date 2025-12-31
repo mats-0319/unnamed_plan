@@ -66,7 +66,7 @@ func Login(ctx *mhttp.Context) {
 }
 
 // verifyTotpCode totpKey is base32 encoded
-func verifyTotpCode(code string, totpKey string) error {
+func verifyTotpCode(code string, totpKey string) *utils.Error {
 	if len(code) != 6 {
 		e := utils.NewError(utils.ET_ParamsError, utils.ED_InvalidTotpCode).WithParam("code", code)
 		mlog.Log(e.String())

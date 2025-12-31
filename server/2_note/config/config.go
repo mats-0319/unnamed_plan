@@ -9,7 +9,7 @@ import (
 )
 
 type Config struct {
-	Address string `json:"address"`
+	UserServerAddr string `json:"user_server_addr"`
 }
 
 var ConfigIns *Config
@@ -19,7 +19,7 @@ func init() {
 }
 
 func getConfig() *Config {
-	jsonBytes := mconfig.GetConfigItem(mconst.UID_UserServer)
+	jsonBytes := mconfig.GetConfigItem(mconst.UID_Note)
 
 	res := &Config{}
 	err := json.Unmarshal(jsonBytes, res)

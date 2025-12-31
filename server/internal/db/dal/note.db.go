@@ -10,7 +10,7 @@ import (
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-func GetNote(id uint) (*model.Note, error) {
+func GetNote(id uint) (*model.Note, *Error) {
 	qn := Q.Note
 	sql := qn.WithContext(context.TODO()).Where(qn.ID.Eq(id))
 
@@ -24,7 +24,7 @@ func GetNote(id uint) (*model.Note, error) {
 	return res, nil
 }
 
-func CreateNote(note *model.Note) error {
+func CreateNote(note *model.Note) *Error {
 	err := Q.Note.WithContext(context.TODO()).Create(note)
 	if err != nil {
 		var e *Error
@@ -41,7 +41,7 @@ func CreateNote(note *model.Note) error {
 	return nil
 }
 
-func UpdateNote(note *model.Note) error {
+func UpdateNote(note *model.Note) *Error {
 	qn := Q.Note
 	err := qn.WithContext(context.TODO()).Where(qn.ID.Eq(note.ID)).Save(note)
 	if err != nil {
@@ -53,7 +53,7 @@ func UpdateNote(note *model.Note) error {
 	return nil
 }
 
-func DeleteNote(id uint) error {
+func DeleteNote(id uint) *Error {
 	qn := Q.Note
 	_, err := qn.WithContext(context.TODO()).Where(qn.ID.Eq(id)).Delete()
 	if err != nil {
@@ -65,7 +65,7 @@ func DeleteNote(id uint) error {
 	return nil
 }
 
-func ListNote(page api.Pagination, writerID ...uint) (int64, []*model.Note, error) {
+func ListNote(page api.Pagination, writerID ...uint) (int64, []*model.Note, *Error) {
 	qn := Q.Note
 	sql := qn.WithContext(context.TODO())
 	if len(writerID) > 0 {
@@ -76,14 +76,14 @@ func ListNote(page api.Pagination, writerID ...uint) (int64, []*model.Note, erro
 	if err != nil {
 		e := NewError(ET_ServerInternalError).WithCause(err)
 		mlog.Log(e.String())
-		return 0, nil, err
+		return 0, nil, e
 	}
 
 	res, err := sql.Order(qn.UpdatedAt.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
 	if err != nil {
 		e := NewError(ET_ServerInternalError).WithCause(err)
 		mlog.Log(e.String())
-		return 0, nil, err
+		return 0, nil, e
 	}
 
 	return amount, res, nil

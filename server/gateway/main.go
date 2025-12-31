@@ -50,6 +50,7 @@ func forward(ctx *mhttp.Context) {
 		ctx.ResData = err
 		return
 	}
+	defer res.Body.Close()
 
 	setLoginToken(ctx)
 

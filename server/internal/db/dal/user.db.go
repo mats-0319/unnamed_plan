@@ -11,7 +11,7 @@ import (
 )
 
 // GetUser query user by 'id'/'username', according to value type
-func GetUser[T uint | string](value T) (*model.User, error) {
+func GetUser[T uint | string](value T) (*model.User, *Error) {
 	qu := Q.User
 	sql := qu.WithContext(context.TODO())
 
@@ -32,7 +32,7 @@ func GetUser[T uint | string](value T) (*model.User, error) {
 	return res, nil
 }
 
-func CreateUser(user *model.User) error {
+func CreateUser(user *model.User) *Error {
 	err := Q.User.WithContext(context.TODO()).Create(user)
 	if err != nil {
 		var e *Error
@@ -49,7 +49,7 @@ func CreateUser(user *model.User) error {
 	return nil
 }
 
-func UpdateUser(user *model.User) error {
+func UpdateUser(user *model.User) *Error {
 	qu := Q.User
 	err := qu.WithContext(context.TODO()).Where(qu.ID.Eq(user.ID)).Save(user)
 	if err != nil {
@@ -61,7 +61,7 @@ func UpdateUser(user *model.User) error {
 	return nil
 }
 
-func ListUsers(page api.Pagination) (int64, []*model.User, error) {
+func ListUsers(page api.Pagination) (int64, []*model.User, *Error) {
 	qu := Q.User
 	sql := qu.WithContext(context.TODO())
 
@@ -69,14 +69,14 @@ func ListUsers(page api.Pagination) (int64, []*model.User, error) {
 	if err != nil {
 		e := NewError(ET_ServerInternalError).WithCause(err)
 		mlog.Log(e.String())
-		return 0, nil, err
+		return 0, nil, e
 	}
 
 	res, err := sql.Order(qu.LastLogin.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
 	if err != nil {
 		e := NewError(ET_ServerInternalError).WithCause(err)
 		mlog.Log(e.String())
-		return 0, nil, err
+		return 0, nil, e
 	}
 
 	return amount, res, nil

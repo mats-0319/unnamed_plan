@@ -19,7 +19,7 @@ todo：截几张使用截图，包括pc端和移动端（等移动端ui调整之
 
 - go 1.25
 - node 24 (corepack-pnpm)
-- postgresql
+- postgresql 16
 
 本地运行：`server/.run/`文件夹包含服务端程序构建配置（jetbrains ide可用），修改配置文件即可启动服务端程序。
 
@@ -29,9 +29,11 @@ todo：截几张使用截图，包括pc端和移动端（等移动端ui调整之
 
 > 感谢：[绘图工具](https://excalidraw.com)，[压缩工具](https://tinypng.com)
 
-todo：画结构图和流程图
+![v0.2结构图](doc/image/up_structure_v2_tiny.png)
 
-## 项目目录
+## 项目介绍
+
+目录：
 
 - build：生成的部署用内容
 - doc：文档
@@ -42,8 +44,41 @@ todo：画结构图和流程图
 - server：服务端代码
 - web：ui代码
 
-## design
+主要技术、框架与工具：
 
-todo：介绍代码过程，例如orm、dao使用的都是gorm；前后端传递消息的格式规范使用的是自研工具gocts；
-程序启动过程、http请求过程等，考虑配图；
-在盘一遍代码过程的过程中，多问几个为什么，尝试进一步优化代码
+- go 1.25
+- gorm
+    - ORM: Object Relation Mapping，对象关系映射，将数据库的行、列甚至数据库本身，映射成编程语言的对象或字段。
+      使用ORM，可以通过形如`db.create(user)`的方式操作数据库，而不需要编写形如`insert into user values (...)`的sql
+    - DAO: Data Access Object，数据访问对象，将数据库操作包装在一起，与业务代码分离。
+      主要应用场景有：需要接多个数据库（pg、mysql、sqlite）、数据操作复杂（例如复杂查询，sql写出来上KB的）
+- gocts：自研工具，可以根据go定义的接口结构，生成对应ts的结构class和axios client代码。
+
+- vue3 (html+ts+less)
+- node 24 (corepack-pnpm)
+- vite
+- axios
+- vue-router
+- pinia
+- element-plus
+- eslint+prettier
+
+- nginx
+- postgresql
+- shell
+
+一个http请求的处理过程：
+
+- 一个请求来到网关，验证请求头`Origin`是否是允许的（配置文件），请求方法是不是`post`
+    - nginx会配置请求发往网关
+    - 验证通过后会设置允许跨域、允许额外的请求头、响应头
+    - 直接返回所有非`post`请求
+- 根据请求的uri，尝试获取对应的处理器
+    - 获取失败，视为不支持的接口请求，返回失败
+- 执行处理器中注册的中间件、处理函数
+    - 网关服务的处理函数统一为转发，即将收到的请求转发给对应的业务服务
+    - 转发会修改`Origin`为网关的监听地址，还会带上自定义的请求头
+- 现在请求来到了业务服务，还是验证`Origin`、获取处理器、执行中间件和处理函数的流程
+    - 业务服务的处理函数可能还包含转发，流程上就是这一步骤的重复
+- 业务服务返回执行结果给转发者，转发者执行完后续流程后返回给前端
+    - 转发者可能是网关，也可能是另一个业务服务，参考上一环节
