@@ -11,7 +11,7 @@ import (
 )
 
 // GetUser query user by 'id'/'username', according to value type
-func GetUser[T uint | string](value T) (*model.User, *Error) {
+func GetUser[T uint | string](value T) (*model.User, error) {
 	qu := Q.User
 	sql := qu.WithContext(context.TODO())
 
@@ -32,7 +32,7 @@ func GetUser[T uint | string](value T) (*model.User, *Error) {
 	return res, nil
 }
 
-func CreateUser(user *model.User) *Error {
+func CreateUser(user *model.User) error {
 	err := Q.User.WithContext(context.TODO()).Create(user)
 	if err != nil {
 		var e *Error
@@ -49,7 +49,7 @@ func CreateUser(user *model.User) *Error {
 	return nil
 }
 
-func UpdateUser(user *model.User) *Error {
+func UpdateUser(user *model.User) error {
 	qu := Q.User
 	err := qu.WithContext(context.TODO()).Where(qu.ID.Eq(user.ID)).Save(user)
 	if err != nil {
@@ -61,7 +61,7 @@ func UpdateUser(user *model.User) *Error {
 	return nil
 }
 
-func ListUsers(page api.Pagination) (int64, []*model.User, *Error) {
+func ListUsers(page api.Pagination) (int64, []*model.User, error) {
 	qu := Q.User
 	sql := qu.WithContext(context.TODO())
 
