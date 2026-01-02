@@ -121,6 +121,7 @@ function listNote(pageNum: number = 1): void {
 			.ncc-form {
 				max-height: calc(100vh - 6.25rem - 6.25rem - 10rem - 8rem - 4rem);
 				overflow-y: auto;
+				white-space: pre-wrap;
 
 				&::-webkit-scrollbar {
 					display: none;
