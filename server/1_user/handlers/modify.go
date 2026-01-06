@@ -16,6 +16,13 @@ func ModifyUser(ctx *mhttp.Context) {
 		return
 	}
 
+	if len(req.Nickname) < 1 && len(req.Password) < 1 && !req.ModifyTkFlag {
+		err := utils.NewError(utils.ET_ParamsError, utils.ED_NoChanges)
+		ctx.ResData = err
+		mlog.Log(err.String())
+		return
+	}
+
 	operator, err := dal.GetUser(ctx.UserID)
 	if err != nil {
 		ctx.ResData = err
@@ -29,8 +36,8 @@ func ModifyUser(ctx *mhttp.Context) {
 		newPassword := utils.CalcSHA256(req.Password, operator.Salt)
 		if newPassword == operator.Password {
 			e := utils.NewError(utils.ET_ParamsError, utils.ED_SamePwd)
-			mlog.Log(e.String())
 			ctx.ResData = e
+			mlog.Log(e.String())
 			return
 		}
 
@@ -40,8 +47,8 @@ func ModifyUser(ctx *mhttp.Context) {
 		bytes, err := base32.StdEncoding.DecodeString(req.TotpKey)
 		if err != nil || len(bytes) > 10 {
 			e := utils.NewError(utils.ET_ParamsError, utils.ED_InvalidTotpKey).WithParam("totp key", req.TotpKey).WithCause(err)
-			mlog.Log(e.String())
 			ctx.ResData = e
+			mlog.Log(e.String())
 			return
 		}
 

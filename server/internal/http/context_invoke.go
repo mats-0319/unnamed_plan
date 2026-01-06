@@ -8,7 +8,7 @@ import (
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-func (ctx *Context) Forward(url string) (*http.Response, error) {
+func (ctx *Context) Invoke(url string) (*http.Response, *Error) {
 	req, err := http.NewRequest(http.MethodPost, url, ctx.Request.Body)
 	if err != nil {
 		e := NewError(ET_ServerInternalError).WithCause(err)

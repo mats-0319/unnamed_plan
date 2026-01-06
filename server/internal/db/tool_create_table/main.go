@@ -32,12 +32,12 @@ func main() {
 		log.Fatalln("create db table failed, error: ", err)
 	}
 
+	// 修改sequence，设置id初始值
 	tableNames, err := db.Migrator().GetTables()
 	if err != nil {
 		log.Fatalln("get table names failed, error: ", err)
 	}
 
-	// 修改sequence，设置初始值
 	for _, v := range tableNames {
 		sequence := fmt.Sprintf("%s_id_seq", v)
 		db.Exec(fmt.Sprintf("alter sequence %s restart with 1001;", sequence))

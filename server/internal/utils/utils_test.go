@@ -3,7 +3,7 @@ package utils
 import "testing"
 
 func TestPasswordWithSalt(t *testing.T) {
-	salt := string(GenerateRandomBytes(10))
+	salt := GenerateRandomStr(10)
 	t.Log("salt :", salt)
 
 	password := "123456"

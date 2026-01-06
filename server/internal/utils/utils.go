@@ -22,8 +22,8 @@ func CalcSHA256(text string, append ...string) string {
 const CharactersLibrary = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 const useBits = 6 // 6个bit位可以表示全部字符库中的字符
 
-// GenerateRandomBytes generate random 'length' readable Bytes
-func GenerateRandomBytes(length int) []byte {
+// GenerateRandomStr generate random 'length' readable Bytes
+func GenerateRandomStr(length int) string {
 	b := make([]byte, length)
 
 	randomNum, remainBits := rand.Int64(), 64
@@ -45,7 +45,7 @@ func GenerateRandomBytes(length int) []byte {
 		}
 	}
 
-	return b
+	return string(b)
 }
 
 // Uuid return uuid v4 string,

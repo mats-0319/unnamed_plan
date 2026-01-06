@@ -1,0 +1,21 @@
+package api
+
+import (
+	"fmt"
+	"time"
+
+	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
+)
+
+func UserRegister() {
+	TestApi("Register")
+
+	TestCase("duplicate register")
+	HttpInvoke(api.URI_Register, `{"user_name":"admin","password":""}`)
+
+	// success
+	newUserName := fmt.Sprintf("new user %d", time.Now().UnixMilli())
+	HttpInvoke(api.URI_Register, fmt.Sprintf(`{"user_name":"%s","password":"123"}`, newUserName))
+
+	TestApiEnd()
+}

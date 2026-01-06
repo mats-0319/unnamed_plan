@@ -31,8 +31,8 @@ func Login(ctx *mhttp.Context) {
 
 	if utils.CalcSHA256(req.Password, user.Salt) != user.Password {
 		e := utils.NewError(utils.ET_ParamsError, utils.ED_InvalidPwd).WithParam("user name", req.UserName)
-		mlog.Log(e.String())
 		ctx.ResData = e
+		mlog.Log(e.String())
 		return
 	}
 
@@ -54,7 +54,7 @@ func Login(ctx *mhttp.Context) {
 
 	// token
 	ctx.ResHeaders[mconst.HttpHeader_UserID] = strconv.Itoa(int(user.ID))
-	ctx.ResHeaders[mconst.HttpHeader_AccessToken] = string(utils.GenerateRandomBytes(10))
+	ctx.ResHeaders[mconst.HttpHeader_AccessToken] = utils.GenerateRandomStr(10)
 
 	ctx.ResData = &api.LoginRes{
 		ResBase:  api.ResBaseSuccess,

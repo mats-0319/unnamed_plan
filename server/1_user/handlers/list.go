@@ -23,8 +23,8 @@ func ListUser(ctx *mhttp.Context) {
 
 	if !operator.IsAdmin {
 		e := NewError(ET_OperatorError, ED_NeedAdmin).WithParam("operator", operator.UserName)
-		mlog.Log(e.String())
 		ctx.ResData = e
+		mlog.Log(e.String())
 		return
 	}
 

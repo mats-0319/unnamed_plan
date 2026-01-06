@@ -18,7 +18,7 @@ func CreateNote(ctx *mhttp.Context) {
 	}
 
 	url := fmt.Sprintf("http://%s/api%s", config.ConfigIns.UserServerAddr, api.URI_Authenticate)
-	res, err := ctx.Forward(url)
+	res, err := ctx.Invoke(url)
 	if err != nil {
 		ctx.ResData = err
 		return
@@ -41,7 +41,8 @@ func CreateNote(ctx *mhttp.Context) {
 		Title:       req.Title,
 		Content:     req.Content,
 	}
-	if err = dal.CreateNote(note); err != nil {
+	err = dal.CreateNote(note)
+	if err != nil {
 		ctx.ResData = err
 		return
 	}

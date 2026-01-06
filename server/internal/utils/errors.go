@@ -27,16 +27,18 @@ const (
 
 	// business-user
 	ED_NeedAdmin       ErrorDetail = "Need Admin"
+	ED_NoChanges       ErrorDetail = "No Changes"
 	ED_InvalidPwd      ErrorDetail = "Invalid UserName or Password"
 	ED_InvalidTotpCode ErrorDetail = "Invalid TOTP Code"
 	ED_InvalidTotpKey  ErrorDetail = "Invalid TOTP Key"
-	ED_SamePwd         ErrorDetail = "Can't User Same Password When Re-set"
+	ED_SamePwd         ErrorDetail = "New Password Can't be Identical to The Old One"
 
 	// business-note
-	ED_NeedOwner     ErrorDetail = "Not Owner of Data"
-	ED_ModifyNothing ErrorDetail = "No Changes"
+	ED_NeedOwner ErrorDetail = "Not Owner of Data"
 
 	// db
-	ED_UserExist ErrorDetail = "User Already Exist"
-	ED_NoteExist ErrorDetail = "Note Already Exist"
+	ED_UserExist    ErrorDetail = "User Already Exist"
+	ED_NoteExist    ErrorDetail = "Note Already Exist"
+	ED_UserNotFound ErrorDetail = "User Not Found"
+	ED_NoteNotFound ErrorDetail = "Note Not Found"
 )

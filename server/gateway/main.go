@@ -45,7 +45,7 @@ func forward(ctx *mhttp.Context) {
 		return
 	}
 
-	res, err := ctx.Forward(url)
+	res, err := ctx.Invoke(url)
 	if err != nil {
 		ctx.ResData = err
 		return
@@ -54,19 +54,16 @@ func forward(ctx *mhttp.Context) {
 
 	setLoginToken(ctx)
 
-	// 这里我们希望统一使用ctx.response设置响应头和返回值，所以不使用io.copy直接复制res.body
-	bodyBytes, err := io.ReadAll(res.Body)
+	bodyBytes, err := readData(res.Body)
 	if err != nil {
-		e := NewError(ET_ServerInternalError).WithCause(err)
-		mlog.Log(e.String())
-		ctx.ResData = e
+		ctx.ResData = err
 		return
 	}
 
 	ctx.ResData = bodyBytes
 }
 
-func getURL(ctx *mhttp.Context) (string, error) {
+func getURL(ctx *mhttp.Context) (string, *Error) {
 	uri := ctx.Request.RequestURI
 	v, ok := serverNames[uri]
 
@@ -95,4 +92,16 @@ func setLoginToken(ctx *mhttp.Context) {
 	if userID > 0 && len(token) > 0 {
 		middleware.SetToken(uint(userID), token)
 	}
+}
+
+func readData(r io.Reader) ([]byte, *Error) {
+	// 这里我们希望统一使用ctx.response设置响应头和返回值，所以不使用io.copy直接复制res.body
+	bodyBytes, err2 := io.ReadAll(r)
+	if err2 != nil {
+		e := NewError(ET_ServerInternalError).WithCause(err2)
+		mlog.Log(e.String())
+		return nil, e
+	}
+
+	return bodyBytes, nil
 }
