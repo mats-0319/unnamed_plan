@@ -1,6 +1,10 @@
 package api
 
-import api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
+import (
+	"log"
+
+	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
+)
 
 func NoteDelete() {
 	TestApi("Delete Note")
@@ -12,9 +16,10 @@ func NoteDelete() {
 	HttpInvoke(api.URI_Login, `{"user_name":"mats0319","password":"8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92","totp_code":""}`)
 	HttpInvoke(api.URI_DeleteNote, `{"id":1001}`)
 
-	// success
+	TestCase("success")
 	HttpInvoke(api.URI_Login, `{"user_name":"user","password":"8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92","totp_code":""}`)
-	HttpInvoke(api.URI_DeleteNote, `{"id":1001}`)
+	res := HttpInvoke(api.URI_DeleteNote, `{"id":1001}`)
+	log.Println(res)
 
 	TestApiEnd()
 }

@@ -62,7 +62,7 @@ func HttpInvoke(uri string, payload string, t ...*LoginToken) string {
 		token.Token = tokenStr
 	}
 
-	return r.Err
+	return string(bodyBytes)
 }
 
 func TestApi(name string) {

@@ -1,6 +1,8 @@
 package api
 
 import (
+	"log"
+
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 )
 
@@ -10,8 +12,9 @@ func NoteCreate() {
 
 	// 通常不会重复创建，因为只有一个note id参数要求唯一，但这个参数还是服务端随机生成的
 
-	// success: 见上方第一条
-	HttpInvoke(api.URI_CreateNote, `{"is_anonymous":false,"title":"123","content":"456"}`)
+	TestCase("success")
+	res := HttpInvoke(api.URI_CreateNote, `{"is_anonymous":false,"title":"123","content":"456"}`)
+	log.Println(res)
 
 	TestApiEnd()
 }

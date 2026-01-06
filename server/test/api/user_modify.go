@@ -1,6 +1,8 @@
 package api
 
 import (
+	"log"
+
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 )
 
@@ -21,8 +23,9 @@ func UserModify() {
 	TestCase("invalid totp key")
 	HttpInvoke(api.URI_ModifyUser, `{"nickname":"","password":"","modify_tk_flag":true,"totp_key":"123"}`)
 
-	// success
-	HttpInvoke(api.URI_ModifyUser, `{"nickname":"123","password":"","modify_tk_flag":false,"totp_key":""}`)
+	TestCase("success")
+	res := HttpInvoke(api.URI_ModifyUser, `{"nickname":"123","password":"","modify_tk_flag":false,"totp_key":""}`)
+	log.Println(res)
 
 	TestApiEnd()
 }
