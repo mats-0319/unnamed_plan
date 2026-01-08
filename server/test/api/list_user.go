@@ -6,7 +6,7 @@ import (
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 )
 
-func UserList() {
+func ListUser() {
 	TestApi("List User")
 
 	// operator not exist(?): 需要mock

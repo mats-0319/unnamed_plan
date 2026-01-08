@@ -12,8 +12,7 @@ import (
 )
 
 type config struct {
-	Port           string   `json:"port"`
-	AllowedOrigins []string `json:"allowed_origins"`
+	Port string `json:"port"`
 }
 
 // StartServer is blocked

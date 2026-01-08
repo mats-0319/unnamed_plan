@@ -6,13 +6,13 @@ import (
 	"encoding/base32"
 	"fmt"
 	"math"
-	"strconv"
 	"time"
 
 	mconst "github.com/mats0319/unnamed_plan/server/internal/const"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
+	"github.com/mats0319/unnamed_plan/server/internal/http/middleware"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
@@ -53,8 +53,7 @@ func Login(ctx *mhttp.Context) {
 	}
 
 	// token
-	ctx.ResHeaders[mconst.HttpHeader_UserID] = strconv.Itoa(int(user.ID))
-	ctx.ResHeaders[mconst.HttpHeader_AccessToken] = utils.GenerateRandomStr(10)
+	ctx.SetHeader(mconst.HttpHeader_AccessToken, middleware.GenToken(user.ID))
 
 	ctx.ResData = &api.LoginRes{
 		ResBase:  api.ResBaseSuccess,

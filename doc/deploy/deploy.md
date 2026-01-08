@@ -102,6 +102,6 @@ nginx常用命令：
 
 ```txt
 #!/bin/sh -e
-[.exe path] &
+([.exe path] &)
 exit 0
 ```

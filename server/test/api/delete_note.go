@@ -6,7 +6,7 @@ import (
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 )
 
-func NoteDelete() {
+func DeleteNote() {
 	TestApi("Delete Note")
 
 	TestCase("note not exist")

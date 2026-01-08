@@ -18,8 +18,9 @@ const (
 	ED_Empty ErrorDetail = ""
 
 	// unauthorized
-	ED_InvalidUserIDOrToken ErrorDetail = "Invalid User ID or Token"
-	ED_TokenExpired         ErrorDetail = "Token Expired"
+	ED_InvalidAccessToken ErrorDetail = "Invalid Access Token"
+	ED_TokenTamperedWith  ErrorDetail = "Access Token has been Tampered With"
+	ED_TokenExpired       ErrorDetail = "Token Expired"
 
 	// params
 	ED_JsonMarshal   ErrorDetail = "Json Marshal Failed"

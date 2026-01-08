@@ -16,20 +16,14 @@ type Handler struct {
 
 type HandlerItem struct {
 	Func        func(ctx *Context)
-	Middlewares []func(ctx *Context) error
+	Middlewares []func(ctx *Context) *Error
 }
 
 func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	ctx := NewContext(writer, request, "127.0.0.1:"+h.config.Port)
+	ctx := NewContext(writer, request)
 	defer ctx.response()
 
-	origin := request.Header.Get("Origin")
-	if !h.isValidOrigin(origin) {
-		ctx.ResData = NewError(ET_ServerInternalError).WithParam("origin", origin)
-		return
-	}
-
-	writer.Header().Set("Access-Control-Allow-Origin", origin)
+	writer.Header().Set("Access-Control-Allow-Origin", "*")
 	writer.Header().Set("Access-Control-Allow-Headers", "*")
 	writer.Header().Set("Access-Control-Expose-Headers", "*")
 
@@ -59,7 +53,7 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	handlerItemIns.Func(ctx)
 }
 
-func (h *Handler) AddHandler(uri string, handlerFunc func(ctx *Context), middlewares ...func(ctx *Context) error) {
+func (h *Handler) AddHandler(uri string, handlerFunc func(ctx *Context), middlewares ...func(ctx *Context) *Error) {
 	if h.handlers == nil {
 		h.handlers = make(map[string]*HandlerItem)
 	}
@@ -74,16 +68,4 @@ func (h *Handler) supportedUri() {
 	for k := range h.handlers {
 		mlog.Log(fmt.Sprintf("| Http Registered: %s", k))
 	}
-}
-
-func (h *Handler) isValidOrigin(origin string) bool {
-	containsFlag := false
-	for _, v := range h.config.AllowedOrigins {
-		if origin == v || v == "*" {
-			containsFlag = true
-			break
-		}
-	}
-
-	return containsFlag
 }

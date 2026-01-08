@@ -12,8 +12,5 @@ const (
 )
 
 const (
-	HttpHeader_UserID      = "Unnamed-Plan-User-Id"
 	HttpHeader_AccessToken = "Unnamed-Plan-Access-Token"
 )
-
-var HttpHeaderList = []string{HttpHeader_UserID, HttpHeader_AccessToken}

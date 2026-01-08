@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/mats0319/unnamed_plan/server/internal/const"
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
@@ -15,27 +14,20 @@ import (
 type Context struct {
 	Writer  http.ResponseWriter
 	Request *http.Request
-	Origin  string // when forward, set http req header 'Origin'
 
-	UserID      uint
 	AccessToken string // 登录成功获得，后续请求均需要在请求头带上该参数
+	UserID      uint
 
-	ResHeaders map[string]string // header - value
-	ResData    any               // allow: errStr/error/struct/[]byte
+	ResData any // allow: errStr/error/struct/[]byte
 }
 
-func NewContext(w http.ResponseWriter, r *http.Request, origin string) *Context {
-	userIDStr := r.Header.Get(mconst.HttpHeader_UserID)
-	userID, _ := strconv.Atoi(userIDStr)
+func NewContext(w http.ResponseWriter, r *http.Request) *Context {
 	token := r.Header.Get(mconst.HttpHeader_AccessToken)
 
 	return &Context{
 		Writer:      w,
 		Request:     r,
-		Origin:      origin,
-		UserID:      uint(userID),
 		AccessToken: token,
-		ResHeaders:  make(map[string]string),
 	}
 }
 
@@ -66,12 +58,12 @@ func (ctx *Context) ParseParams(obj any, r ...io.Reader) bool {
 	return true
 }
 
+func (ctx *Context) SetHeader(header string, value string) {
+	ctx.Writer.Header().Set(header, value)
+}
+
 // response 该函数不应该中途返回，一定要执行到write
 func (ctx *Context) response() {
-	for header, value := range ctx.ResHeaders {
-		ctx.Writer.Header().Set(header, value)
-	}
-
 	code, resBytes := serializeRes(ctx.ResData)
 
 	if code != http.StatusOK {
@@ -105,7 +97,7 @@ func serializeRes(obj any) (int, []byte) {
 
 	jsonBytes, err := json.Marshal(obj)
 	if err != nil {
-		// 因为这里已经给resBytes定型了，所以返回错误也没啥能做的，就不返回了
+		// 因为这里已经给resBytes定型了，返回错误也没啥能做的，就不返回了
 		mlog.Log("serialize handlers res to json failed", mlog.Field("error", err))
 		return code, nil
 	}

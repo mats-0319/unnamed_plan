@@ -16,22 +16,15 @@ type LoginToken struct {
 	Token  string
 }
 
-var token = &LoginToken{}
+var accessToken = ""
 
-func HttpInvoke(uri string, payload string, t ...*LoginToken) string {
+func HttpInvoke(uri string, payload string) string {
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:10319/api"+uri, strings.NewReader(payload))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// set login token
-	if len(t) > 0 {
-		req.Header.Set(mconst.HttpHeader_UserID, t[0].UserID)
-		req.Header.Set(mconst.HttpHeader_AccessToken, t[0].Token)
-	} else {
-		req.Header.Set(mconst.HttpHeader_UserID, token.UserID)
-		req.Header.Set(mconst.HttpHeader_AccessToken, token.Token)
-	}
+	req.Header.Set(mconst.HttpHeader_AccessToken, accessToken)
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -53,13 +46,11 @@ func HttpInvoke(uri string, payload string, t ...*LoginToken) string {
 		log.Println(r.Err)
 	}
 
-	// read login token
-	userIDStr := res.Header.Get(mconst.HttpHeader_UserID)
+	// read access token
 	tokenStr := res.Header.Get(mconst.HttpHeader_AccessToken)
 
-	if len(userIDStr) > 0 && len(tokenStr) > 0 {
-		token.UserID = userIDStr
-		token.Token = tokenStr
+	if len(tokenStr) > 0 {
+		accessToken = tokenStr
 	}
 
 	return string(bodyBytes)

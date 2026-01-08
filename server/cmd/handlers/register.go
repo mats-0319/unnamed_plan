@@ -23,7 +23,8 @@ func Register(ctx *mhttp.Context) {
 		Password: pwd,
 		Salt:     salt,
 	}
-	if err := dal.CreateUser(user); err != nil {
+	err := dal.CreateUser(user)
+	if err != nil {
 		ctx.ResData = err
 		return
 	}

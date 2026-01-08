@@ -6,7 +6,7 @@ import (
 	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 )
 
-func NoteModify() {
+func ModifyNote() {
 	TestApi("Modify Note")
 
 	TestCase("note not exist")

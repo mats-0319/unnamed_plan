@@ -13,9 +13,7 @@ if [ -d "./build/" ]; then
 fi
 
 # '-p' flag will generate parent path if not exist
-mkdir -p "./build/server_gateway/"
-mkdir -p "./build/server_1_user/"
-mkdir -p "./build/server_2_note/"
+mkdir -p "./build/server/"
 # ui will 'mv' whole dir, unnecessary to 'mkdir'
 
 # build server
@@ -31,13 +29,11 @@ mkdir -p "./build/server_2_note/"
       go build -o "server_exec"
       cd ../.. || exit 1
 
-      mv "./server/${server_name}/server_exec" "./build/server_${server_name}/unnamed_plan_server_exec"
-      cp "./server/${server_name}/config_production.json" "./build/server_${server_name}/config.json"
+      mv "./server/${server_name}/server_exec" "./build/server/unnamed_plan_server_exec"
+      cp "./server/${server_name}/config_production.json" "./build/server/config.json"
     }
 
-  build_server "gateway"
-  build_server "1_user"
-  build_server "2_note"
+  build_server "cmd"
 
 # build ui
 
