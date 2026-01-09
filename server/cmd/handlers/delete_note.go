@@ -27,7 +27,8 @@ func DeleteNote(ctx *mhttp.Context) {
 		return
 	}
 
-	if err = dal.DeleteNote(req.ID); err != nil {
+	err = dal.DeleteNote(req.ID)
+	if err != nil {
 		ctx.ResData = err
 		return
 	}

@@ -21,13 +21,13 @@ func CreateNote(ctx *mhttp.Context) {
 	}
 
 	note := &model.Note{
-		NoteID:      utils.Uuid[string](),
 		WriterID:    operator.ID,
 		WriterName:  operator.Nickname,
 		IsAnonymous: req.IsAnonymous,
 		Title:       req.Title,
 		Content:     req.Content,
 	}
+	note.NoteID = utils.CalcSHA256(note.Serialize()) // 保证接口幂等性
 	err = dal.CreateNote(note)
 	if err != nil {
 		ctx.ResData = err

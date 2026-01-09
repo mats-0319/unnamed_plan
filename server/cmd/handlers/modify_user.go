@@ -16,20 +16,21 @@ func ModifyUser(ctx *mhttp.Context) {
 		return
 	}
 
-	if len(req.Nickname) < 1 && len(req.Password) < 1 && !req.ModifyTkFlag {
-		err := utils.NewError(utils.ET_ParamsError, utils.ED_NoChanges)
-		ctx.ResData = err
-		mlog.Log(err.String())
-		return
-	}
-
 	operator, err := dal.GetUser(ctx.UserID)
 	if err != nil {
 		ctx.ResData = err
 		return
 	}
 
-	if len(req.Nickname) > 0 {
+	modifyNicknameFlag := len(req.Nickname) > 0 && req.Nickname != operator.Nickname
+	if !modifyNicknameFlag && len(req.Password) < 1 && !req.ModifyTkFlag {
+		e := utils.NewError(utils.ET_ParamsError, utils.ED_NoChanges)
+		ctx.ResData = e
+		mlog.Log(e.String())
+		return
+	}
+
+	if modifyNicknameFlag {
 		operator.Nickname = req.Nickname
 	}
 	if len(req.Password) > 0 {
