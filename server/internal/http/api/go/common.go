@@ -5,9 +5,8 @@ type Pagination struct {
 	Num  int `json:"num"`
 }
 
-type ResBase struct {
+type Response struct {
 	IsSuccess bool   `json:"is_success"`
 	Err       string `json:"err"`
+	Data      any    `json:"data"`
 }
-
-var ResBaseSuccess = ResBase{IsSuccess: true}

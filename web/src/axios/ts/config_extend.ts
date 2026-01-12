@@ -13,17 +13,26 @@ export function initInterceptors(invalidLoginHandler: () => void): void {
 	})
 
 	axiosWrapper.interceptors.response.use(
-		(value: AxiosResponse): AxiosResponse => {
+		(value: AxiosResponse) => {
 			//@ts-ignore
 			const accessToken: string = value.headers.get(HttpHeader_AccessToken)
 			if (accessToken && accessToken.length > 0) {
 				localStorage.setItem(StorageName_AccessToken, accessToken)
 			}
 
-			return value
+			if (!value.data.is_success) {
+				log.fail(value.config.url as string, value.data.err)
+				return Promise.reject({ isBusinessError: true })
+			}
+
+			return value.data
 		},
 		(error: any) => {
-			const code = error.response.status
+			if (!!error.isBusinessError) {
+				return Promise.reject()
+			}
+
+			const code: number = error.response?.status
 
 			if (code == 401) {
 				// 验证失败，用户id或访问密钥错误

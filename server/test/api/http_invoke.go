@@ -37,7 +37,7 @@ func HttpInvoke(uri string, payload string) string {
 		log.Fatal(err)
 	}
 
-	r := &api.ResBase{} // 因为会设计失败的用例，所以不判断r.isSuccess
+	r := &api.Response{} // 因为会设计失败的用例，所以不判断r.isSuccess
 	err = json.Unmarshal(bodyBytes, r)
 	if err != nil {
 		log.Fatal(err)

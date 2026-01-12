@@ -2,7 +2,7 @@
 # Use At: Cloud Server
 # Behavior: Stop and Restart Servers
 
-pkill unnamed_plan_server_exec
+pkill -f unnamed_plan_server_exec
 
 from_path=$(pwd)
 

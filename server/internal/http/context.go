@@ -18,7 +18,7 @@ type Context struct {
 	AccessToken string // 登录成功获得，后续请求均需要在请求头带上该参数
 	UserID      uint
 
-	ResData any // allow: errStr/error/struct/[]byte
+	ResData any // expect: *utils.Error / *api.resStruct
 }
 
 func NewContext(w http.ResponseWriter, r *http.Request) *Context {
@@ -58,17 +58,11 @@ func (ctx *Context) ParseParams(obj any, r ...io.Reader) bool {
 	return true
 }
 
-func (ctx *Context) SetHeader(header string, value string) {
-	ctx.Writer.Header().Set(header, value)
-}
-
 // response 该函数不应该中途返回，一定要执行到write
 func (ctx *Context) response() {
 	code, resBytes := serializeRes(ctx.ResData)
 
-	if code != http.StatusOK {
-		ctx.Writer.WriteHeader(code)
-	}
+	ctx.Writer.WriteHeader(code)
 
 	_, err := ctx.Writer.Write(resBytes)
 	if err != nil {
@@ -82,17 +76,14 @@ func serializeRes(obj any) (int, []byte) {
 
 	switch v := obj.(type) {
 	case *Error:
-		obj = &api.ResBase{Err: v.Error()}
+		obj = &api.Response{Err: v.Error()}
 
-		switch v.Typ {
-		case ET_ServerInternalError:
-			code = http.StatusInternalServerError
-		case ET_UnauthorizedError:
-			code = http.StatusUnauthorized
+		code = getHttpCode(v)
+	default: // *api.resStruct(s)
+		obj = &api.Response{
+			IsSuccess: true,
+			Data:      v,
 		}
-	case []byte: // forward res, no marshal
-		return code, v
-	default: // struct
 	}
 
 	jsonBytes, err := json.Marshal(obj)
@@ -103,4 +94,16 @@ func serializeRes(obj any) (int, []byte) {
 	}
 
 	return code, jsonBytes
+}
+
+func getHttpCode(err *Error) int {
+	code := http.StatusOK
+	switch err.Typ {
+	case ET_ServerInternalError:
+		code = http.StatusInternalServerError
+	case ET_UnauthorizedError:
+		code = http.StatusUnauthorized
+	}
+
+	return code
 }

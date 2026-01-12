@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -11,8 +12,8 @@ import (
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-// token structure: `{"user_id":[xxx],"expire_time":[xxx]}.[hash]`
-// hash: sha256([random str]+`{[xxx]}`)
+// token structure: `hex({"user_id":[xxx],"expire_time":[xxx]}).hex(hash(salt,payload))`
+// hash algorithm: sha256
 
 type AccessToken struct {
 	UserID     uint  `json:"user_id"`
@@ -32,12 +33,18 @@ func GenToken(userID uint) string {
 		return ""
 	}
 
-	return fmt.Sprintf("%s.%s", jsonBytes, genTokenHash(string(jsonBytes)))
+	jsonHex := hex.EncodeToString(jsonBytes)
+
+	return fmt.Sprintf("%s.%s", jsonHex, genTokenHash(jsonHex))
 }
 
 func VerifyToken(ctx *mhttp.Context) *Error {
-	index := strings.LastIndex(ctx.AccessToken, ".")
-	tokenSplit := []string{ctx.AccessToken[:index], ctx.AccessToken[index+1:]}
+	tokenSplit := strings.Split(ctx.AccessToken, ".")
+	if len(tokenSplit) != 2 {
+		e := NewError(ET_UnauthorizedError, ED_InvalidAccessToken).WithParam("token", ctx.AccessToken)
+		mlog.Log(e.String())
+		return e
+	}
 
 	hash := genTokenHash(tokenSplit[0])
 	if hash != tokenSplit[1] {
@@ -65,6 +72,6 @@ func VerifyToken(ctx *mhttp.Context) *Error {
 	return nil
 }
 
-func genTokenHash(tokenStr string) string {
-	return CalcSHA256(hashSalt, tokenStr)
+func genTokenHash(tokenHex string) string {
+	return CalcSHA256(hashSalt, tokenHex)
 }

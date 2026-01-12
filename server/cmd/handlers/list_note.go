@@ -30,9 +30,8 @@ func ListNote(ctx *mhttp.Context) {
 	}
 
 	ctx.ResData = &api.ListNoteRes{
-		ResBase: api.ResBaseSuccess,
-		Amount:  count,
-		Notes:   notesFromDBToHttp(notes),
+		Amount: count,
+		Notes:  notesFromDBToHttp(notes),
 	}
 }
 

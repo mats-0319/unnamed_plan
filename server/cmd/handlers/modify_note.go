@@ -44,5 +44,5 @@ func ModifyNote(ctx *mhttp.Context) {
 		return
 	}
 
-	ctx.ResData = &api.ModifyNoteRes{ResBase: api.ResBaseSuccess}
+	ctx.ResData = &api.ModifyNoteRes{}
 }

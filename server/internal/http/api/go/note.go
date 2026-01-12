@@ -9,7 +9,6 @@ type CreateNoteReq struct {
 }
 
 type CreateNoteRes struct {
-	ResBase
 }
 
 const URI_ListNote = "/note/list"
@@ -31,7 +30,6 @@ type ListNoteReq struct {
 }
 
 type ListNoteRes struct {
-	ResBase
 	Amount int64   `json:"amount"`
 	Notes  []*Note `json:"notes"`
 }
@@ -48,7 +46,6 @@ type ModifyNoteReq struct {
 }
 
 type ModifyNoteRes struct {
-	ResBase
 }
 
 const URI_DeleteNote = "/note/delete"
@@ -59,5 +56,4 @@ type DeleteNoteReq struct {
 }
 
 type DeleteNoteRes struct {
-	ResBase
 }

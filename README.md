@@ -1,21 +1,15 @@
 # 未命名计划
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/mats9693/unnamed_plan.svg)](https://pkg.go.dev/github.com/mats9693/unnamed_plan)
-[![Go Report Card](https://goreportcard.com/badge/github.com/mats9693/unnamed_plan)](https://goreportcard.com/report/github.com/mats9693/unnamed_plan)
+[//]: # ([![Go Reference]&#40;https://pkg.go.dev/badge/github.com/mats9693/unnamed_plan.svg&#41;]&#40;https://pkg.go.dev/github.com/mats9693/unnamed_plan&#41;)
+
+[//]: # ([![Go Report Card]&#40;https://goreportcard.com/badge/github.com/mats9693/unnamed_plan&#41;]&#40;https://goreportcard.com/report/github.com/mats9693/unnamed_plan&#41;)
 [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 
-微服务架构示例项目，在学习微服务架构的过程中编写，配套有一个web界面。
-
-- 涉及微服务的内容尽量不调用第三方库，而是学会一部分、手搓一部分
-- 完成后会部署到公网，如果[公网地址](https://115.190.167.134)不可用，多半是我买的云服务器到期了 ^_^ （2026.9.25）
-
-## 效果图
-
-todo：截几张使用截图，包括pc端和移动端（等移动端ui调整之后）
+一个web项目，用来学习web开发和部署，项目会部署到公网，如果[公网地址](https://115.190.167.134)不可用，多半是我买的云服务器到期了 ^_^ （2026.9.25）
 
 ## 使用
 
-使用本项目需要以下环境：（版本号为经过测试的推荐版本）
+如果你想在本地运行该项目，需要以下环境：（版本号为经过测试的推荐版本）
 
 - go 1.25
 - node 24 (corepack-pnpm)
@@ -29,7 +23,7 @@ todo：截几张使用截图，包括pc端和移动端（等移动端ui调整之
 
 > 感谢：[绘图工具](https://excalidraw.com)，[压缩工具](https://tinypng.com)
 
-![v0.2结构图](doc/image/up_structure_v2_tiny.png)
+todo
 
 ## 项目介绍(draft)
 
@@ -52,7 +46,7 @@ todo：截几张使用截图，包括pc端和移动端（等移动端ui调整之
       使用ORM，可以通过形如`db.create(user)`的方式操作数据库，而不需要编写形如`insert into user values (...)`的sql
     - DAO: Data Access Object，数据访问对象，将数据库操作包装在一起，与业务代码分离。
       主要应用场景有：需要接多个数据库（pg、mysql、sqlite）、数据操作复杂（例如复杂查询，sql写出来上KB的）
-- gocts：自研工具，可以根据go定义的接口结构，生成对应ts的结构class和axios client代码。
+- gocts：自研工具，可以根据go定义的接口结构，生成对应的ts结构（class）和axios client代码。
 
 - vue3 (html+ts+less)
 - node 24 (corepack-pnpm)

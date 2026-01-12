@@ -5,12 +5,7 @@ import { log } from "@/ts/log.ts"
 
 export let useNoteStore = defineStore("note", () => {
 	function create(isAnonymous: boolean, title: string, content: string, cb: () => void): void {
-		noteAxios.createNote(isAnonymous, title, content).then(({ data }: { data: CreateNoteRes }) => {
-			if (!data.is_success) {
-				log.fail("create note", data.err)
-				return
-			}
-
+		noteAxios.createNote(isAnonymous, title, content).then(({}: { data: CreateNoteRes }) => {
 			cb()
 
 			log.success("create note")
@@ -24,11 +19,6 @@ export let useNoteStore = defineStore("note", () => {
 		cb: (amount: number, notes: Array<Note>) => void
 	): void {
 		noteAxios.listNote({ size: pageSize, num: pageNum }, listMyFlag).then(({ data }: { data: ListNoteRes }) => {
-			if (!data.is_success) {
-				log.fail("list note", data.err)
-				return
-			}
-
 			cb(data.amount, data.notes)
 
 			log.success("list note")
@@ -36,12 +26,7 @@ export let useNoteStore = defineStore("note", () => {
 	}
 
 	function modify(id: number, isAnonymous: boolean, title: string, content: string, cb: () => void): void {
-		noteAxios.modifyNote(id, isAnonymous, title, content).then(({ data }: { data: ModifyNoteRes }) => {
-			if (!data.is_success) {
-				log.fail("modify note", data.err)
-				return
-			}
-
+		noteAxios.modifyNote(id, isAnonymous, title, content).then(({}: { data: ModifyNoteRes }) => {
 			cb()
 
 			log.success("modify note")
@@ -49,12 +34,7 @@ export let useNoteStore = defineStore("note", () => {
 	}
 
 	function del(id: number, cb: () => void): void {
-		noteAxios.deleteNote(id).then(({ data }: { data: DeleteNoteRes }) => {
-			if (!data.is_success) {
-				log.fail("delete note", data.err)
-				return
-			}
-
+		noteAxios.deleteNote(id).then(({}: { data: DeleteNoteRes }) => {
 			cb()
 
 			log.success("delete note")

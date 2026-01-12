@@ -33,5 +33,5 @@ func DeleteNote(ctx *mhttp.Context) {
 		return
 	}
 
-	ctx.ResData = &api.DeleteNoteRes{ResBase: api.ResBaseSuccess}
+	ctx.ResData = &api.DeleteNoteRes{}
 }

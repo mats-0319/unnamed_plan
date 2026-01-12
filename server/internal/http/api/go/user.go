@@ -9,7 +9,6 @@ type LoginReq struct {
 }
 
 type LoginRes struct {
-	ResBase
 	UserID   uint   `json:"user_id"`
 	UserName string `json:"user_name"`
 	Nickname string `json:"nickname"`
@@ -24,7 +23,6 @@ type RegisterReq struct {
 }
 
 type RegisterRes struct {
-	ResBase
 }
 
 const URI_ListUser = "/user/list"
@@ -46,7 +44,6 @@ type ListUserReq struct {
 }
 
 type ListUserRes struct {
-	ResBase
 	Amount int64   `json:"amount"` // 符合查询条件的用户总数
 	Users  []*User `json:"users"`
 }
@@ -63,7 +60,6 @@ type ModifyUserReq struct {
 }
 
 type ModifyUserRes struct {
-	ResBase
 }
 
 const URI_Authenticate = "/user/authenticate"
@@ -73,7 +69,6 @@ type AuthenticateReq struct {
 }
 
 type AuthenticateRes struct {
-	ResBase
 	UserID   uint   `json:"user_id"`
 	UserName string `json:"user_name"`
 	Nickname string `json:"nickname"`

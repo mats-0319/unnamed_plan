@@ -29,5 +29,5 @@ func Register(ctx *mhttp.Context) {
 		return
 	}
 
-	ctx.ResData = &api.RegisterRes{ResBase: api.ResBaseSuccess}
+	ctx.ResData = &api.RegisterRes{}
 }

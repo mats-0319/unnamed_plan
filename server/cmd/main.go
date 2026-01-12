@@ -24,7 +24,7 @@ func newHandler() *mhttp.Handler {
 
 	// note
 	h.AddHandler(uriPrefix+api.URI_CreateNote, handlers.CreateNote, middleware.VerifyToken)
-	h.AddHandler(uriPrefix+api.URI_ListNote, handlers.ListNote, middleware.VerifyToken)
+	h.AddHandler(uriPrefix+api.URI_ListNote, handlers.ListNote)
 	h.AddHandler(uriPrefix+api.URI_ModifyNote, handlers.ModifyNote, middleware.VerifyToken)
 	h.AddHandler(uriPrefix+api.URI_DeleteNote, handlers.DeleteNote, middleware.VerifyToken)
 

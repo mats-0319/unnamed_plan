@@ -16,7 +16,7 @@ const routes: Array<RouteRecordRaw> = [
 		path: "/personal-center",
 		name: "personalCenter",
 		meta: { requireLogin: true },
-		component: () => import("@/views/personal_center/home.vue"),
+		component: () => import("@/views/personal_center/left.vue"),
 		children: [
 			{
 				path: "",

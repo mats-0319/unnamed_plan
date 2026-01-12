@@ -35,9 +35,8 @@ func ListUser(ctx *mhttp.Context) {
 	}
 
 	ctx.ResData = &api.ListUserRes{
-		ResBase: api.ResBaseSuccess,
-		Amount:  count,
-		Users:   usersFromDBToHttp(users),
+		Amount: count,
+		Users:  usersFromDBToHttp(users),
 	}
 }
 
