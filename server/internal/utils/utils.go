@@ -1,19 +1,16 @@
 package utils
 
 import (
+	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
 	"math/rand/v2"
-	"strings"
-
-	"github.com/google/uuid"
 )
 
-// CalcSHA256 calc sha256('text'[+'extension'])
-func CalcSHA256(text string, append ...string) string {
-	hash := sha256.New()
-	hash.Reset()
-	hash.Write([]byte(text + strings.Join(append, "")))
+// CalcSHA256 calc hmac-sha256('key', 'content')
+func CalcSHA256(content string, key ...byte) string {
+	hash := hmac.New(sha256.New, key)
+	hash.Write([]byte(content))
 	bytes := hash.Sum(nil)
 
 	return hex.EncodeToString(bytes)
@@ -22,8 +19,8 @@ func CalcSHA256(text string, append ...string) string {
 const CharactersLibrary = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 const useBits = 6 // 6个bit位可以表示全部字符库中的字符
 
-// GenerateRandomStr generate random 'length' readable Bytes
-func GenerateRandomStr(length int) string {
+// GenerateRandomBytes generate random 'length' readable Bytes
+func GenerateRandomBytes[T string | []byte](length int) T {
 	b := make([]byte, length)
 
 	randomNum, remainBits := rand.Int64(), 64
@@ -45,16 +42,5 @@ func GenerateRandomStr(length int) string {
 		}
 	}
 
-	return string(b)
-}
-
-// Uuid return uuid v4 string,
-// with same 'data', it will return same string,
-// without 'data', it will return random string.
-func Uuid[T string | []byte](data ...T) string {
-	if len(data) < 1 {
-		return uuid.NewString()
-	}
-
-	return uuid.NewHash(sha256.New(), uuid.Nil, []byte(data[0]), 4).String()
+	return T(b)
 }

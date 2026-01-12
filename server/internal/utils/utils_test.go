@@ -3,14 +3,14 @@ package utils
 import "testing"
 
 func TestPasswordWithSalt(t *testing.T) {
-	salt := GenerateRandomStr(10)
+	salt := GenerateRandomBytes[[]byte](10)
 	t.Log("salt :", salt)
 
 	password := "123456"
 	password = CalcSHA256(password)
 	t.Log("pwd 1:", password)
 
-	password = CalcSHA256(password + salt)
+	password = CalcSHA256(password, salt...)
 	t.Log("pwd 2:", password)
 
 	//    utils_test.go:7: salt : vkAvvZNxfO

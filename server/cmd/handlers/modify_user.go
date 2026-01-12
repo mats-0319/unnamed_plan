@@ -34,7 +34,7 @@ func ModifyUser(ctx *mhttp.Context) {
 		operator.Nickname = req.Nickname
 	}
 	if len(req.Password) > 0 {
-		newPassword := utils.CalcSHA256(req.Password, operator.Salt)
+		newPassword := utils.CalcSHA256(req.Password, []byte(operator.Salt)...)
 		if newPassword == operator.Password {
 			e := utils.NewError(utils.ET_ParamsError, utils.ED_SamePwd)
 			ctx.ResData = e

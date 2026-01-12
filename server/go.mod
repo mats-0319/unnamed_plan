@@ -3,7 +3,6 @@ module github.com/mats0319/unnamed_plan/server
 go 1.25
 
 require (
-	github.com/google/uuid v1.6.0
 	go.uber.org/zap v1.27.1
 	gorm.io/driver/postgres v1.5.0
 	gorm.io/gen v0.3.27
@@ -14,6 +13,7 @@ require (
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
 	github.com/jackc/pgx/v5 v5.5.5 // indirect

@@ -29,7 +29,7 @@ func Login(ctx *mhttp.Context) {
 		return
 	}
 
-	if utils.CalcSHA256(req.Password, user.Salt) != user.Password {
+	if utils.CalcSHA256(req.Password, []byte(user.Salt)...) != user.Password {
 		e := utils.NewError(utils.ET_ParamsError, utils.ED_InvalidPwd).WithParam("user name", req.UserName)
 		ctx.ResData = e
 		mlog.Log(e.String())

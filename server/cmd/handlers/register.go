@@ -14,8 +14,8 @@ func Register(ctx *mhttp.Context) {
 		return
 	}
 
-	salt := utils.GenerateRandomStr(10)
-	pwd := utils.CalcSHA256(req.Password + salt)
+	salt := utils.GenerateRandomBytes[string](10)
+	pwd := utils.CalcSHA256(req.Password, []byte(salt)...)
 
 	user := &model.User{
 		UserName: req.UserName,

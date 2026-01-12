@@ -12,18 +12,18 @@ import (
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-// token structure: `hex({"user_id":[xxx],"expire_time":[xxx]}).hex(hash(salt,payload))`
-// hash algorithm: sha256
+// token structure: `hex({"user_id":[xxx],"expire_time":[xxx]}).hex(hash(payload, salt))`
+// hash algorithm: hmac-sha256
 
 type AccessToken struct {
 	UserID     uint  `json:"user_id"`
 	ExpireTime int64 `json:"expire_time"`
 }
 
-var hashSalt = GenerateRandomStr(10)
+var hashSalt = GenerateRandomBytes[[]byte](10)
 
 func GenToken(userID uint) string {
-	jsonBytes, err := json.Marshal(&AccessToken{
+	tokenBytes, err := json.Marshal(&AccessToken{
 		UserID:     userID,
 		ExpireTime: time.Now().Add(time.Hour * 6).UnixMilli(), // hard code 'expire time' = 6h
 	})
@@ -33,9 +33,9 @@ func GenToken(userID uint) string {
 		return ""
 	}
 
-	jsonHex := hex.EncodeToString(jsonBytes)
+	tokenHex := hex.EncodeToString(tokenBytes)
 
-	return fmt.Sprintf("%s.%s", jsonHex, genTokenHash(jsonHex))
+	return fmt.Sprintf("%s.%s", tokenHex, genTokenHash(tokenHex))
 }
 
 func VerifyToken(ctx *mhttp.Context) *Error {
@@ -73,5 +73,5 @@ func VerifyToken(ctx *mhttp.Context) *Error {
 }
 
 func genTokenHash(tokenHex string) string {
-	return CalcSHA256(hashSalt, tokenHex)
+	return CalcSHA256(tokenHex, hashSalt...)
 }
