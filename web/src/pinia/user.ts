@@ -9,7 +9,7 @@ export let useUserStore = defineStore("user", () => {
 	let user = ref<User>(new User())
 
 	function register(userName: string, password: string, cb: () => void): void {
-		let pwdHash = CryptoJs.HmacSHA256(password, "").toString(CryptoJs.enc.Hex)
+		let pwdHash = CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex)
 
 		userAxios.register(userName, pwdHash).then(({}: { data: RegisterRes }) => {
 			cb()
@@ -21,7 +21,7 @@ export let useUserStore = defineStore("user", () => {
 	}
 
 	function login(userName: string, password: string, totpCode: string, cb: () => void): void {
-		let pwdHash = CryptoJs.HmacSHA256(password, "").toString(CryptoJs.enc.Hex)
+		let pwdHash = CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex)
 
 		userAxios.login(userName, pwdHash, totpCode).then(({ data }: { data: LoginRes }) => {
 			user.value = loginResToUser(data)
@@ -33,7 +33,7 @@ export let useUserStore = defineStore("user", () => {
 	}
 
 	function modify(nickname: string, password: string, modifyTkFlag: boolean, totpKey: string): void {
-		let pwdHash = CryptoJs.HmacSHA256(password, "").toString(CryptoJs.enc.Hex)
+		let pwdHash = CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex)
 
 		userAxios.modifyUser(nickname, pwdHash, modifyTkFlag, totpKey).then(({}: { data: ModifyUserRes }) => {
 			log.success("modify user")

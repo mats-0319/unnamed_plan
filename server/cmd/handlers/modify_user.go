@@ -34,15 +34,15 @@ func ModifyUser(ctx *mhttp.Context) {
 		operator.Nickname = req.Nickname
 	}
 	if len(req.Password) > 0 {
-		newPassword := utils.HmacSHA256(req.Password, operator.Salt)
-		if newPassword == operator.Password {
+		err = utils.VerifyPassword(req.Password, operator.Password)
+		if err == nil {
 			e := utils.NewError(utils.ET_ParamsError, utils.ED_SamePwd)
 			ctx.ResData = e
 			mlog.Log(e.String())
 			return
 		}
 
-		operator.Password = newPassword
+		operator.Password = utils.GeneratePwdHash(req.Password)
 	}
 	if req.ModifyTkFlag {
 		bytes, err := base32.StdEncoding.DecodeString(req.TotpKey)

@@ -7,7 +7,7 @@ import (
 	"math/rand/v2"
 )
 
-// HmacSHA256 calc hmac-sha256('key', 'content')
+// HmacSHA256 calc hmac-sha256('key', 'content'), return hex(hash)
 func HmacSHA256[T string | []byte](content string, key ...T) string {
 	var k []byte
 	if len(key) > 0 {
@@ -16,6 +16,15 @@ func HmacSHA256[T string | []byte](content string, key ...T) string {
 
 	hasher := hmac.New(sha256.New, k) // k default nil is ok
 	hasher.Write([]byte(content))
+	bytes := hasher.Sum(nil)
+
+	return hex.EncodeToString(bytes)
+}
+
+// CalcSHA256 for test
+func CalcSHA256(password string) string {
+	hasher := sha256.New()
+	hasher.Write([]byte(password))
 	bytes := hasher.Sum(nil)
 
 	return hex.EncodeToString(bytes)

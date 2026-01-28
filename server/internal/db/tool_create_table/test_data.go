@@ -12,10 +12,9 @@ var defaultUsers = []*model.User{
 }
 
 func newUser(userName string, nickname string, totpKey string, isAdmin bool) *model.User {
-	salt := utils.GenerateRandomBytes[string](10)
 	pwd := "123456"
-	pwd = utils.HmacSHA256[string](pwd)
-	pwd = utils.HmacSHA256(pwd, salt)
+	pwd = utils.CalcSHA256(pwd)
+	pwd = utils.GeneratePwdHash(pwd)
 
 	if len(nickname) < 1 {
 		nickname = userName
@@ -25,7 +24,6 @@ func newUser(userName string, nickname string, totpKey string, isAdmin bool) *mo
 		UserName: userName,
 		Nickname: nickname,
 		Password: pwd,
-		Salt:     salt,
 		TotpKey:  totpKey,
 		IsAdmin:  isAdmin,
 	}

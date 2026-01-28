@@ -12,15 +12,15 @@ import (
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-// token structure: `hex({"user_id":[xxx],"expire_time":[xxx]}).hex(hash(payload, salt))`
+// token structure: `hex({"user_id":[xxx]...}).hex(hash(payload, key))`
+// - payload: hex({"user_id":[xxx]...}), hex str before '.'
+// - 轮换hmacKey：在token payload添加key版本号，同时维护多个版本的key
 // hash algorithm: hmac-sha256
 
 type AccessToken struct {
 	UserID     uint  `json:"user_id"`
 	ExpireTime int64 `json:"expire_time"`
 }
-
-var hashSalt = GenerateRandomBytes[[]byte](10)
 
 func GenToken(userID uint) string {
 	tokenBytes, err := json.Marshal(&AccessToken{
@@ -79,6 +79,8 @@ func VerifyToken(ctx *mhttp.Context) *Error {
 	return nil
 }
 
+var hmacKey = GenerateRandomBytes[[]byte](10)
+
 func genTokenHash(tokenHex string) string {
-	return HmacSHA256(tokenHex, hashSalt)
+	return HmacSHA256(tokenHex, hmacKey)
 }

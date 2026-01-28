@@ -31,12 +31,9 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 	_user.CreatedAt = field.NewInt64(tableName, "created_at")
 	_user.UpdatedAt = field.NewInt64(tableName, "updated_at")
 	_user.DeletedAt = field.NewField(tableName, "deleted_at")
-	_user.ExportID = field.NewUint(tableName, "export_id")
-	_user.ExportedAt = field.NewInt64(tableName, "exported_at")
 	_user.UserName = field.NewString(tableName, "user_name")
 	_user.Nickname = field.NewString(tableName, "nickname")
 	_user.Password = field.NewString(tableName, "password")
-	_user.Salt = field.NewString(tableName, "salt")
 	_user.TotpKey = field.NewString(tableName, "totp_key")
 	_user.IsAdmin = field.NewBool(tableName, "is_admin")
 	_user.LastLogin = field.NewInt64(tableName, "last_login")
@@ -49,20 +46,17 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 type user struct {
 	userDo userDo
 
-	ALL        field.Asterisk
-	ID         field.Uint
-	CreatedAt  field.Int64
-	UpdatedAt  field.Int64
-	DeletedAt  field.Field
-	ExportID   field.Uint
-	ExportedAt field.Int64
-	UserName   field.String
-	Nickname   field.String
-	Password   field.String
-	Salt       field.String
-	TotpKey    field.String
-	IsAdmin    field.Bool
-	LastLogin  field.Int64
+	ALL       field.Asterisk
+	ID        field.Uint
+	CreatedAt field.Int64
+	UpdatedAt field.Int64
+	DeletedAt field.Field
+	UserName  field.String
+	Nickname  field.String
+	Password  field.String
+	TotpKey   field.String
+	IsAdmin   field.Bool
+	LastLogin field.Int64
 
 	fieldMap map[string]field.Expr
 }
@@ -83,12 +77,9 @@ func (u *user) updateTableName(table string) *user {
 	u.CreatedAt = field.NewInt64(table, "created_at")
 	u.UpdatedAt = field.NewInt64(table, "updated_at")
 	u.DeletedAt = field.NewField(table, "deleted_at")
-	u.ExportID = field.NewUint(table, "export_id")
-	u.ExportedAt = field.NewInt64(table, "exported_at")
 	u.UserName = field.NewString(table, "user_name")
 	u.Nickname = field.NewString(table, "nickname")
 	u.Password = field.NewString(table, "password")
-	u.Salt = field.NewString(table, "salt")
 	u.TotpKey = field.NewString(table, "totp_key")
 	u.IsAdmin = field.NewBool(table, "is_admin")
 	u.LastLogin = field.NewInt64(table, "last_login")
@@ -116,17 +107,14 @@ func (u *user) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (u *user) fillFieldMap() {
-	u.fieldMap = make(map[string]field.Expr, 13)
+	u.fieldMap = make(map[string]field.Expr, 10)
 	u.fieldMap["id"] = u.ID
 	u.fieldMap["created_at"] = u.CreatedAt
 	u.fieldMap["updated_at"] = u.UpdatedAt
 	u.fieldMap["deleted_at"] = u.DeletedAt
-	u.fieldMap["export_id"] = u.ExportID
-	u.fieldMap["exported_at"] = u.ExportedAt
 	u.fieldMap["user_name"] = u.UserName
 	u.fieldMap["nickname"] = u.Nickname
 	u.fieldMap["password"] = u.Password
-	u.fieldMap["salt"] = u.Salt
 	u.fieldMap["totp_key"] = u.TotpKey
 	u.fieldMap["is_admin"] = u.IsAdmin
 	u.fieldMap["last_login"] = u.LastLogin

@@ -6,11 +6,10 @@ import (
 
 type User struct {
 	mdb_model.Model
-	UserName  string `gorm:"unique;not null"`  // login name
-	Nickname  string `gorm:"unique;not null"`  // display name
-	Password  string `gorm:"size:64;not null"` // hex(sha256(hex(sha256(text)), salt))
-	Salt      string `gorm:"size:10;not null"`
-	TotpKey   string `gorm:"size:16"` // 允许为空，需要设置后启用
+	UserName  string `gorm:"unique;not null"` // login name
+	Nickname  string `gorm:"unique;not null"` // display name
+	Password  string `gorm:"not null"`        // argon2id(hex(sha256(password)), salt)
+	TotpKey   string `gorm:"size:16"`         // 允许为空，需要设置后启用
 	IsAdmin   bool
 	LastLogin int64 // timestamp, unit: milli
 }

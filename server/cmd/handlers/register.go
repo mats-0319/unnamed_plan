@@ -14,14 +14,12 @@ func Register(ctx *mhttp.Context) {
 		return
 	}
 
-	salt := utils.GenerateRandomBytes[string](10)
-	pwd := utils.HmacSHA256(req.Password, salt)
+	pwd := utils.GeneratePwdHash(req.Password)
 
 	user := &model.User{
 		UserName: req.UserName,
 		Nickname: req.UserName,
 		Password: pwd,
-		Salt:     salt,
 	}
 	err := dal.CreateUser(user)
 	if err != nil {

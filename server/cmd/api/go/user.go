@@ -19,7 +19,7 @@ const URI_Register = "/register"
 
 type RegisterReq struct {
 	UserName string `json:"user_name"` // nickname is same, user can modify later
-	Password string `json:"password"`  // hex(sha256('text')), server generate 'salt' and save it
+	Password string `json:"password"`  // hex(sha256('text'))
 }
 
 type RegisterRes struct {

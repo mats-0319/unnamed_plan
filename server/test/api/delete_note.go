@@ -14,11 +14,11 @@ func DeleteNote() {
 
 	TestCase("not writer")
 	HttpInvoke(api2.URI_Login, `{"user_name":"mats0319","password":"8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92","totp_code":""}`)
-	HttpInvoke(api2.URI_DeleteNote, `{"id":1001}`)
+	HttpInvoke(api2.URI_DeleteNote, `{"id":1003}`)
 
 	TestCase("success")
 	HttpInvoke(api2.URI_Login, `{"user_name":"user","password":"8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92","totp_code":""}`)
-	res := HttpInvoke(api2.URI_DeleteNote, `{"id":1001}`)
+	res := HttpInvoke(api2.URI_DeleteNote, `{"id":1003}`)
 	log.Println(res)
 
 	TestApiEnd()

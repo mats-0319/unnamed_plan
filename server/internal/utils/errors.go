@@ -25,14 +25,19 @@ const (
 	// params
 	ED_JsonMarshal   ErrorDetail = "Json Marshal Failed"
 	ED_JsonUnmarshal ErrorDetail = "Json Unmarshal Failed"
+	ED_HexDecode     ErrorDetail = "Hex Decode Failed"
 
 	// business-user
 	ED_NeedAdmin       ErrorDetail = "Need Admin"
 	ED_NoChanges       ErrorDetail = "No Changes"
-	ED_InvalidPwd      ErrorDetail = "Invalid UserName or Password"
+	ED_PwdStructure    ErrorDetail = "Wrong Password Structure"
+	ED_PwdVersion      ErrorDetail = "Wrong Password Version"
+	ED_PwdParams       ErrorDetail = "Wrong Password Params"
+	ED_WrongPwd        ErrorDetail = "Wrong UserName or Password"
 	ED_InvalidTotpCode ErrorDetail = "Invalid TOTP Code"
+	ED_WrongTotpCode   ErrorDetail = "Wrong TOTP Code"
 	ED_InvalidTotpKey  ErrorDetail = "Invalid TOTP Key"
-	ED_SamePwd         ErrorDetail = "New Password Can't be Identical to The Old One"
+	ED_SamePwd         ErrorDetail = "New Password Can't be Identical to the Old One"
 
 	// business-note
 	ED_NeedOwner ErrorDetail = "Not Owner of Data"

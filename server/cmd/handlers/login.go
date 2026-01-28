@@ -28,10 +28,9 @@ func Login(ctx *mhttp.Context) {
 		return
 	}
 
-	if utils.HmacSHA256(req.Password, user.Salt) != user.Password {
-		e := utils.NewError(utils.ET_ParamsError, utils.ED_InvalidPwd).WithParam("user name", req.UserName)
-		ctx.ResData = e
-		mlog.Log(e.String())
+	err = utils.VerifyPassword(req.Password, user.Password)
+	if err != nil {
+		ctx.ResData = err
 		return
 	}
 
@@ -96,7 +95,7 @@ func verifyTotpCode(code string, totpKey string) *utils.Error {
 	}
 
 	if !existFlag {
-		e := utils.NewError(utils.ET_ParamsError, utils.ED_InvalidTotpCode).WithParam("code", code)
+		e := utils.NewError(utils.ET_ParamsError, utils.ED_WrongTotpCode).WithParam("code", code)
 		mlog.Log(e.String())
 		return e
 	}
