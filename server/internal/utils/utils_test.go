@@ -3,17 +3,17 @@ package utils
 import "testing"
 
 func TestPasswordWithSalt(t *testing.T) {
-	salt := GenerateRandomBytes[[]byte](10)
+	salt := GenerateRandomBytes[string](10)
 	t.Log("salt :", salt)
 
 	password := "123456"
-	password = CalcSHA256(password)
+	password = HmacSHA256[string](password)
 	t.Log("pwd 1:", password)
 
-	password = CalcSHA256(password, salt...)
+	password = HmacSHA256(password, salt)
 	t.Log("pwd 2:", password)
 
-	//    utils_test.go:7: salt : vkAvvZNxfO
-	//    utils_test.go:11: pwd 1: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92
-	//    utils_test.go:14: pwd 2: 0fae47e6f0d24e8366f55484e5af228f5eefeed3ca7e5cb2f1f9d31b3579bae5
+	//    utils_test.go:7:  salt : 3RHPTqCpQ7
+	//    utils_test.go:11: pwd 1: dbd978ccdbbe8b6de77f6b37b5df9b5b62a7e892a501c3b53eaa16b0838bd5ed
+	//    utils_test.go:14: pwd 2: d0cdec83c70294c327df7808118fdf80697438664361b69095496075d1d616e1
 }

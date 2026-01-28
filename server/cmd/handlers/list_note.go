@@ -1,11 +1,10 @@
 package handlers
 
 import (
+	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
+	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
-	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
-	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
-	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 func ListNote(ctx *mhttp.Context) {
@@ -14,16 +13,7 @@ func ListNote(ctx *mhttp.Context) {
 		return
 	}
 
-	var (
-		count int64
-		notes = make([]*model.Note, 0)
-		err   *utils.Error
-	)
-	if req.ListMyFlag {
-		count, notes, err = dal.ListNote(req.Page, ctx.UserID)
-	} else {
-		count, notes, err = dal.ListNote(req.Page)
-	}
+	count, notes, err := dal.ListNote(req.Page, req.UserID)
 	if err != nil {
 		ctx.ResData = err
 		return

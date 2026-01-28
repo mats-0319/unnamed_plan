@@ -22,13 +22,7 @@
 		</el-form-item>
 
 		<el-form-item>
-			<outlined-button
-				details="密码为空表示不修改<br/>
-          修改TOTP密钥且新值为空，表示关闭TOTP功能<br/><br/>
-          昵称、密码、TOTP均无修改时，不可提交"
-				:disabled="!canModifyFlag"
-				@click="modifyUser()"
-			>
+			<outlined-button :details="tips_ModifyUser" :disabled="!canModifyFlag" @click="modifyUser()">
 				修改个人信息
 			</outlined-button>
 		</el-form-item>
@@ -40,6 +34,7 @@ import { ModifyUserReq } from "@/axios/ts/user.go.ts"
 import { onMounted, ref, watch } from "vue"
 import { useUserStore } from "@/pinia/user.ts"
 import OutlinedButton from "@/components/outlined_button.vue"
+import { tips_ModifyUser } from "@/ts/data.ts"
 
 let userStore = useUserStore()
 

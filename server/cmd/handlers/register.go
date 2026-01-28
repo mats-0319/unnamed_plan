@@ -1,10 +1,10 @@
 package handlers
 
 import (
+	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
+	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
-	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
-	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
@@ -15,7 +15,7 @@ func Register(ctx *mhttp.Context) {
 	}
 
 	salt := utils.GenerateRandomBytes[string](10)
-	pwd := utils.CalcSHA256(req.Password, []byte(salt)...)
+	pwd := utils.HmacSHA256(req.Password, salt)
 
 	user := &model.User{
 		UserName: req.UserName,

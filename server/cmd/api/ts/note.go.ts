@@ -1,7 +1,7 @@
 // Generate File, Should Not Edit.
 // Author : mario. github.com/mats0319
 // Code   : github.com/mats0319/study/go/gocts
-// Version: gocts v0.2.1
+// Version: gocts v0.2.3
 
 import { Pagination } from "./common.go"
 
@@ -11,10 +11,7 @@ export class CreateNoteReq {
     content: string = "";
 }
 
-export class CreateNoteRes {
-    is_success: boolean = false;
-    err: string = "";
-}
+export class CreateNoteRes {}
 
 export class Note {
     id: number = 0;
@@ -29,14 +26,12 @@ export class Note {
 
 export class ListNoteReq {
     page: Pagination = new Pagination();
-    list_my_flag: boolean = false;
+    user_id: number = 0; // 非0表示查询指定用户的note
 }
 
 export class ListNoteRes {
     amount: number = 0;
     notes: Array<Note> = new Array<Note>();
-    is_success: boolean = false;
-    err: string = "";
 }
 
 // ModifyNoteReq modify default is old value, only set fields not equal to old values
@@ -48,17 +43,11 @@ export class ModifyNoteReq {
     content: string = "";
 }
 
-export class ModifyNoteRes {
-    is_success: boolean = false;
-    err: string = "";
-}
+export class ModifyNoteRes {}
 
 // DeleteNoteReq can only delete myself note
 export class DeleteNoteReq {
     id: number = 0;
 }
 
-export class DeleteNoteRes {
-    is_success: boolean = false;
-    err: string = "";
-}
+export class DeleteNoteRes {}

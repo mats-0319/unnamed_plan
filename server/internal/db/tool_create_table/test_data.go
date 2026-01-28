@@ -1,36 +1,39 @@
 package main
 
 import (
-	"github.com/mats0319/unnamed_plan/server/internal/db/model"
+	"github.com/mats0319/unnamed_plan/server/cmd/model"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 var defaultUsers = []*model.User{
-	{
-		UserName: "mats0319",
-		Nickname: "Mario",
-		Password: "15549caf9adafbe5543a26d51bcadba9029bbe5c871e8f195627a1a5fd77673c",
-		Salt:     "9gIAEwTUge",
-		TotpKey:  "",
-		IsAdmin:  true,
-	}, {
-		UserName: "admin",
-		Nickname: "admin",
-		Password: "a797a2163a2186de1d45e633b2e3a58bbb0eb3eb323fac22034fa27c067685cf",
-		Salt:     "HGxHMnVXJS",
-		TotpKey:  "5SSFNNEJUENPCCKP",
-		IsAdmin:  true,
-	}, {
-		UserName: "user",
-		Nickname: "user",
-		Password: "68ecd7703f2cb36105a51e42947d8cd000e101123b1f07133fe593557ebf1b22",
-		Salt:     "3rWYu5vMNI",
-		TotpKey:  "",
-	},
+	newUser("mats0319", "Mario", "", true),
+	newUser("admin", "", "5SSFNNEJUENPCCKP", true),
+	newUser("user", "", "", false),
+}
+
+func newUser(userName string, nickname string, totpKey string, isAdmin bool) *model.User {
+	salt := utils.GenerateRandomBytes[string](10)
+	pwd := "123456"
+	pwd = utils.HmacSHA256[string](pwd)
+	pwd = utils.HmacSHA256(pwd, salt)
+
+	if len(nickname) < 1 {
+		nickname = userName
+	}
+
+	return &model.User{
+		UserName: userName,
+		Nickname: nickname,
+		Password: pwd,
+		Salt:     salt,
+		TotpKey:  totpKey,
+		IsAdmin:  isAdmin,
+	}
 }
 
 var testNotes = []*model.Note{
-	model.NewNote(1001, "mats0319", false, noteTitle_1, noteContent_1),
-	model.NewNote(1001, "mats0319", false, noteTitle_2, noteContent_2),
+	model.NewNote(1001, "Mario", false, noteTitle_1, noteContent_1),
+	model.NewNote(1001, "Mario", false, noteTitle_2, noteContent_2),
 }
 
 const (

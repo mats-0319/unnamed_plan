@@ -61,16 +61,3 @@ type ModifyUserReq struct {
 
 type ModifyUserRes struct {
 }
-
-const URI_Authenticate = "/user/authenticate"
-
-// AuthenticateReq 相当于使用token的登录
-type AuthenticateReq struct {
-}
-
-type AuthenticateRes struct {
-	UserID   uint   `json:"user_id"`
-	UserName string `json:"user_name"`
-	Nickname string `json:"nickname"`
-	IsAdmin  bool   `json:"is_admin"`
-}

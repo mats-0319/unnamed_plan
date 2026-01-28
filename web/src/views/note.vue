@@ -5,6 +5,7 @@
 				<p class="ncc-title">
 					小纸条<span class="ncct-right">{{ currentNum }} / {{ amount }}</span>
 				</p>
+
 				<el-form class="ncc-form" v-model="currentNote" label-width="20%">
 					<el-form-item label="ID">{{ currentNote.note_id }}</el-form-item>
 					<el-form-item label="作者">{{ currentNote.is_anonymous ? "-" : currentNote.writer }}</el-form-item>
@@ -16,9 +17,7 @@
 			</div>
 		</stacked_cards>
 
-		<div class="n-options">
-			<elevated_button :loading="nextLoadingFlag" @click="nextNote">下一张</elevated_button>
-		</div>
+		<elevated_button class="n-options" :loading="nextLoadingFlag" @click="nextNote"> 下一张 </elevated_button>
 	</div>
 
 	<bottom />
@@ -81,7 +80,7 @@ function setCurrentNote(note: Note): void {
 }
 
 function listNote(pageNum: number = 1): void {
-	noteStore.list(10, pageNum, false, (a: number, n: Array<Note>) => {
+	noteStore.list(10, pageNum, 0, (a: number, n: Array<Note>) => {
 		amount.value = a
 		notes.value = n
 		nextPage.value = pageNum + 1
@@ -135,6 +134,7 @@ function listNote(pageNum: number = 1): void {
 			bottom: 8rem;
 		}
 
+		width: 10rem;
 		position: absolute;
 		right: 1rem;
 		bottom: 3rem;

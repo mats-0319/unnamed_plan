@@ -11,9 +11,7 @@
 				</div>
 
 				<div class="tc-item center-hv">
-					<outlined-button v-show="!userStore.isLogin()" @click="beforeOpenLoginDialog()"
-						>登录</outlined-button
-					>
+					<outlined-button v-show="!userStore.isLogin()" @click="beforeOpenLoginDialog()">登录</outlined-button>
 					<div v-show="userStore.isLogin()">
 						<el-dropdown placement="bottom-end">
 							<template #default>
@@ -50,7 +48,7 @@
 			</el-form-item>
 
 			<el-form-item>
-				<outlined-button details="请输入用户名和密码后点击注册" :disabled="!canLoginFlag" @click="register">
+				<outlined-button :details="tips_RegisterUser" :disabled="!canLoginFlag" @click="register">
 					注册新用户
 				</outlined-button>
 			</el-form-item>
@@ -70,6 +68,7 @@ import { useFlagStore } from "@/pinia/flag.ts"
 import OutlinedButton from "@/components/outlined_button.vue"
 import { routerLink } from "@/ts/util.ts"
 import { LoginReq } from "@/axios/ts/user.go.ts"
+import { tips_RegisterUser } from "@/ts/data.ts"
 
 let flags = useFlagStore()
 let userStore = useUserStore()

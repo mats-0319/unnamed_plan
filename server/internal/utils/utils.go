@@ -7,11 +7,16 @@ import (
 	"math/rand/v2"
 )
 
-// CalcSHA256 calc hmac-sha256('key', 'content')
-func CalcSHA256(content string, key ...byte) string {
-	hash := hmac.New(sha256.New, key)
-	hash.Write([]byte(content))
-	bytes := hash.Sum(nil)
+// HmacSHA256 calc hmac-sha256('key', 'content')
+func HmacSHA256[T string | []byte](content string, key ...T) string {
+	var k []byte
+	if len(key) > 0 {
+		k = []byte(key[0])
+	}
+
+	hasher := hmac.New(sha256.New, k) // k default nil is ok
+	hasher.Write([]byte(content))
+	bytes := hasher.Sum(nil)
 
 	return hex.EncodeToString(bytes)
 }
@@ -19,7 +24,7 @@ func CalcSHA256(content string, key ...byte) string {
 const CharactersLibrary = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 const useBits = 6 // 6个bit位可以表示全部字符库中的字符
 
-// GenerateRandomBytes generate random 'length' readable Bytes
+// GenerateRandomBytes generate random readable Bytes
 func GenerateRandomBytes[T string | []byte](length int) T {
 	b := make([]byte, length)
 

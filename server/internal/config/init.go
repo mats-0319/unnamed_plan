@@ -19,7 +19,7 @@ type ConfigItem struct {
 
 var conf = &Config{}
 
-func init() {
+func Initialize() {
 	confBytes, err := os.ReadFile("./config.json")
 	if err != nil {
 		log.Fatalln("> Read config file failed, path: 'config.json', error: ", err)

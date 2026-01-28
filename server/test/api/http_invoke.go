@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	mconst "github.com/mats0319/unnamed_plan/server/internal/const"
-	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
+	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
+	mconst "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 type LoginToken struct {
@@ -37,7 +37,7 @@ func HttpInvoke(uri string, payload string) string {
 		log.Fatal(err)
 	}
 
-	r := &api.Response{} // 因为会设计失败的用例，所以不判断r.isSuccess
+	r := &mhttp.Response{} // 因为会设计失败的用例，所以不判断r.isSuccess
 	err = json.Unmarshal(bodyBytes, r)
 	if err != nil {
 		log.Fatal(err)

@@ -46,6 +46,13 @@ func VerifyToken(ctx *mhttp.Context) *Error {
 		return e
 	}
 
+	tokenBytes, err := hex.DecodeString(tokenSplit[0])
+	if err != nil {
+		e := NewError(ET_UnauthorizedError, ED_InvalidAccessToken).WithCause(err)
+		mlog.Log(e.String())
+		return e
+	}
+
 	hash := genTokenHash(tokenSplit[0])
 	if hash != tokenSplit[1] {
 		e := NewError(ET_UnauthorizedError, ED_TokenTamperedWith).WithParam("token", ctx.AccessToken)
@@ -54,7 +61,7 @@ func VerifyToken(ctx *mhttp.Context) *Error {
 	}
 
 	token := &AccessToken{}
-	err := json.Unmarshal([]byte(tokenSplit[0]), token)
+	err = json.Unmarshal(tokenBytes, token)
 	if err != nil {
 		e := NewError(ET_UnauthorizedError, ED_InvalidAccessToken).WithCause(err)
 		mlog.Log(e.String())
@@ -73,5 +80,5 @@ func VerifyToken(ctx *mhttp.Context) *Error {
 }
 
 func genTokenHash(tokenHex string) string {
-	return CalcSHA256(tokenHex, hashSalt...)
+	return HmacSHA256(tokenHex, hashSalt)
 }

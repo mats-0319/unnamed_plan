@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/mats0319/unnamed_plan/server/internal/db/model"
+	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -15,6 +15,7 @@ func main() {
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info), // print all sql
+		//DryRun: true, // 获取sql，在禁止外部访问的数据库（正式库）使用
 	})
 	if err != nil {
 		log.Fatalln("open db failed, error: ", err)
@@ -44,5 +45,5 @@ func main() {
 	}
 
 	db.Create(defaultUsers)
-	//db.Create(testNotes)
+	db.Create(testNotes)
 }

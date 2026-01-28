@@ -1,7 +1,7 @@
 // Generate File, Should Not Edit.
 // Author : mario. github.com/mats0319
 // Code   : github.com/mats0319/study/go/gocts
-// Version: gocts v0.2.1
+// Version: gocts v0.2.3
 
 import axios, { AxiosInstance } from "axios"
 
@@ -10,6 +10,7 @@ export const axiosWrapper: AxiosInstance = axios.create({
 	timeout: 3000
 })
 
+// getBaseUrl according to dev/product env & local ipv4 addr, set 'baseURL'
 function getBaseUrl(): string {
 	let url = import.meta.env.Vite_axios_base_url
 	let localIP = window.location.hostname

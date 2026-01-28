@@ -5,7 +5,6 @@ import (
 	"os"
 
 	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
-	mconst "github.com/mats0319/unnamed_plan/server/internal/const"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	"gorm.io/driver/postgres"
@@ -19,7 +18,7 @@ type config struct {
 	MaxOpenConns int    `json:"max_open_conns"`
 }
 
-func init() {
+func Initialize() {
 	configIns, err := getDBConfig()
 	if err != nil {
 		mlog.Log("get db config failed", mlog.Field("error", err))
@@ -50,7 +49,7 @@ func init() {
 }
 
 func getDBConfig() (*config, error) {
-	bytes := mconfig.GetConfigItem(mconst.UID_DB)
+	bytes := mconfig.GetConfigItem("658e06f7-71d5-4ada-b715-8c1a4489e5d2")
 
 	conf := &config{}
 	err := json.Unmarshal(bytes, conf)

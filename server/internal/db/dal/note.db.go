@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
-	"github.com/mats0319/unnamed_plan/server/internal/db/model"
-	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
+	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
+	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
@@ -70,11 +70,11 @@ func DeleteNote(id uint) *Error {
 	return nil
 }
 
-func ListNote(page api.Pagination, writerID ...uint) (int64, []*model.Note, *Error) {
+func ListNote(page api.Pagination, writerID uint) (int64, []*model.Note, *Error) {
 	qn := Q.Note
 	sql := qn.WithContext(context.TODO())
-	if len(writerID) > 0 {
-		sql = sql.Where(qn.WriterID.Eq(writerID[0]))
+	if writerID > 0 {
+		sql = sql.Where(qn.WriterID.Eq(writerID))
 	}
 
 	amount, err := sql.Count()

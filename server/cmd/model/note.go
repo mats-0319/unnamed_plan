@@ -3,11 +3,12 @@ package model
 import (
 	"fmt"
 
+	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 type Note struct {
-	Model
+	mdb_model.Model
 	NoteID      string `gorm:"unique;not null"` // 使用其他字段计算获得，可用于保证新增接口幂等性
 	WriterID    uint   // user id
 	WriterName  string // user nickname(at that time)
@@ -28,7 +29,7 @@ func NewNote(writerID uint, writerName string, isAnonymous bool, title string, c
 	noteBytes := fmt.Sprintf(`"writer id":%d,"writer name":%s,"is anonymous":%t,"title":%s,"content":%s`,
 		noteIns.WriterID, noteIns.WriterName, noteIns.IsAnonymous, noteIns.Title, noteIns.Content)
 
-	noteIns.NoteID = utils.CalcSHA256(noteBytes) // 保证新增接口幂等性
+	noteIns.NoteID = utils.HmacSHA256[string](noteBytes) // 保证新增接口幂等性
 
 	return noteIns
 }

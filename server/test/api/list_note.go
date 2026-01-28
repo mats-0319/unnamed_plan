@@ -3,7 +3,7 @@ package api
 import (
 	"log"
 
-	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
+	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
 )
 
 func ListNote() {

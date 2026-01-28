@@ -1,7 +1,7 @@
 // Generate File, Should Not Edit.
 // Author : mario. github.com/mats0319
 // Code   : github.com/mats0319/study/go/gocts
-// Version: gocts v0.2.1
+// Version: gocts v0.2.3
 
 import { axiosWrapper } from "./config"
 import { AxiosResponse } from "axios"
@@ -19,10 +19,10 @@ class NoteAxios {
         return axiosWrapper.post("/note/create", req)
     }
 
-    public listNote(page: Pagination, list_my_flag: boolean): Promise<AxiosResponse<ListNoteRes>> {
+    public listNote(page: Pagination, user_id: number): Promise<AxiosResponse<ListNoteRes>> {
         let req: ListNoteReq = {
             page: page,
-            list_my_flag: list_my_flag,
+            user_id: user_id,
         }
 
         return axiosWrapper.post("/note/list", req)

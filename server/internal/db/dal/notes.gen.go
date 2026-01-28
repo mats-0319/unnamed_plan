@@ -8,7 +8,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/mats0319/unnamed_plan/server/internal/db/model"
+	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
@@ -31,6 +31,8 @@ func newNote(db *gorm.DB, opts ...gen.DOOption) note {
 	_note.CreatedAt = field.NewInt64(tableName, "created_at")
 	_note.UpdatedAt = field.NewInt64(tableName, "updated_at")
 	_note.DeletedAt = field.NewField(tableName, "deleted_at")
+	_note.ExportID = field.NewUint(tableName, "export_id")
+	_note.ExportedAt = field.NewInt64(tableName, "exported_at")
 	_note.NoteID = field.NewString(tableName, "note_id")
 	_note.WriterID = field.NewUint(tableName, "writer_id")
 	_note.WriterName = field.NewString(tableName, "writer_name")
@@ -51,6 +53,8 @@ type note struct {
 	CreatedAt   field.Int64
 	UpdatedAt   field.Int64
 	DeletedAt   field.Field
+	ExportID    field.Uint
+	ExportedAt  field.Int64
 	NoteID      field.String
 	WriterID    field.Uint
 	WriterName  field.String
@@ -77,6 +81,8 @@ func (n *note) updateTableName(table string) *note {
 	n.CreatedAt = field.NewInt64(table, "created_at")
 	n.UpdatedAt = field.NewInt64(table, "updated_at")
 	n.DeletedAt = field.NewField(table, "deleted_at")
+	n.ExportID = field.NewUint(table, "export_id")
+	n.ExportedAt = field.NewInt64(table, "exported_at")
 	n.NoteID = field.NewString(table, "note_id")
 	n.WriterID = field.NewUint(table, "writer_id")
 	n.WriterName = field.NewString(table, "writer_name")
@@ -107,11 +113,13 @@ func (n *note) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (n *note) fillFieldMap() {
-	n.fieldMap = make(map[string]field.Expr, 10)
+	n.fieldMap = make(map[string]field.Expr, 12)
 	n.fieldMap["id"] = n.ID
 	n.fieldMap["created_at"] = n.CreatedAt
 	n.fieldMap["updated_at"] = n.UpdatedAt
 	n.fieldMap["deleted_at"] = n.DeletedAt
+	n.fieldMap["export_id"] = n.ExportID
+	n.fieldMap["exported_at"] = n.ExportedAt
 	n.fieldMap["note_id"] = n.NoteID
 	n.fieldMap["writer_id"] = n.WriterID
 	n.fieldMap["writer_name"] = n.WriterName

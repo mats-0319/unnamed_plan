@@ -1,14 +1,20 @@
 package main
 
 import (
+	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
 	"github.com/mats0319/unnamed_plan/server/cmd/handlers"
-	_ "github.com/mats0319/unnamed_plan/server/internal/db"
+	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
+	mdb "github.com/mats0319/unnamed_plan/server/internal/db"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
-	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 	"github.com/mats0319/unnamed_plan/server/internal/http/middleware"
+	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 )
 
 func main() {
+	mconfig.Initialize()
+	mlog.Initialize()
+	mdb.Initialize()
+
 	mhttp.StartServer(newHandler())
 }
 

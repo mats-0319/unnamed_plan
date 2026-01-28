@@ -8,10 +8,9 @@ import (
 	"math"
 	"time"
 
-	mconst "github.com/mats0319/unnamed_plan/server/internal/const"
+	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
-	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 	"github.com/mats0319/unnamed_plan/server/internal/http/middleware"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
@@ -29,7 +28,7 @@ func Login(ctx *mhttp.Context) {
 		return
 	}
 
-	if utils.CalcSHA256(req.Password, []byte(user.Salt)...) != user.Password {
+	if utils.HmacSHA256(req.Password, user.Salt) != user.Password {
 		e := utils.NewError(utils.ET_ParamsError, utils.ED_InvalidPwd).WithParam("user name", req.UserName)
 		ctx.ResData = e
 		mlog.Log(e.String())
@@ -53,7 +52,7 @@ func Login(ctx *mhttp.Context) {
 	}
 
 	// token
-	ctx.Writer.Header().Set(mconst.HttpHeader_AccessToken, middleware.GenToken(user.ID))
+	ctx.Writer.Header().Set(utils.HttpHeader_AccessToken, middleware.GenToken(user.ID))
 
 	ctx.ResData = &api.LoginRes{
 		UserID:   user.ID,

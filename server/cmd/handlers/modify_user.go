@@ -3,9 +3,9 @@ package handlers
 import (
 	"encoding/base32"
 
+	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
-	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
@@ -34,7 +34,7 @@ func ModifyUser(ctx *mhttp.Context) {
 		operator.Nickname = req.Nickname
 	}
 	if len(req.Password) > 0 {
-		newPassword := utils.CalcSHA256(req.Password, []byte(operator.Salt)...)
+		newPassword := utils.HmacSHA256(req.Password, operator.Salt)
 		if newPassword == operator.Password {
 			e := utils.NewError(utils.ET_ParamsError, utils.ED_SamePwd)
 			ctx.ResData = e

@@ -4,8 +4,7 @@
 			<div class="hc-item hc-item-1 center-vertical">
 				你不是你以为的你自己，也不是别人眼中的你自己，而是你以为的别人眼中的你自己。<br />
 				<span class="hci-en">
-					You are not who you think you are, nor who others see you as, but rather who you believe others see
-					you as.
+					You are not who you think you are, nor who others see you as, but rather who you believe others see you as.
 				</span>
 			</div>
 

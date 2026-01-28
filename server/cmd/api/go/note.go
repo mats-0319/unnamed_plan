@@ -25,8 +25,8 @@ type Note struct {
 }
 
 type ListNoteReq struct {
-	Page       Pagination `json:"page"`
-	ListMyFlag bool       `json:"list_my_flag"`
+	Page   Pagination `json:"page"`
+	UserID uint       `json:"user_id"` // 非0表示查询指定用户的note
 }
 
 type ListNoteRes struct {
