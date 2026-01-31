@@ -35,7 +35,7 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	handlerItemIns, ok := h.handlers[request.RequestURI]
 	if !ok {
-		err := NewError(ET_ServerInternalError).WithParam("uri", request.RequestURI)
+		err := ErrServerInternalError().WithParam("uri", request.RequestURI)
 		mlog.Log(err.String())
 		ctx.ResData = err
 		return

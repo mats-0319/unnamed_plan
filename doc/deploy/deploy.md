@@ -2,7 +2,7 @@
 
 > 服务器系统：Ubuntu 24.04
 
-## 数据库(pg)
+## 数据库(postgresql)
 
 ubuntu系统自带一个pg数据库的指定版本快照，如果想要安装其他版本，参考[官方文档](https://www.postgresql.org/download/linux/ubuntu/)
 
@@ -30,12 +30,15 @@ config file: `/etc/postgresql/16/main/postgresql.conf`(注意版本号)
 add: `listen_address: '*'`
 
 config file: `/etc/postgresql/16/main/pg_hba.conf`
-add: 
+add:
+
 ```txt
 host cloud all 127.0.0.1/32 md5     // 允许本机连接cloud数据库
 host cloud all 0.0.0.0/0    reject  // 不允许其他连接访问cloud
 host all   all 0.0.0.0/0    md5     // 允许所有远程连接
 ```
+
+数据库可视化工具往往可以通过先登录云服务器再访问的方式，在本地访问远程限制访问的数据库
 
 重启/重载服务：`sudo systemctl restart/reload postgresql`
 
@@ -54,7 +57,7 @@ host all   all 0.0.0.0/0    md5     // 允许所有远程连接
 配置文件路径：`/etc/nginx/nginx.conf`
 日志文件路径：`/var/log/nginx/access.log`（配置文件内可修改）
 
-默认配置包含`/etc/nginx/conf.d/*.conf`
+默认配置包含`/etc/nginx/conf.d/*.conf`，所以我们将编辑好的`.conf`文件丢到那个文件夹下面即可
 
 详细配置，见本文档同目录下，`*.conf`配置文件
 
@@ -102,6 +105,15 @@ nginx常用命令：
 
 ```txt
 #!/bin/sh -e
-([.exe path] &)
+([.exe path] &) 
 exit 0
 ```
+
+&：不阻塞
+()：在命令行窗口关闭后仍能持续运行
+
+## 部署web应用
+
+构建ui、服务端程序，参考`scripts/build.sh`
+
+将构建内容上传到云服务器，启动/重新启动服务端程序，参考`scripts/restart_server.sh`

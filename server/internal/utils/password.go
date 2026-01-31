@@ -54,7 +54,7 @@ func VerifyPassword(password, encodedHash string) *Error {
 
 	// 使用恒定时间比较防止时序攻击
 	if subtle.ConstantTimeCompare(key, newKey) != 1 {
-		e := NewError(ET_ParamsError, ED_WrongPwd).WithParam("old key", key).WithParam("new key", newKey)
+		e := ErrWrongPwd().WithParam("old key", key).WithParam("new key", newKey)
 		mlog.Log(e.String())
 		return e
 	}
@@ -65,7 +65,7 @@ func VerifyPassword(password, encodedHash string) *Error {
 func decodeHash(encodedHash string) (*PasswordManager, []byte, []byte, *Error) {
 	pwdSplit := strings.Split(encodedHash, ".")
 	if len(pwdSplit) != 5 || pwdSplit[0] != "argon2id" {
-		e := NewError(ET_ParamsError, ED_PwdStructure).WithParam("encoded pwd", encodedHash)
+		e := ErrPwdStructure().WithParam("encoded pwd", encodedHash)
 		mlog.Log(e.String())
 		return nil, nil, nil, e
 	}
@@ -73,7 +73,7 @@ func decodeHash(encodedHash string) (*PasswordManager, []byte, []byte, *Error) {
 	var version int
 	_, err := fmt.Sscanf(pwdSplit[1], "v=%d", &version)
 	if err != nil || version != argon2.Version {
-		e := NewError(ET_ParamsError, ED_PwdVersion).WithCause(err).WithParam("version", version)
+		e := ErrPwdVersion().WithCause(err).WithParam("version", version)
 		mlog.Log(e.String())
 		return nil, nil, nil, e
 	}
@@ -81,21 +81,21 @@ func decodeHash(encodedHash string) (*PasswordManager, []byte, []byte, *Error) {
 	params := &PasswordManager{}
 	_, err = fmt.Sscanf(pwdSplit[2], "m=%d,t=%d,p=%d", &params.Memory, &params.CalcTimes, &params.Threads)
 	if err != nil {
-		e := NewError(ET_ParamsError, ED_PwdParams).WithCause(err)
+		e := ErrPwdParams().WithCause(err)
 		mlog.Log(e.String())
 		return nil, nil, nil, e
 	}
 
 	salt, err := hex.DecodeString(pwdSplit[3])
 	if err != nil {
-		e := NewError(ET_ParamsError, ED_HexDecode).WithCause(err).WithParam("salt", pwdSplit[3])
+		e := ErrHexDecode().WithCause(err).WithParam("salt", pwdSplit[3])
 		mlog.Log(e.String())
 		return nil, nil, nil, e
 	}
 
 	key, err := hex.DecodeString(pwdSplit[4])
 	if err != nil {
-		e := NewError(ET_ParamsError, ED_HexDecode).WithCause(err).WithParam("key", pwdSplit[4])
+		e := ErrHexDecode().WithCause(err).WithParam("key", pwdSplit[4])
 		mlog.Log(e.String())
 		return nil, nil, nil, e
 	}

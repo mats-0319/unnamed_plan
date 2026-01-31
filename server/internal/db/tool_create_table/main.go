@@ -15,7 +15,7 @@ func main() {
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info), // print all sql
-		//DryRun: true, // 获取sql，在禁止外部访问的数据库（正式库）使用
+		//DryRun: true,                                // 获取sql，在禁止外部访问的数据库（正式库）使用
 	})
 	if err != nil {
 		log.Fatalln("open db failed, error: ", err)
@@ -40,7 +40,7 @@ func main() {
 	}
 
 	for _, v := range tableNames {
-		sequence := fmt.Sprintf("%s_id_seq", v)
+		sequence := fmt.Sprintf("%s_id_seq", v) // 如果gorm修改了它的ID自增序列命名，这里也要相应修改，能不能直接获取序列名？
 		db.Exec(fmt.Sprintf("alter sequence %s restart with 1001;", sequence))
 	}
 

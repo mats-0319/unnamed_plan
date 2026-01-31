@@ -64,7 +64,7 @@ func Login(ctx *mhttp.Context) {
 // verifyTotpCode totpKey is base32 encoded
 func verifyTotpCode(code string, totpKey string) *utils.Error {
 	if len(code) != 6 {
-		e := utils.NewError(utils.ET_ParamsError, utils.ED_InvalidTotpCode).WithParam("code", code)
+		e := utils.ErrInvalidTotpCode().WithParam("code", code)
 		mlog.Log(e.String())
 		return e
 	}
@@ -72,7 +72,7 @@ func verifyTotpCode(code string, totpKey string) *utils.Error {
 	key := make([]byte, 10)
 	n, err := base32.StdEncoding.Decode(key, []byte(totpKey))
 	if err != nil {
-		e := utils.NewError(utils.ET_ServerInternalError).WithCause(err)
+		e := utils.ErrServerInternalError().WithCause(err)
 		mlog.Log(e.String())
 		return e
 	}
@@ -95,7 +95,7 @@ func verifyTotpCode(code string, totpKey string) *utils.Error {
 	}
 
 	if !existFlag {
-		e := utils.NewError(utils.ET_ParamsError, utils.ED_WrongTotpCode).WithParam("code", code)
+		e := utils.ErrWrongTotpCode().WithParam("code", code)
 		mlog.Log(e.String())
 		return e
 	}

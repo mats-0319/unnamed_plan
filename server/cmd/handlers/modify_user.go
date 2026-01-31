@@ -24,7 +24,7 @@ func ModifyUser(ctx *mhttp.Context) {
 
 	modifyNicknameFlag := len(req.Nickname) > 0 && req.Nickname != operator.Nickname
 	if !modifyNicknameFlag && len(req.Password) < 1 && !req.ModifyTkFlag {
-		e := utils.NewError(utils.ET_ParamsError, utils.ED_NoChanges)
+		e := utils.ErrNoChanges().WithParam("operator", ctx.UserID)
 		ctx.ResData = e
 		mlog.Log(e.String())
 		return
@@ -36,7 +36,7 @@ func ModifyUser(ctx *mhttp.Context) {
 	if len(req.Password) > 0 {
 		err = utils.VerifyPassword(req.Password, operator.Password)
 		if err == nil {
-			e := utils.NewError(utils.ET_ParamsError, utils.ED_SamePwd)
+			e := utils.ErrSamePwd()
 			ctx.ResData = e
 			mlog.Log(e.String())
 			return
@@ -47,7 +47,7 @@ func ModifyUser(ctx *mhttp.Context) {
 	if req.ModifyTkFlag {
 		bytes, err := base32.StdEncoding.DecodeString(req.TotpKey)
 		if err != nil || len(bytes) > 10 {
-			e := utils.NewError(utils.ET_ParamsError, utils.ED_InvalidTotpKey).WithParam("totp key", req.TotpKey).WithCause(err)
+			e := utils.ErrInvalidTotpKey().WithParam("totp key", req.TotpKey).WithCause(err)
 			ctx.ResData = e
 			mlog.Log(e.String())
 			return

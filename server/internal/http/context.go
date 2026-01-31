@@ -39,7 +39,7 @@ func (ctx *Context) ParseParams(obj any, r ...io.Reader) bool {
 
 	bodyBytes, err := io.ReadAll(reader)
 	if err != nil {
-		e := NewError(ET_ServerInternalError).WithCause(err)
+		e := ErrServerInternalError().WithCause(err)
 		mlog.Log(e.String())
 		ctx.ResData = e
 		return false
@@ -47,7 +47,7 @@ func (ctx *Context) ParseParams(obj any, r ...io.Reader) bool {
 
 	err = json.Unmarshal(bodyBytes, obj)
 	if err != nil {
-		e := NewError(ET_ParamsError, ED_JsonUnmarshal).WithCause(err)
+		e := ErrJsonUnmarshal().WithCause(err)
 		mlog.Log(e.String())
 		ctx.ResData = e
 		return false

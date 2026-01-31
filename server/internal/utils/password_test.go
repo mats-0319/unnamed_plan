@@ -5,7 +5,7 @@ import (
 )
 
 func TestPassword(t *testing.T) {
-	pwdFromWeb := CalcSHA256("123456")
+	pwdFromWeb := CalcSHA256("123456") // hex(hash('password'))
 	t.Log("> Password From Web: ", pwdFromWeb)
 
 	pwdDB := GeneratePwdHash(pwdFromWeb)

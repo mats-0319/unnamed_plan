@@ -28,7 +28,7 @@ func GenToken(userID uint) string {
 		ExpireTime: time.Now().Add(time.Hour * 6).UnixMilli(), // hard code 'expire time' = 6h
 	})
 	if err != nil {
-		e := NewError(ET_ServerInternalError, ED_JsonMarshal).WithCause(err)
+		e := ErrServerInternalError().WithCause(err)
 		mlog.Log(e.String())
 		return ""
 	}
@@ -41,21 +41,21 @@ func GenToken(userID uint) string {
 func VerifyToken(ctx *mhttp.Context) *Error {
 	tokenSplit := strings.Split(ctx.AccessToken, ".")
 	if len(tokenSplit) != 2 {
-		e := NewError(ET_UnauthorizedError, ED_InvalidAccessToken).WithParam("token", ctx.AccessToken)
+		e := ErrInvalidAccessToken().WithParam("token", ctx.AccessToken)
 		mlog.Log(e.String())
 		return e
 	}
 
 	tokenBytes, err := hex.DecodeString(tokenSplit[0])
 	if err != nil {
-		e := NewError(ET_UnauthorizedError, ED_InvalidAccessToken).WithCause(err)
+		e := ErrInvalidAccessToken().WithCause(err)
 		mlog.Log(e.String())
 		return e
 	}
 
 	hash := genTokenHash(tokenSplit[0])
 	if hash != tokenSplit[1] {
-		e := NewError(ET_UnauthorizedError, ED_TokenTamperedWith).WithParam("token", ctx.AccessToken)
+		e := ErrTokenTamperedWith().WithParam("token", ctx.AccessToken)
 		mlog.Log(e.String())
 		return e
 	}
@@ -63,13 +63,13 @@ func VerifyToken(ctx *mhttp.Context) *Error {
 	token := &AccessToken{}
 	err = json.Unmarshal(tokenBytes, token)
 	if err != nil {
-		e := NewError(ET_UnauthorizedError, ED_InvalidAccessToken).WithCause(err)
+		e := ErrInvalidAccessToken().WithCause(err)
 		mlog.Log(e.String())
 		return e
 	}
 
 	if token.ExpireTime < time.Now().UnixMilli() {
-		e := NewError(ET_UnauthorizedError, ED_TokenExpired).WithParam("expire time", token.ExpireTime)
+		e := ErrTokenExpired().WithParam("expire time", token.ExpireTime)
 		mlog.Log(e.String())
 		return e
 	}

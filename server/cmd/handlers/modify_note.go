@@ -21,14 +21,14 @@ func ModifyNote(ctx *mhttp.Context) {
 	}
 
 	if req.IsAnonymous == note.IsAnonymous && req.Title == note.Title && req.Content == note.Content {
-		e := NewError(ET_ParamsError, ED_NoChanges).WithParam("operator", ctx.UserID)
+		e := ErrNoChanges().WithParam("operator", ctx.UserID)
 		ctx.ResData = e
 		mlog.Log(e.String())
 		return
 	}
 
 	if ctx.UserID != note.WriterID {
-		e := NewError(ET_OperatorError, ED_NeedOwner).WithParam("operator", ctx.UserID).WithParam("owner", note.WriterID)
+		e := ErrNeedOwner().WithParam("operator", ctx.UserID).WithParam("owner", note.WriterID)
 		ctx.ResData = e
 		mlog.Log(e.String())
 		return

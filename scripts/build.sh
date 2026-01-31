@@ -2,12 +2,13 @@
 # Use At: Local Dev Env
 # Behavior: Generate Server and UI at 'root/build'
 
-from_path=$(pwd)
+from_path=$(pwd) # record current path
 
 # change dir, for run this script from anywhere
 cd "$(dirname "$0")" || exit 1
 cd .. || exit 1
 
+# clean history build data
 if [ -d "./build/" ]; then
   rm -rf ./build/*
 fi
@@ -44,8 +45,9 @@ mkdir -p "./build/server/"
 
   mv "./web/dist/" "./build/dist/"
 
-# shell
+# copy shell
 
   cp "./scripts/restart_server.sh" "./build/restart_server.sh"
 
+# back to from path
 cd "$from_path" || exit 1

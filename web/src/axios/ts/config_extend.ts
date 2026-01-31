@@ -45,3 +45,23 @@ export function initInterceptors(invalidLoginHandler: () => void): void {
 		}
 	)
 }
+
+// export interface AxiosResponse<T = any, D = any, H = {}> {
+//   data: T;
+//   status: number;
+//   statusText: string;
+//   headers: H & RawAxiosResponseHeaders | AxiosResponseHeaders;
+//   config: InternalAxiosRequestConfig<D>;
+//   request?: any;
+// }
+//
+// 根据axios类型定义，我们在res拦截器里拿到的value.data就是我们定义的返回结构：
+// type Response struct {
+// 	IsSuccess bool   `json:"is_success"`
+// 	Err       string `json:"err"`
+// 	Data      any    `json:"data"`
+// }
+//
+// 因为res拦截器要求输入/输出参数类型一致，所以不容易直接返回请求的有效属性(value.data.data)
+// - `type AxiosResponseInterceptorUse<T> = (onFulfilled?: ((value: T) => T | Promise<T>)`
+// 所以解析请求的返回值需要这样写：`({ data }: { data: LoginRes })`，而很难直接写`(data: LoginRes)`
