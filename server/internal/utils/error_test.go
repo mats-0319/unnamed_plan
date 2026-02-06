@@ -6,17 +6,9 @@ import (
 )
 
 func TestLogStyle(t *testing.T) {
-	e := ErrJsonMarshal().WithCause(errors.New("a new error")).
+	e := ErrServerInternalError().WithCause(errors.New("a new error")).
 		WithParam("first param", "first value").
-		WithParam("second param", new(string))
+		WithParam("second param", 10000)
 
-	t.Log(e.String())
-}
-
-func TestReuse(t *testing.T) {
-	e := ErrServerInternalError().WithParam("key", "value")
-	t.Log(e.String())
-	
-	e = ErrServerInternalError()
 	t.Log(e.String())
 }

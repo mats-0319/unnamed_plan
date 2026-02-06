@@ -24,7 +24,7 @@ func ModifyUser(ctx *mhttp.Context) {
 
 	modifyNicknameFlag := len(req.Nickname) > 0 && req.Nickname != operator.Nickname
 	if !modifyNicknameFlag && len(req.Password) < 1 && !req.ModifyTkFlag {
-		e := utils.ErrNoChanges().WithParam("operator", ctx.UserID)
+		e := utils.ErrNoChanges().WithParam("operator", operator.UserName)
 		ctx.ResData = e
 		mlog.Log(e.String())
 		return
@@ -34,7 +34,7 @@ func ModifyUser(ctx *mhttp.Context) {
 		operator.Nickname = req.Nickname
 	}
 	if len(req.Password) > 0 {
-		err = utils.VerifyPassword(req.Password, operator.Password)
+		err = utils.VerifyPassword(req.Password, operator.Password) // in modify, same pwd is invalid
 		if err == nil {
 			e := utils.ErrSamePwd()
 			ctx.ResData = e

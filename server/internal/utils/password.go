@@ -10,7 +10,8 @@ import (
 	"golang.org/x/crypto/argon2"
 )
 
-// hash str structure: `argon2id.v=19.m=65536,t=3,p=1.[saltHex].[keyHex]`
+// pwd hash structure: `argon2id.v=19,m=65536,t=3,p=1.[saltHex].[keyHex]`
+// more: doc/design.md 密码存储hash
 
 type PasswordManager struct {
 	CalcTimes uint32 // 迭代次数
@@ -40,12 +41,13 @@ func GeneratePwdHash(password string, params ...*PasswordManager) string {
 	key := argon2.IDKey([]byte(password), salt, pm.CalcTimes, pm.Memory, pm.Threads, pm.KeyLength)
 	keyHex := hex.EncodeToString(key)
 
-	return fmt.Sprintf("argon2id.v=19.m=%d,t=%d,p=%d.%s.%s",
-		pm.Memory, pm.CalcTimes, pm.Threads, saltHex, keyHex)
+	return fmt.Sprintf("argon2id.v=%d,m=%d,t=%d,c=%d.%s.%s",
+		argon2.Version, pm.Memory, pm.CalcTimes, pm.Threads, saltHex, keyHex)
 }
 
-func VerifyPassword(password, encodedHash string) *Error {
-	params, salt, key, err := decodeHash(encodedHash)
+// VerifyPassword decode 'key' from 'pwd hash', calc 'new key' with 'password', compare two keys
+func VerifyPassword(password, pwdHash string) *Error {
+	params, salt, key, err := decodeHash(pwdHash)
 	if err != nil {
 		return err
 	}
@@ -62,40 +64,33 @@ func VerifyPassword(password, encodedHash string) *Error {
 	return nil
 }
 
-func decodeHash(encodedHash string) (*PasswordManager, []byte, []byte, *Error) {
-	pwdSplit := strings.Split(encodedHash, ".")
-	if len(pwdSplit) != 5 || pwdSplit[0] != "argon2id" {
-		e := ErrPwdStructure().WithParam("encoded pwd", encodedHash)
+func decodeHash(pwdHash string) (*PasswordManager, []byte, []byte, *Error) {
+	pwdSplit := strings.Split(pwdHash, ".")
+	if len(pwdSplit) != 4 || pwdSplit[0] != "argon2id" {
+		e := ErrInvalidPwd().WithParam("encoded pwd", pwdHash)
 		mlog.Log(e.String())
 		return nil, nil, nil, e
 	}
 
 	var version int
-	_, err := fmt.Sscanf(pwdSplit[1], "v=%d", &version)
-	if err != nil || version != argon2.Version {
-		e := ErrPwdVersion().WithCause(err).WithParam("version", version)
-		mlog.Log(e.String())
-		return nil, nil, nil, e
-	}
-
 	params := &PasswordManager{}
-	_, err = fmt.Sscanf(pwdSplit[2], "m=%d,t=%d,p=%d", &params.Memory, &params.CalcTimes, &params.Threads)
-	if err != nil {
-		e := ErrPwdParams().WithCause(err)
+	_, err := fmt.Sscanf(pwdSplit[1], "v=%d,m=%d,t=%d,c=%d", &version, &params.Memory, &params.CalcTimes, &params.Threads)
+	if err != nil || version != argon2.Version {
+		e := ErrPwdParams().WithCause(err).WithParam("version", version).WithParam("params", params)
 		mlog.Log(e.String())
 		return nil, nil, nil, e
 	}
 
-	salt, err := hex.DecodeString(pwdSplit[3])
+	salt, err := hex.DecodeString(pwdSplit[2])
 	if err != nil {
-		e := ErrHexDecode().WithCause(err).WithParam("salt", pwdSplit[3])
+		e := ErrHexDecode().WithCause(err).WithParam("salt", pwdSplit[2])
 		mlog.Log(e.String())
 		return nil, nil, nil, e
 	}
 
-	key, err := hex.DecodeString(pwdSplit[4])
+	key, err := hex.DecodeString(pwdSplit[3])
 	if err != nil {
-		e := ErrHexDecode().WithCause(err).WithParam("key", pwdSplit[4])
+		e := ErrHexDecode().WithCause(err).WithParam("key", pwdSplit[3])
 		mlog.Log(e.String())
 		return nil, nil, nil, e
 	}

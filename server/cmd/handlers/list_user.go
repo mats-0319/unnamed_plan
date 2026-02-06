@@ -28,7 +28,7 @@ func ListUser(ctx *mhttp.Context) {
 		return
 	}
 
-	count, users, err := dal.ListUsers(req.Page)
+	count, users, err := dal.ListUser(req.Page)
 	if err != nil {
 		ctx.ResData = err
 		return

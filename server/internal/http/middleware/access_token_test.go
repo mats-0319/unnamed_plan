@@ -7,11 +7,11 @@ import (
 )
 
 func TestAccessToken(t *testing.T) {
-	token := GenToken(1001)
+	token := GenAccessToken(1001)
 	t.Log("> Token: ", token)
 
 	ctx := &mhttp.Context{AccessToken: token}
-	err := VerifyToken(ctx)
+	err := VerifyAccessToken(ctx)
 	if err != nil {
 		t.Error(err.String())
 	}

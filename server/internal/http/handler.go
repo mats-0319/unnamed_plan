@@ -20,22 +20,22 @@ type HandlerItem struct {
 }
 
 func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	ctx := NewContext(writer, request)
-	defer ctx.response()
-
 	writer.Header().Set("Access-Control-Allow-Origin", "*")
 	writer.Header().Set("Access-Control-Allow-Headers", "*")
 	writer.Header().Set("Access-Control-Expose-Headers", "*")
 
 	if request.Method != http.MethodPost { // return after set header
-		return
+		return // res body is empty
 	}
 
 	mlog.Log(fmt.Sprintf("| %s | %s |", request.URL.String(), time.Now().String()))
 
+	ctx := NewContext(writer, request)
+	defer ctx.response()
+
 	handlerItemIns, ok := h.handlers[request.RequestURI]
 	if !ok {
-		err := ErrServerInternalError().WithParam("uri", request.RequestURI)
+		err := ErrUnsupportedUri().WithParam("uri", request.RequestURI)
 		mlog.Log(err.String())
 		ctx.ResData = err
 		return

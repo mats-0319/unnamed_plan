@@ -45,7 +45,7 @@ func serializeRes(obj any) (int, []byte) {
 	jsonBytes, err := json.Marshal(obj)
 	if err != nil {
 		// 因为这里已经给resBytes定型了，返回错误也没啥能做的，就不返回了
-		mlog.Log("serialize handlers res to json failed", mlog.Field("error", err))
+		mlog.Log("serialize res to json failed", mlog.Field("error", err))
 		return code, nil
 	}
 
@@ -54,11 +54,14 @@ func serializeRes(obj any) (int, []byte) {
 
 func getHttpCode(err *Error) int {
 	code := http.StatusOK
+
 	switch err.Typ {
+	case ET_BadRequest:
+		code = http.StatusBadRequest
+	case ET_Unauthorized:
+		code = http.StatusUnauthorized
 	case ET_ServerInternalError:
 		code = http.StatusInternalServerError
-	case ET_UnauthorizedError:
-		code = http.StatusUnauthorized
 	}
 
 	return code

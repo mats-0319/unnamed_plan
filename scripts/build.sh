@@ -36,6 +36,8 @@ mkdir -p "./build/server/"
 
   build_server "cmd"
 
+  cp "./scripts/restart_server.sh" "./build/restart_server.sh"
+
 # build ui
 
   cd "./web" || exit 1
@@ -44,10 +46,6 @@ mkdir -p "./build/server/"
   cd .. || exit 1
 
   mv "./web/dist/" "./build/dist/"
-
-# copy shell
-
-  cp "./scripts/restart_server.sh" "./build/restart_server.sh"
 
 # back to from path
 cd "$from_path" || exit 1

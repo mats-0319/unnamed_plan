@@ -1,17 +1,24 @@
 package api
 
 import (
-	"log"
-
 	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
+	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 )
 
 func ListNote() {
-	TestApi("List Note")
+	testCase("success", listNoteCase_Success)
+}
 
-	TestCase("success")
-	res := HttpInvoke(api.URI_ListNote, `{"page":{"size":10,"num":1},"user_id":0}`)
-	log.Println(res)
+func listNoteCase_Success() string {
+	res := httpInvoke(api.URI_ListNote, `{"page":{"size":10,"num":1},"user_id":0}`)
+	if !res.IsSuccess {
+		return res.Err
+	}
 
-	TestApiEnd()
+	count, data, err := dal.ListNote(api.Pagination{Size: 10, Num: 1}, 0)
+	if count != 1 || len(data) != 1 || err != nil {
+		return unknownError
+	}
+
+	return ""
 }

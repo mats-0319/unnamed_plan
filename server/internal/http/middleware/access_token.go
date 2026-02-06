@@ -13,16 +13,14 @@ import (
 )
 
 // token structure: `hex({"user_id":[xxx]...}).hex(hash(payload, key))`
-// - payload: hex({"user_id":[xxx]...}), hex str before '.'
-// - 轮换hmacKey：在token payload添加key版本号，同时维护多个版本的key
-// hash algorithm: hmac-sha256
+// more: doc/design.md 接口访问令牌
 
 type AccessToken struct {
 	UserID     uint  `json:"user_id"`
 	ExpireTime int64 `json:"expire_time"`
 }
 
-func GenToken(userID uint) string {
+func GenAccessToken(userID uint) string {
 	tokenBytes, err := json.Marshal(&AccessToken{
 		UserID:     userID,
 		ExpireTime: time.Now().Add(time.Hour * 6).UnixMilli(), // hard code 'expire time' = 6h
@@ -38,7 +36,7 @@ func GenToken(userID uint) string {
 	return fmt.Sprintf("%s.%s", tokenHex, genTokenHash(tokenHex))
 }
 
-func VerifyToken(ctx *mhttp.Context) *Error {
+func VerifyAccessToken(ctx *mhttp.Context) *Error {
 	tokenSplit := strings.Split(ctx.AccessToken, ".")
 	if len(tokenSplit) != 2 {
 		e := ErrInvalidAccessToken().WithParam("token", ctx.AccessToken)
@@ -46,16 +44,16 @@ func VerifyToken(ctx *mhttp.Context) *Error {
 		return e
 	}
 
-	tokenBytes, err := hex.DecodeString(tokenSplit[0])
-	if err != nil {
-		e := ErrInvalidAccessToken().WithCause(err)
+	hash := genTokenHash(tokenSplit[0])
+	if hash != tokenSplit[1] {
+		e := ErrTokenTamperedWith().WithParam("token", ctx.AccessToken)
 		mlog.Log(e.String())
 		return e
 	}
 
-	hash := genTokenHash(tokenSplit[0])
-	if hash != tokenSplit[1] {
-		e := ErrTokenTamperedWith().WithParam("token", ctx.AccessToken)
+	tokenBytes, err := hex.DecodeString(tokenSplit[0])
+	if err != nil {
+		e := ErrInvalidAccessToken().WithCause(err)
 		mlog.Log(e.String())
 		return e
 	}
@@ -68,8 +66,9 @@ func VerifyToken(ctx *mhttp.Context) *Error {
 		return e
 	}
 
-	if token.ExpireTime < time.Now().UnixMilli() {
-		e := ErrTokenExpired().WithParam("expire time", token.ExpireTime)
+	now := time.Now().UnixMilli()
+	if token.ExpireTime < now {
+		e := ErrTokenExpired().WithParam("expire time", token.ExpireTime).WithParam("now", now)
 		mlog.Log(e.String())
 		return e
 	}

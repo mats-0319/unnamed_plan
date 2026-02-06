@@ -51,7 +51,7 @@ func Login(ctx *mhttp.Context) {
 	}
 
 	// token
-	ctx.Writer.Header().Set(utils.HttpHeader_AccessToken, middleware.GenToken(user.ID))
+	ctx.Writer.Header().Set(utils.HttpHeader_AccessToken, middleware.GenAccessToken(user.ID))
 
 	ctx.ResData = &api.LoginRes{
 		UserID:   user.ID,
@@ -72,7 +72,7 @@ func verifyTotpCode(code string, totpKey string) *utils.Error {
 	key := make([]byte, 10)
 	n, err := base32.StdEncoding.Decode(key, []byte(totpKey))
 	if err != nil {
-		e := utils.ErrServerInternalError().WithCause(err)
+		e := utils.ErrInvalidTotpCode().WithCause(err)
 		mlog.Log(e.String())
 		return e
 	}
@@ -80,6 +80,7 @@ func verifyTotpCode(code string, totpKey string) *utils.Error {
 
 	timestep := time.Now().Unix() / 30
 
+	// allow last/current/next totp code
 	validCodes := []string{
 		calcTotpCode(key, iTob(timestep-1)),
 		calcTotpCode(key, iTob(timestep)),

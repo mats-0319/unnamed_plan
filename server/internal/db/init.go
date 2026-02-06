@@ -2,6 +2,7 @@ package mdb
 
 import (
 	"encoding/json"
+	"flag"
 	"os"
 
 	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
@@ -10,7 +11,16 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 )
+
+var isTestMode bool // for api test
+
+func init() {
+	flag.BoolVar(&isTestMode, "t", false, "use different db connection")
+
+	flag.Parse()
+}
 
 type config struct {
 	DSN          string `json:"dsn"`
@@ -25,10 +35,15 @@ func Initialize() {
 		os.Exit(1)
 	}
 
-	db, err := gorm.Open(postgres.Open(configIns.DSN), &gorm.Config{
+	gormConfig := &gorm.Config{
 		Logger:                 logger.Default.LogMode(logger.Silent),
 		SkipDefaultTransaction: true,
-	})
+	}
+	if isTestMode {
+		gormConfig.NamingStrategy = schema.NamingStrategy{TablePrefix: "t_"}
+	}
+
+	db, err := gorm.Open(postgres.Open(configIns.DSN), gormConfig)
 	if err != nil {
 		mlog.Log("open db failed", mlog.Field("error", err))
 		os.Exit(1)
@@ -45,7 +60,11 @@ func Initialize() {
 
 	dal.SetDefault(db)
 
-	mlog.Log("> DB init.")
+	logStr := "> DB init."
+	if isTestMode {
+		logStr += " [test mode]"
+	}
+	mlog.Log(logStr)
 }
 
 func getDBConfig() (*config, error) {

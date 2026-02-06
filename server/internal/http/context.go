@@ -20,24 +20,15 @@ type Context struct {
 }
 
 func NewContext(w http.ResponseWriter, r *http.Request) *Context {
-	token := r.Header.Get(HttpHeader_AccessToken)
-
 	return &Context{
 		Writer:      w,
 		Request:     r,
-		AccessToken: token,
+		AccessToken: r.Header.Get(HttpHeader_AccessToken),
 	}
 }
 
-func (ctx *Context) ParseParams(obj any, r ...io.Reader) bool {
-	var reader io.Reader
-	if len(r) > 0 {
-		reader = r[0]
-	} else {
-		reader = ctx.Request.Body
-	}
-
-	bodyBytes, err := io.ReadAll(reader)
+func (ctx *Context) ParseParams(obj any) bool {
+	bodyBytes, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
 		e := ErrServerInternalError().WithCause(err)
 		mlog.Log(e.String())

@@ -1,24 +1,39 @@
 package api
 
 import (
-	"log"
-
 	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
+	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 func ListUser() {
-	TestApi("List User")
+	testCase("operator not admin", listUserCase_NotAdmin)
+	testCase("success", listUserCase_Success)
+}
 
-	// operator not exist(?): 需要mock
+func listUserCase_NotAdmin() string {
+	loginCase_Success(false)() // set token
 
-	TestCase("operator not admin")
-	HttpInvoke(api.URI_Login, `{"user_name":"user","password":"8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92","totp_code":""}`)
-	HttpInvoke(api.URI_ListUser, `{"page":{"size":10,"num":1}}`)
+	res := httpInvoke(api.URI_ListUser, `{"page":{"size":10,"num":1}}`)
+	if res.IsSuccess || res.Err != utils.ErrNeedAdmin().Error() {
+		return unknownError
+	}
 
-	TestCase("success")
-	HttpInvoke(api.URI_Login, `{"user_name":"mats0319","password":"8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92","totp_code":""}`)
-	res := HttpInvoke(api.URI_ListUser, `{"page":{"size":10,"num":1}}`)
-	log.Println(res)
+	return ""
+}
 
-	TestApiEnd()
+func listUserCase_Success() string {
+	loginCase_Success(true)()
+
+	res := httpInvoke(api.URI_ListUser, `{"page":{"size":10,"num":1}}`)
+	if !res.IsSuccess {
+		return res.Err
+	}
+
+	count, _, err := dal.ListUser(api.Pagination{Size: 10, Num: 1})
+	if count != 4 || err != nil {
+		return unknownError
+	}
+
+	return ""
 }

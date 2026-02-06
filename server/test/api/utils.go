@@ -11,14 +11,9 @@ import (
 	mconst "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-type LoginToken struct {
-	UserID string
-	Token  string
-}
-
 var accessToken = ""
 
-func HttpInvoke(uri string, payload string) string {
+func httpInvoke(uri string, payload string) *mhttp.Response {
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:10319/api"+uri, strings.NewReader(payload))
 	if err != nil {
 		log.Fatal(err)
@@ -42,28 +37,26 @@ func HttpInvoke(uri string, payload string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if !r.IsSuccess {
-		log.Println(r.Err)
+	if r.IsSuccess {
+		// read access token
+		tokenStr := res.Header.Get(mconst.HttpHeader_AccessToken)
+
+		if len(tokenStr) > 0 {
+			accessToken = tokenStr
+		}
 	}
 
-	// read access token
-	tokenStr := res.Header.Get(mconst.HttpHeader_AccessToken)
+	return r
+}
 
-	if len(tokenStr) > 0 {
-		accessToken = tokenStr
+const unknownError = "unknown error"
+
+func testCase(name string, f func() string) {
+	errStr := f()
+	if len(errStr) < 1 {
+		log.Printf("- case: %s. Test Passed.\n", name)
+	} else {
+		log.Printf("- case: %s. Test Failed. error: %s\n", name, errStr)
+		panic("test failed")
 	}
-
-	return string(bodyBytes)
-}
-
-func TestApi(name string) {
-	log.Printf("> %s.\n", name)
-}
-
-func TestCase(name string) {
-	log.Printf("- %s:\n", name)
-}
-
-func TestApiEnd() {
-	log.Println()
 }

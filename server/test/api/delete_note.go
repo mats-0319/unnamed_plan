@@ -1,25 +1,49 @@
 package api
 
 import (
-	"log"
-
-	api2 "github.com/mats0319/unnamed_plan/server/cmd/api/go"
+	api "github.com/mats0319/unnamed_plan/server/cmd/api/go"
+	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 func DeleteNote() {
-	TestApi("Delete Note")
+	testCase("note not exist", deleteNoteCase_NoteNotExist)
+	testCase("not writer", deleteNoteCase_NotWriter)
+	testCase("success", deleteNoteCase_Success)
+}
 
-	TestCase("note not exist")
-	HttpInvoke(api2.URI_DeleteNote, `{"id":0}`)
+func deleteNoteCase_NoteNotExist() string {
+	res := httpInvoke(api.URI_DeleteNote, `{"id":0}`)
+	if res.IsSuccess || res.Err != utils.ErrNoteNotFound().Error() {
+		return unknownError
+	}
 
-	TestCase("not writer")
-	HttpInvoke(api2.URI_Login, `{"user_name":"mats0319","password":"8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92","totp_code":""}`)
-	HttpInvoke(api2.URI_DeleteNote, `{"id":1003}`)
+	return ""
+}
 
-	TestCase("success")
-	HttpInvoke(api2.URI_Login, `{"user_name":"user","password":"8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92","totp_code":""}`)
-	res := HttpInvoke(api2.URI_DeleteNote, `{"id":1003}`)
-	log.Println(res)
+func deleteNoteCase_NotWriter() string {
+	loginCase_Success(false)()
 
-	TestApiEnd()
+	res := httpInvoke(api.URI_DeleteNote, `{"id":1001}`)
+	if res.IsSuccess || res.Err != utils.ErrNeedOwner().Error() {
+		return unknownError
+	}
+
+	return ""
+}
+
+func deleteNoteCase_Success() string {
+	loginCase_Success(true)()
+
+	res := httpInvoke(api.URI_DeleteNote, `{"id":1001}`)
+	if !res.IsSuccess {
+		return res.Err
+	}
+
+	count, _, err := dal.ListNote(api.Pagination{Size: 10, Num: 1}, 0)
+	if count != 0 || err != nil {
+		return unknownError
+	}
+
+	return ""
 }

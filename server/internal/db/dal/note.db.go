@@ -20,7 +20,7 @@ func GetNote(id uint) (*model.Note, *Error) {
 		if strings.Contains(err.Error(), "record not found") {
 			e = ErrNoteNotFound().WithCause(err)
 		} else {
-			e = ErrServerInternalError().WithCause(err)
+			e = ErrDBError().WithCause(err)
 		}
 		mlog.Log(e.String())
 		return nil, e
@@ -36,7 +36,7 @@ func CreateNote(note *model.Note) *Error {
 		if strings.Contains(err.Error(), "violates unique constraint") {
 			e = ErrNoteExist().WithCause(err)
 		} else {
-			e = ErrServerInternalError().WithCause(err)
+			e = ErrDBError().WithCause(err)
 		}
 
 		mlog.Log(e.String())
@@ -50,7 +50,7 @@ func UpdateNote(note *model.Note) *Error {
 	qn := Q.Note
 	err := qn.WithContext(context.TODO()).Where(qn.ID.Eq(note.ID)).Save(note)
 	if err != nil {
-		e := ErrServerInternalError().WithCause(err)
+		e := ErrDBError().WithCause(err)
 		mlog.Log(e.String())
 		return e
 	}
@@ -62,7 +62,7 @@ func DeleteNote(id uint) *Error {
 	qn := Q.Note
 	_, err := qn.WithContext(context.TODO()).Where(qn.ID.Eq(id)).Delete()
 	if err != nil {
-		e := ErrServerInternalError().WithCause(err)
+		e := ErrDBError().WithCause(err)
 		mlog.Log(e.String())
 		return e
 	}
@@ -79,14 +79,14 @@ func ListNote(page api.Pagination, writerID uint) (int64, []*model.Note, *Error)
 
 	amount, err := sql.Count()
 	if err != nil {
-		e := ErrServerInternalError().WithCause(err)
+		e := ErrDBError().WithCause(err)
 		mlog.Log(e.String())
 		return 0, nil, e
 	}
 
 	res, err := sql.Order(qn.UpdatedAt.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
 	if err != nil {
-		e := ErrServerInternalError().WithCause(err)
+		e := ErrDBError().WithCause(err)
 		mlog.Log(e.String())
 		return 0, nil, e
 	}

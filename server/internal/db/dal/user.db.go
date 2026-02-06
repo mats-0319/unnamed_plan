@@ -28,7 +28,7 @@ func GetUser[T uint | string](value T) (*model.User, *Error) {
 		if strings.Contains(err.Error(), "record not found") {
 			e = ErrUserNotFound().WithCause(err)
 		} else {
-			e = ErrServerInternalError().WithCause(err)
+			e = ErrDBError().WithCause(err)
 		}
 		mlog.Log(e.String())
 		return nil, e
@@ -44,7 +44,7 @@ func CreateUser(user *model.User) *Error {
 		if strings.Contains(err.Error(), "violates unique constraint") {
 			e = ErrUserExist().WithCause(err)
 		} else {
-			e = ErrServerInternalError().WithCause(err)
+			e = ErrDBError().WithCause(err)
 		}
 
 		mlog.Log(e.String())
@@ -58,7 +58,7 @@ func UpdateUser(user *model.User) *Error {
 	qu := Q.User
 	err := qu.WithContext(context.TODO()).Where(qu.ID.Eq(user.ID)).Save(user)
 	if err != nil {
-		e := ErrServerInternalError().WithCause(err)
+		e := ErrDBError().WithCause(err)
 		mlog.Log(e.String())
 		return e
 	}
@@ -66,20 +66,20 @@ func UpdateUser(user *model.User) *Error {
 	return nil
 }
 
-func ListUsers(page api.Pagination) (int64, []*model.User, *Error) {
+func ListUser(page api.Pagination) (int64, []*model.User, *Error) {
 	qu := Q.User
 	sql := qu.WithContext(context.TODO())
 
 	amount, err := sql.Count()
 	if err != nil {
-		e := ErrServerInternalError().WithCause(err)
+		e := ErrDBError().WithCause(err)
 		mlog.Log(e.String())
 		return 0, nil, e
 	}
 
 	res, err := sql.Order(qu.LastLogin.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
 	if err != nil {
-		e := ErrServerInternalError().WithCause(err)
+		e := ErrDBError().WithCause(err)
 		mlog.Log(e.String())
 		return 0, nil, e
 	}

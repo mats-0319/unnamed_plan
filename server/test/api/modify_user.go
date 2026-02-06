@@ -1,31 +1,61 @@
 package api
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
+	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 func ModifyUser() {
-	TestApi("Modify User")
-	HttpInvoke(api.URI_Login, `{"user_name":"user","password":"8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92","totp_code":""}`)
+	testCase("no changes", modifyUserCase_NoChanges)
+	testCase("same pwd", modifyUserCase_SamePwd)
+	testCase("invalid totp key", modifyUserCase_InvalidTotpKey)
+	testCase("success", modifyUserCase_Success)
+}
 
-	TestCase("no changes")
-	HttpInvoke(api.URI_ModifyUser, `{"nickname":"","password":"","modify_tk_flag":false,"totp_key":""}`)
+func modifyUserCase_NoChanges() string {
+	res := httpInvoke(api.URI_ModifyUser, `{"nickname":"","password":"","modify_tk_flag":false,"totp_key":""}`)
+	if res.IsSuccess || res.Err != utils.ErrNoChanges().Error() {
+		return unknownError
+	}
 
-	// operator not exist(?): need mock
+	return ""
+}
 
-	TestCase("same pwd")
-	HttpInvoke(api.URI_ModifyUser, `{"nickname":"",
-"password":"8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
-"modify_tk_flag":false,"totp_key":""}`)
+func modifyUserCase_SamePwd() string {
+	pwd := utils.CalcSHA256("123456")
 
-	TestCase("invalid totp key")
-	HttpInvoke(api.URI_ModifyUser, `{"nickname":"","password":"","modify_tk_flag":true,"totp_key":"123"}`)
+	res := httpInvoke(api.URI_ModifyUser, fmt.Sprintf(`{"nickname":"","password":"%s","modify_tk_flag":false,"totp_key":""}`, pwd))
+	if res.IsSuccess || res.Err != utils.ErrSamePwd().Error() {
+		return unknownError
+	}
 
-	TestCase("success")
-	res := HttpInvoke(api.URI_ModifyUser, `{"nickname":"123","password":"","modify_tk_flag":false,"totp_key":""}`)
-	log.Println(res)
+	return ""
+}
 
-	TestApiEnd()
+func modifyUserCase_InvalidTotpKey() string {
+	res := httpInvoke(api.URI_ModifyUser, `{"nickname":"","password":"","modify_tk_flag":true,"totp_key":"123"}`)
+	if res.IsSuccess || res.Err != utils.ErrInvalidTotpKey().Error() {
+		return unknownError
+	}
+
+	return ""
+}
+
+func modifyUserCase_Success() string {
+	loginCase_Success(false)()
+
+	res := httpInvoke(api.URI_ModifyUser, `{"nickname":"123","password":"","modify_tk_flag":false,"totp_key":""}`)
+	if !res.IsSuccess {
+		return res.Err
+	}
+
+	user, err := dal.GetUser("user")
+	if (user != nil && user.Nickname != "123") || err != nil {
+		return unknownError
+	}
+
+	return ""
 }

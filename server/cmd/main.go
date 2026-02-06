@@ -21,18 +21,20 @@ func main() {
 func newHandler() *mhttp.Handler {
 	h := &mhttp.Handler{}
 
+	// optimize: into config, if product version use domain name, url -> 'https://api.xxx.com/login'
 	uriPrefix := "/api"
+
 	// user
 	h.AddHandler(uriPrefix+api.URI_Register, handlers.Register)
 	h.AddHandler(uriPrefix+api.URI_Login, handlers.Login)
-	h.AddHandler(uriPrefix+api.URI_ListUser, handlers.ListUser, middleware.VerifyToken)
-	h.AddHandler(uriPrefix+api.URI_ModifyUser, handlers.ModifyUser, middleware.VerifyToken)
+	h.AddHandler(uriPrefix+api.URI_ListUser, handlers.ListUser, middleware.VerifyAccessToken)
+	h.AddHandler(uriPrefix+api.URI_ModifyUser, handlers.ModifyUser, middleware.VerifyAccessToken)
 
 	// note
-	h.AddHandler(uriPrefix+api.URI_CreateNote, handlers.CreateNote, middleware.VerifyToken)
+	h.AddHandler(uriPrefix+api.URI_CreateNote, handlers.CreateNote, middleware.VerifyAccessToken)
 	h.AddHandler(uriPrefix+api.URI_ListNote, handlers.ListNote)
-	h.AddHandler(uriPrefix+api.URI_ModifyNote, handlers.ModifyNote, middleware.VerifyToken)
-	h.AddHandler(uriPrefix+api.URI_DeleteNote, handlers.DeleteNote, middleware.VerifyToken)
+	h.AddHandler(uriPrefix+api.URI_ModifyNote, handlers.ModifyNote, middleware.VerifyAccessToken)
+	h.AddHandler(uriPrefix+api.URI_DeleteNote, handlers.DeleteNote, middleware.VerifyAccessToken)
 
 	return h
 }
