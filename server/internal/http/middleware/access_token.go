@@ -12,17 +12,17 @@ import (
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-// token structure: `hex({"user_id":[xxx]...}).hex(hash(payload, key))`
+// token structure: `hex({"user":[xxx]...}).hex(hash(payload, key))`
 // more: doc/design.md 接口访问令牌
 
 type AccessToken struct {
-	UserID     uint  `json:"user_id"`
-	ExpireTime int64 `json:"expire_time"`
+	User       string `json:"user"`
+	ExpireTime int64  `json:"expire_time"`
 }
 
-func GenAccessToken(userID uint) string {
+func GenAccessToken(userName string) string {
 	tokenBytes, err := json.Marshal(&AccessToken{
-		UserID:     userID,
+		User:       userName,
 		ExpireTime: time.Now().Add(time.Hour * 6).UnixMilli(), // hard code 'expire time' = 6h
 	})
 	if err != nil {
@@ -73,7 +73,7 @@ func VerifyAccessToken(ctx *mhttp.Context) *Error {
 		return e
 	}
 
-	ctx.UserID = token.UserID
+	ctx.User = token.User
 
 	return nil
 }

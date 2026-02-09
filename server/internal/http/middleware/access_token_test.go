@@ -16,5 +16,5 @@ func TestAccessToken(t *testing.T) {
 		t.Error(err.String())
 	}
 
-	t.Logf("> Verified, user id: %d", ctx.UserID)
+	t.Logf("> Verified, user id: %d", ctx.User)
 }

@@ -13,13 +13,13 @@ func CreateNote(ctx *mhttp.Context) {
 		return
 	}
 
-	operator, err := dal.GetUser(ctx.UserID)
+	operator, err := dal.GetUser(ctx.User)
 	if err != nil {
 		ctx.ResData = err
 		return
 	}
 
-	note := model.NewNote(operator.ID, operator.Nickname, req.IsAnonymous, req.Title, req.Content)
+	note := model.NewNote(operator.UserName, operator.Nickname, req.IsAnonymous, req.Title, req.Content)
 	err = dal.CreateNote(note)
 	if err != nil {
 		ctx.ResData = err

@@ -70,11 +70,11 @@ func DeleteNote(id uint) *Error {
 	return nil
 }
 
-func ListNote(page api.Pagination, writerID uint) (int64, []*model.Note, *Error) {
+func ListNote(page api.Pagination, writer string) (int64, []*model.Note, *Error) {
 	qn := Q.Note
 	sql := qn.WithContext(context.TODO())
-	if writerID > 0 {
-		sql = sql.Where(qn.WriterID.Eq(writerID))
+	if len(writer) > 0 {
+		sql = sql.Where(qn.Writer.Eq(writer))
 	}
 
 	amount, err := sql.Count()

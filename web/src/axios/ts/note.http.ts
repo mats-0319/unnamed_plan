@@ -28,10 +28,10 @@ class NoteAxios {
 		return axiosWrapper.post("/note/create", req)
 	}
 
-	public listNote(page: Pagination, user_id: number): Promise<AxiosResponse<ListNoteRes>> {
+	public listNote(page: Pagination, user_name: string): Promise<AxiosResponse<ListNoteRes>> {
 		let req: ListNoteReq = {
 			page: page,
-			user_id: user_id
+			user_name: user_name
 		}
 
 		return axiosWrapper.post("/note/list", req)

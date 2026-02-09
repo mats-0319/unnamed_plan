@@ -77,7 +77,7 @@ func ListUser(page api.Pagination) (int64, []*model.User, *Error) {
 		return 0, nil, e
 	}
 
-	res, err := sql.Order(qu.LastLogin.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
+	res, err := sql.Order(qu.UpdatedAt.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
 	if err != nil {
 		e := ErrDBError().WithCause(err)
 		mlog.Log(e.String())

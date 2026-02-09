@@ -31,7 +31,9 @@ import { Note } from "@/axios/ts/note.go.ts"
 import { useNoteStore } from "@/pinia/note.ts"
 import { displayTimestamp } from "@/ts/util.ts"
 import Elevated_button from "@/components/elevated_button.vue"
+import { useUserStore } from "@/pinia/user.ts"
 
+let userStore = useUserStore()
 let noteStore = useNoteStore()
 
 let amount = ref<number>(0)
@@ -80,7 +82,7 @@ function setCurrentNote(note: Note): void {
 }
 
 function listNote(pageNum: number = 1): void {
-	noteStore.list(10, pageNum, 0, (a: number, n: Array<Note>) => {
+	noteStore.list(10, pageNum, userStore.user.user_name, (a: number, n: Array<Note>) => {
 		amount.value = a
 		notes.value = n
 		nextPage.value = pageNum + 1

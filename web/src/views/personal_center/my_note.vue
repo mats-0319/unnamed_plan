@@ -183,7 +183,7 @@ function del(): void {
 }
 
 function listNote(pageNum: number = 1): void {
-	noteStore.list(10, pageNum, userStore.user.id, (a: number, n: Array<Note>) => {
+	noteStore.list(10, pageNum, userStore.user.user_name, (a: number, n: Array<Note>) => {
 		amount.value = a
 		notes.value = n
 	})

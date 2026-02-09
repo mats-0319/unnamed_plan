@@ -30,8 +30,8 @@ func newUser(userName string, nickname string, totpKey string, isAdmin bool) *mo
 }
 
 var testNotes = []*model.Note{
-	model.NewNote(1001, "Mario", false, noteTitle_1, noteContent_1),
-	model.NewNote(1001, "Mario", false, noteTitle_2, noteContent_2),
+	model.NewNote("mats0319", "Mario", false, noteTitle_1, noteContent_1),
+	model.NewNote("mats0319", "Mario", false, noteTitle_2, noteContent_2),
 }
 
 const (

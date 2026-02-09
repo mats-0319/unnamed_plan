@@ -20,7 +20,7 @@ export class LoginRes {
 
 export class RegisterReq {
 	user_name: string = "" // nickname is same, user can modify later
-	password: string = "" // hex(sha256('text')), server generate 'salt' and save it
+	password: string = "" // hex(sha256('text'))
 }
 
 export class RegisterRes {}
@@ -28,7 +28,6 @@ export class RegisterRes {}
 export class User {
 	id: number = 0
 	created_at: number = 0
-	updated_at: number = 0
 	user_name: string = "" // login name
 	nickname: string = "" // display name
 	totp_key: string = "" // 允许为空，需要设置后启动

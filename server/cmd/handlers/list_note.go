@@ -13,7 +13,7 @@ func ListNote(ctx *mhttp.Context) {
 		return
 	}
 
-	count, notes, err := dal.ListNote(req.Page, req.UserID)
+	count, notes, err := dal.ListNote(req.Page, req.UserName)
 	if err != nil {
 		ctx.ResData = err
 		return

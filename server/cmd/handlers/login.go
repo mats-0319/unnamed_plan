@@ -42,16 +42,14 @@ func Login(ctx *mhttp.Context) {
 		}
 	}
 
-	user.LastLogin = time.Now().UnixMilli()
-
-	err = dal.UpdateUser(user)
+	err = dal.UpdateUser(user) // modify user.UpdateAt
 	if err != nil {
 		ctx.ResData = err
 		return
 	}
 
 	// token
-	ctx.Writer.Header().Set(utils.HttpHeader_AccessToken, middleware.GenAccessToken(user.ID))
+	ctx.Writer.Header().Set(utils.HttpHeader_AccessToken, middleware.GenAccessToken(user.UserName))
 
 	ctx.ResData = &api.LoginRes{
 		UserID:   user.ID,

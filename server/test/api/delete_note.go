@@ -40,7 +40,7 @@ func deleteNoteCase_Success() string {
 		return res.Err
 	}
 
-	count, _, err := dal.ListNote(api.Pagination{Size: 10, Num: 1}, 0)
+	count, _, err := dal.ListNote(api.Pagination{Size: 10, Num: 1}, "")
 	if count != 0 || err != nil {
 		return unknownError
 	}

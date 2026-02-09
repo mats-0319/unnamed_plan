@@ -20,8 +20,8 @@ func DeleteNote(ctx *mhttp.Context) {
 		return
 	}
 
-	if ctx.UserID != note.WriterID {
-		e := ErrNeedOwner().WithParam("operator", ctx.UserID).WithParam("owner", note.WriterID)
+	if ctx.User != note.Writer {
+		e := ErrNeedOwner().WithParam("operator", ctx.User).WithParam("owner", note.Writer)
 		ctx.ResData = e
 		mlog.Log(e.String())
 		return

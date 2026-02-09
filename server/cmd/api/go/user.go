@@ -30,7 +30,6 @@ const URI_ListUser = "/user/list"
 type User struct {
 	ID        uint   `json:"id"`
 	CreatedAt int64  `json:"created_at"`
-	UpdatedAt int64  `json:"updated_at"`
 	UserName  string `json:"user_name"` // login name
 	Nickname  string `json:"nickname"`  // display name
 	TotpKey   string `json:"totp_key"`  // 允许为空，需要设置后启动

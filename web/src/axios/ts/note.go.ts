@@ -26,7 +26,7 @@ export class Note {
 
 export class ListNoteReq {
 	page: Pagination = new Pagination()
-	user_id: number = 0 // 非0表示查询指定用户的note
+	user_name: string = "" // 非空表示查询指定用户的note
 }
 
 export class ListNoteRes {

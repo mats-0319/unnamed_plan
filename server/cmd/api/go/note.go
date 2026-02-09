@@ -25,8 +25,8 @@ type Note struct {
 }
 
 type ListNoteReq struct {
-	Page   Pagination `json:"page"`
-	UserID uint       `json:"user_id"` // 非0表示查询指定用户的note
+	Page     Pagination `json:"page"`
+	UserName string     `json:"user_name"` // 非空表示查询指定用户的note
 }
 
 type ListNoteRes struct {

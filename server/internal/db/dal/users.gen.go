@@ -36,7 +36,6 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 	_user.Password = field.NewString(tableName, "password")
 	_user.TotpKey = field.NewString(tableName, "totp_key")
 	_user.IsAdmin = field.NewBool(tableName, "is_admin")
-	_user.LastLogin = field.NewInt64(tableName, "last_login")
 
 	_user.fillFieldMap()
 
@@ -56,7 +55,6 @@ type user struct {
 	Password  field.String
 	TotpKey   field.String
 	IsAdmin   field.Bool
-	LastLogin field.Int64
 
 	fieldMap map[string]field.Expr
 }
@@ -82,7 +80,6 @@ func (u *user) updateTableName(table string) *user {
 	u.Password = field.NewString(table, "password")
 	u.TotpKey = field.NewString(table, "totp_key")
 	u.IsAdmin = field.NewBool(table, "is_admin")
-	u.LastLogin = field.NewInt64(table, "last_login")
 
 	u.fillFieldMap()
 
@@ -107,7 +104,7 @@ func (u *user) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (u *user) fillFieldMap() {
-	u.fieldMap = make(map[string]field.Expr, 10)
+	u.fieldMap = make(map[string]field.Expr, 9)
 	u.fieldMap["id"] = u.ID
 	u.fieldMap["created_at"] = u.CreatedAt
 	u.fieldMap["updated_at"] = u.UpdatedAt
@@ -117,7 +114,6 @@ func (u *user) fillFieldMap() {
 	u.fieldMap["password"] = u.Password
 	u.fieldMap["totp_key"] = u.TotpKey
 	u.fieldMap["is_admin"] = u.IsAdmin
-	u.fieldMap["last_login"] = u.LastLogin
 }
 
 func (u user) clone(db *gorm.DB) user {

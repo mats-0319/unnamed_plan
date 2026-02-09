@@ -16,7 +16,7 @@ func ModifyUser(ctx *mhttp.Context) {
 		return
 	}
 
-	operator, err := dal.GetUser(ctx.UserID)
+	operator, err := dal.GetUser(ctx.User)
 	if err != nil {
 		ctx.ResData = err
 		return

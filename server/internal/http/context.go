@@ -14,7 +14,7 @@ type Context struct {
 	Request *http.Request
 
 	AccessToken string // 登录成功获得，后续请求均需要在请求头带上该参数
-	UserID      uint
+	User        string // user name
 
 	ResData any // expect: *utils.Error / *api.resStruct
 }

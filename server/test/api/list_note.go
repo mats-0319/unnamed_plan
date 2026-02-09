@@ -15,7 +15,7 @@ func listNoteCase_Success() string {
 		return res.Err
 	}
 
-	count, data, err := dal.ListNote(api.Pagination{Size: 10, Num: 1}, 0)
+	count, data, err := dal.ListNote(api.Pagination{Size: 10, Num: 1}, "")
 	if count != 1 || len(data) != 1 || err != nil {
 		return unknownError
 	}
