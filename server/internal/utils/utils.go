@@ -21,7 +21,6 @@ func HmacSHA256[T string | []byte](content string, key ...T) string {
 	return hex.EncodeToString(bytes)
 }
 
-// CalcSHA256 for test
 func CalcSHA256(password string) string {
 	hasher := sha256.New()
 	hasher.Write([]byte(password))

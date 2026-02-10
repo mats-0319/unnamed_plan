@@ -26,10 +26,10 @@ func NewNote(writer string, writerName string, isAnonymous bool, title string, c
 		Content:     content,
 	}
 
-	noteBytes := fmt.Sprintf(`"writer id":%d,"writer name":%s,"is anonymous":%t,"title":%s,"content":%s`,
+	noteBytes := fmt.Sprintf(`"writer":%s,"writer name":%s,"is anonymous":%t,"title":%s,"content":%s`,
 		noteIns.Writer, noteIns.WriterName, noteIns.IsAnonymous, noteIns.Title, noteIns.Content)
 
-	noteIns.NoteID = utils.HmacSHA256[string](noteBytes) // 保证新增接口幂等性
+	noteIns.NoteID = utils.CalcSHA256(noteBytes) // 保证新增接口幂等性
 
 	return noteIns
 }

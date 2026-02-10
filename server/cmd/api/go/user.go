@@ -9,7 +9,6 @@ type LoginReq struct {
 }
 
 type LoginRes struct {
-	UserID   uint   `json:"user_id"`
 	UserName string `json:"user_name"`
 	Nickname string `json:"nickname"`
 	IsAdmin  bool   `json:"is_admin"`
@@ -28,11 +27,10 @@ type RegisterRes struct {
 const URI_ListUser = "/user/list"
 
 type User struct {
-	ID        uint   `json:"id"`
-	CreatedAt int64  `json:"created_at"`
 	UserName  string `json:"user_name"` // login name
 	Nickname  string `json:"nickname"`  // display name
-	TotpKey   string `json:"totp_key"`  // 允许为空，需要设置后启动
+	CreatedAt int64  `json:"created_at"`
+	TotpKey   string `json:"totp_key"` // 允许为空，需要设置后启动
 	IsAdmin   bool   `json:"is_admin"`
 	LastLogin int64  `json:"last_login"` // timestamp, unit: milli
 }

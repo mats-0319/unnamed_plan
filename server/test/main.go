@@ -3,13 +3,15 @@ package main
 import (
 	"log"
 
+	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	"github.com/mats0319/unnamed_plan/server/test/api"
 )
 
 // start server with flag '-t' to use test db connection
 func main() {
+	mlog.Initialize()
+
 	createTable()
-	defer dropTable()
 
 	testApi("Register", api.Register)
 	testApi("Login", api.Login)
@@ -20,6 +22,8 @@ func main() {
 	testApi("List Note", api.ListNote)
 	testApi("Modify Note", api.ModifyNote)
 	testApi("Delete Note", api.DeleteNote)
+
+	dropTable()
 }
 
 func testApi(name string, f func()) {

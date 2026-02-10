@@ -10,19 +10,9 @@ import (
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-// GetUser query user by 'id'/'username', according to value type
-func GetUser[T uint | string](value T) (*model.User, *Error) {
+func GetUser(userName string) (*model.User, *Error) {
 	qu := Q.User
-	sql := qu.WithContext(context.TODO())
-
-	switch v := any(value).(type) {
-	case uint:
-		sql = sql.Where(qu.ID.Eq(v))
-	case string:
-		sql = sql.Where(qu.UserName.Eq(v))
-	}
-
-	res, err := sql.First()
+	res, err := qu.WithContext(context.TODO()).Where(qu.UserName.Eq(userName)).First()
 	if err != nil {
 		var e *Error
 		if strings.Contains(err.Error(), "record not found") {

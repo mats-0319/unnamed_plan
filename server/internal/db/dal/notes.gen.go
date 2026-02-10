@@ -27,7 +27,7 @@ func newNote(db *gorm.DB, opts ...gen.DOOption) note {
 
 	tableName := _note.noteDo.TableName()
 	_note.ALL = field.NewAsterisk(tableName)
-	_note.ID = field.NewUint(tableName, "id")
+	_note.ID = field.NewField(tableName, "id")
 	_note.CreatedAt = field.NewInt64(tableName, "created_at")
 	_note.UpdatedAt = field.NewInt64(tableName, "updated_at")
 	_note.DeletedAt = field.NewField(tableName, "deleted_at")
@@ -47,7 +47,7 @@ type note struct {
 	noteDo noteDo
 
 	ALL         field.Asterisk
-	ID          field.Uint
+	ID          field.Field
 	CreatedAt   field.Int64
 	UpdatedAt   field.Int64
 	DeletedAt   field.Field
@@ -73,7 +73,7 @@ func (n note) As(alias string) *note {
 
 func (n *note) updateTableName(table string) *note {
 	n.ALL = field.NewAsterisk(table)
-	n.ID = field.NewUint(table, "id")
+	n.ID = field.NewField(table, "id")
 	n.CreatedAt = field.NewInt64(table, "created_at")
 	n.UpdatedAt = field.NewInt64(table, "updated_at")
 	n.DeletedAt = field.NewField(table, "deleted_at")

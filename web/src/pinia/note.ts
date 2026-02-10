@@ -25,16 +25,16 @@ export let useNoteStore = defineStore("note", () => {
 		})
 	}
 
-	function modify(id: number, isAnonymous: boolean, title: string, content: string, cb: () => void): void {
-		noteAxios.modifyNote(id, isAnonymous, title, content).then(({}: { data: ModifyNoteRes }) => {
+	function modify(noteID: string, isAnonymous: boolean, title: string, content: string, cb: () => void): void {
+		noteAxios.modifyNote(noteID, isAnonymous, title, content).then(({}: { data: ModifyNoteRes }) => {
 			cb()
 
 			log.success("modify note")
 		})
 	}
 
-	function del(id: number, cb: () => void): void {
-		noteAxios.deleteNote(id).then(({}: { data: DeleteNoteRes }) => {
+	function del(noteID: string, cb: () => void): void {
+		noteAxios.deleteNote(noteID).then(({}: { data: DeleteNoteRes }) => {
 			cb()
 
 			log.success("delete note")

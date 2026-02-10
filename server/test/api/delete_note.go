@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+
 	api "github.com/mats0319/unnamed_plan/server/cmd/api/go"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
@@ -13,7 +15,7 @@ func DeleteNote() {
 }
 
 func deleteNoteCase_NoteNotExist() string {
-	res := httpInvoke(api.URI_DeleteNote, `{"id":0}`)
+	res := httpInvoke(api.URI_DeleteNote, `{"note_id":"not exist"}`)
 	if res.IsSuccess || res.Err != utils.ErrNoteNotFound().Error() {
 		return unknownError
 	}
@@ -24,7 +26,7 @@ func deleteNoteCase_NoteNotExist() string {
 func deleteNoteCase_NotWriter() string {
 	loginCase_Success(false)()
 
-	res := httpInvoke(api.URI_DeleteNote, `{"id":1001}`)
+	res := httpInvoke(api.URI_DeleteNote, fmt.Sprintf(`{"note_id":"%s"}`, noteID))
 	if res.IsSuccess || res.Err != utils.ErrNeedOwner().Error() {
 		return unknownError
 	}
@@ -35,7 +37,7 @@ func deleteNoteCase_NotWriter() string {
 func deleteNoteCase_Success() string {
 	loginCase_Success(true)()
 
-	res := httpInvoke(api.URI_DeleteNote, `{"id":1001}`)
+	res := httpInvoke(api.URI_DeleteNote, fmt.Sprintf(`{"note_id":"%s"}`, noteID))
 	if !res.IsSuccess {
 		return res.Err
 	}

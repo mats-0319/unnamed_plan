@@ -14,7 +14,7 @@ func ModifyNote(ctx *mhttp.Context) {
 		return
 	}
 
-	note, err := dal.GetNote(req.ID)
+	note, err := dal.GetNote(req.NoteID)
 	if err != nil {
 		ctx.ResData = err
 		return

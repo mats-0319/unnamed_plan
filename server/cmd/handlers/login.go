@@ -52,7 +52,6 @@ func Login(ctx *mhttp.Context) {
 	ctx.Writer.Header().Set(utils.HttpHeader_AccessToken, middleware.GenAccessToken(user.UserName))
 
 	ctx.ResData = &api.LoginRes{
-		UserID:   user.ID,
 		UserName: user.UserName,
 		Nickname: user.Nickname,
 		IsAdmin:  user.IsAdmin,

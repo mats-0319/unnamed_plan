@@ -29,10 +29,9 @@ func notesFromDBToHttp(notes []*model.Note) []*api.Note {
 	res := make([]*api.Note, len(notes))
 	for i, v := range notes {
 		res[i] = &api.Note{
-			ID:          v.ID,
+			NoteID:      v.NoteID,
 			CreatedAt:   v.CreatedAt,
 			UpdatedAt:   v.UpdatedAt,
-			NoteID:      v.NoteID,
 			Writer:      v.WriterName,
 			IsAnonymous: v.IsAnonymous,
 			Title:       v.Title,

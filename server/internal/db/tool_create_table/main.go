@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/mats0319/unnamed_plan/server/cmd/model"
@@ -31,17 +30,6 @@ func main() {
 	err = db.Migrator().CreateTable(model.ModelList...)
 	if err != nil {
 		log.Fatalln("create db table failed, error: ", err)
-	}
-
-	// 修改sequence，设置id初始值
-	tableNames, err := db.Migrator().GetTables()
-	if err != nil {
-		log.Fatalln("get table names failed, error: ", err)
-	}
-
-	for _, v := range tableNames {
-		sequence := fmt.Sprintf("%s_id_seq", v) // 如果gorm修改了它的ID自增序列命名，这里也要相应修改，能不能直接获取序列名？
-		db.Exec(fmt.Sprintf("alter sequence %s restart with 1001;", sequence))
 	}
 
 	db.Create(defaultUsers)

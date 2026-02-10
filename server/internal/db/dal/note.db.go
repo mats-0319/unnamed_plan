@@ -10,9 +10,9 @@ import (
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-func GetNote(id uint) (*model.Note, *Error) {
+func GetNote(noteID string) (*model.Note, *Error) {
 	qn := Q.Note
-	sql := qn.WithContext(context.TODO()).Where(qn.ID.Eq(id))
+	sql := qn.WithContext(context.TODO()).Where(qn.NoteID.Eq(noteID))
 
 	res, err := sql.First()
 	if err != nil {
@@ -58,9 +58,9 @@ func UpdateNote(note *model.Note) *Error {
 	return nil
 }
 
-func DeleteNote(id uint) *Error {
+func DeleteNote(noteID string) *Error {
 	qn := Q.Note
-	_, err := qn.WithContext(context.TODO()).Where(qn.ID.Eq(id)).Delete()
+	_, err := qn.WithContext(context.TODO()).Where(qn.NoteID.Eq(noteID)).Delete()
 	if err != nil {
 		e := ErrDBError().WithCause(err)
 		mlog.Log(e.String())

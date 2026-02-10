@@ -28,9 +28,9 @@ class NoteAxios {
         return axiosWrapper.post("/note/list", req)
     }
 
-    public modifyNote(id: number, is_anonymous: boolean, title: string, content: string): Promise<AxiosResponse<ModifyNoteRes>> {
+    public modifyNote(note_id: string, is_anonymous: boolean, title: string, content: string): Promise<AxiosResponse<ModifyNoteRes>> {
         let req: ModifyNoteReq = {
-            id: id,
+            note_id: note_id,
             is_anonymous: is_anonymous,
             title: title,
             content: content,
@@ -39,9 +39,9 @@ class NoteAxios {
         return axiosWrapper.post("/note/modify", req)
     }
 
-    public deleteNote(id: number): Promise<AxiosResponse<DeleteNoteRes>> {
+    public deleteNote(note_id: string): Promise<AxiosResponse<DeleteNoteRes>> {
         let req: DeleteNoteReq = {
-            id: id,
+            note_id: note_id,
         }
 
         return axiosWrapper.post("/note/delete", req)

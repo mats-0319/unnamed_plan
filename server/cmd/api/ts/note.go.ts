@@ -14,10 +14,9 @@ export class CreateNoteReq {
 export class CreateNoteRes {}
 
 export class Note {
-    id: number = 0;
+    note_id: string = "";
     created_at: number = 0;
     updated_at: number = 0;
-    note_id: string = "";
     writer: string = ""; // writer nickname
     is_anonymous: boolean = false;
     title: string = "";
@@ -37,7 +36,7 @@ export class ListNoteRes {
 // ModifyNoteReq modify default is old value, only set fields not equal to old values
 // can only modify myself note
 export class ModifyNoteReq {
-    id: number = 0;
+    note_id: string = "";
     is_anonymous: boolean = false;
     title: string = "";
     content: string = "";
@@ -47,7 +46,7 @@ export class ModifyNoteRes {}
 
 // DeleteNoteReq can only delete myself note
 export class DeleteNoteReq {
-    id: number = 0;
+    note_id: string = "";
 }
 
 export class DeleteNoteRes {}

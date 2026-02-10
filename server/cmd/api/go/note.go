@@ -14,10 +14,9 @@ type CreateNoteRes struct {
 const URI_ListNote = "/note/list"
 
 type Note struct {
-	ID          uint   `json:"id"`
+	NoteID      string `json:"note_id"`
 	CreatedAt   int64  `json:"created_at"`
 	UpdatedAt   int64  `json:"updated_at"`
-	NoteID      string `json:"note_id"`
 	Writer      string `json:"writer"` // writer nickname
 	IsAnonymous bool   `json:"is_anonymous"`
 	Title       string `json:"title"`
@@ -39,7 +38,7 @@ const URI_ModifyNote = "/note/modify"
 // ModifyNoteReq modify default is old value, only set fields not equal to old values
 // can only modify myself note
 type ModifyNoteReq struct {
-	ID          uint   `json:"id"`
+	NoteID      string `json:"note_id"`
 	IsAnonymous bool   `json:"is_anonymous"`
 	Title       string `json:"title"`
 	Content     string `json:"content"`
@@ -52,7 +51,7 @@ const URI_DeleteNote = "/note/delete"
 
 // DeleteNoteReq can only delete myself note
 type DeleteNoteReq struct {
-	ID uint `json:"id"`
+	NoteID string `json:"note_id"`
 }
 
 type DeleteNoteRes struct {

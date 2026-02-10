@@ -12,7 +12,6 @@ export class LoginReq {
 }
 
 export class LoginRes {
-	user_id: number = 0
 	user_name: string = ""
 	nickname: string = ""
 	is_admin: boolean = false
@@ -26,10 +25,9 @@ export class RegisterReq {
 export class RegisterRes {}
 
 export class User {
-	id: number = 0
-	created_at: number = 0
 	user_name: string = "" // login name
 	nickname: string = "" // display name
+	created_at: number = 0
 	totp_key: string = "" // 允许为空，需要设置后启动
 	is_admin: boolean = false
 	last_login: number = 0 // timestamp, unit: milli

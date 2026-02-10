@@ -144,7 +144,7 @@ function create(): void {
 function beforeModify(note: Note): void {
 	originData.value = deepCopy(note)
 	modifyNoteReq.value = {
-		id: note.id,
+		note_id: note.note_id,
 		is_anonymous: note.is_anonymous,
 		title: note.title,
 		content: note.content
@@ -155,7 +155,7 @@ function beforeModify(note: Note): void {
 
 function modify(): void {
 	noteStore.modify(
-		modifyNoteReq.value.id,
+		modifyNoteReq.value.note_id,
 		modifyNoteReq.value.is_anonymous,
 		modifyNoteReq.value.title,
 		modifyNoteReq.value.content,
@@ -169,14 +169,14 @@ function modify(): void {
 function beforeDelete(note: Note): void {
 	originData.value = deepCopy(note)
 	deleteNoteReq.value = {
-		id: note.id
+		note_id: note.note_id
 	}
 
 	showDeleteDialog.value = true
 }
 
 function del(): void {
-	noteStore.del(deleteNoteReq.value.id, () => {
+	noteStore.del(deleteNoteReq.value.note_id, () => {
 		listNote()
 		showDeleteDialog.value = false
 	})

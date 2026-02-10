@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"strings"
 
 	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
@@ -40,38 +38,11 @@ func initDB() {
 }
 
 func createTable() {
-	if db == nil {
-		initDB()
-	}
+	dropTable()
 
-	err := db.Migrator().DropTable(model.ModelList...)
-	if err != nil {
-		log.Fatalln("drop db table failed, error: ", err)
-	}
-
-	err = db.Migrator().CreateTable(model.ModelList...)
+	err := db.Migrator().CreateTable(model.ModelList...)
 	if err != nil {
 		log.Fatalln("create db table failed, error: ", err)
-	}
-
-	// 修改sequence，设置id初始值
-	tableNames, err := db.Migrator().GetTables()
-	if err != nil {
-		log.Fatalln("get table names failed, error: ", err)
-	}
-
-	for _, v := range tableNames {
-		if !strings.HasPrefix(v, "t_") {
-			continue // skip normal tables
-		}
-
-		sequenceName := ""
-		err := db.Raw(fmt.Sprintf("select pg_get_serial_sequence('%s', 'id')", v)).Scan(&sequenceName).Error
-		if err != nil {
-			log.Fatalln("get sequence name failed, error: ", err)
-		}
-
-		db.Exec(fmt.Sprintf("alter sequence %s restart with 1001;", sequenceName))
 	}
 
 	db.Create(presetUser())

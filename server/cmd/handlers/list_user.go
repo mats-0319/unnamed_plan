@@ -44,10 +44,9 @@ func usersFromDBToHttp(users []*model.User) []*api.User {
 	res := make([]*api.User, len(users))
 	for i, v := range users {
 		res[i] = &api.User{
-			ID:        v.ID,
-			CreatedAt: v.CreatedAt,
 			UserName:  v.UserName,
 			Nickname:  v.Nickname,
+			CreatedAt: v.CreatedAt,
 			TotpKey:   v.TotpKey,
 			IsAdmin:   v.IsAdmin,
 			LastLogin: v.UpdatedAt,

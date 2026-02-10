@@ -50,7 +50,6 @@ export let useUserStore = defineStore("user", () => {
 
 	function loginResToUser(res: LoginRes): User {
 		let userIns = new User()
-		userIns.id = res.user_id
 		userIns.user_name = res.user_name
 		userIns.nickname = res.nickname
 		userIns.is_admin = res.is_admin
