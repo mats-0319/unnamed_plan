@@ -21,7 +21,7 @@ func StartServer(handler *Handler) {
 	handler.supportedUri()
 
 	addr := fmt.Sprintf("%s:%s", "0.0.0.0", handler.config.Port)
-	mlog.Log("> Listening at: " + addr)
+	mlog.Info("> Listening at: " + addr)
 
 	err := http.ListenAndServe(addr, handler)
 	if err != nil {

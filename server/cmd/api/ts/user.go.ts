@@ -5,9 +5,16 @@
 
 import { Pagination } from "./common.go"
 
+export class RegisterReq {
+    user_name: string = ""; // unique, also default nickname
+    password: string = ""; // hex(sha256('text'))
+}
+
+export class RegisterRes {}
+
 export class LoginReq {
     user_name: string = "";
-    password: string = ""; // hex(sha256('text'))
+    password: string = "";
     totp_code: string = "";
 }
 
@@ -15,25 +22,18 @@ export class LoginRes {
     user_name: string = "";
     nickname: string = "";
     is_admin: boolean = false;
+    enable_2fa: boolean = false;
 }
-
-export class RegisterReq {
-    user_name: string = ""; // nickname is same, user can modify later
-    password: string = ""; // hex(sha256('text'))
-}
-
-export class RegisterRes {}
 
 export class User {
     user_name: string = ""; // login name
     nickname: string = ""; // display name
     created_at: number = 0;
-    totp_key: string = ""; // 允许为空，需要设置后启动
     is_admin: boolean = false;
+    enable_2fa: boolean = false;
     last_login: number = 0; // timestamp, unit: milli
 }
 
-// ListUserReq 考虑添加按照字段查询、按照字段排序
 export class ListUserReq {
     page: Pagination = new Pagination();
 }
@@ -43,13 +43,12 @@ export class ListUserRes {
     users: Array<User> = new Array<User>();
 }
 
-// ModifyUserReq 属性字段为空，视为不修改对应字段，有专属的bool变量标识是否修改的字段不适用该默认规则
-// 例如totp key字段，flag为true且key字段为空，视为禁用totp
+// ModifyUserReq string类型的属性为空，视为不修改对应字段
 export class ModifyUserReq {
     nickname: string = "";
     password: string = ""; // hex(sha256('text')), check: can't be same
-    modify_tk_flag: boolean = false; // if modify totp key
-    totp_key: string = ""; // length: 16
+    enable_2fa: boolean = false;
+    totp_key: string = "";
 }
 
 export class ModifyUserRes {}

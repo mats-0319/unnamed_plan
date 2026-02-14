@@ -10,8 +10,8 @@ import (
 type Note struct {
 	mdb_model.Model
 	NoteID      string `gorm:"unique;not null"` // 使用其他字段计算获得，可用于保证新增接口幂等性
-	Writer      string // user name
-	WriterName  string // user nickname(at that time)
+	Writer      string `gorm:"not null"`        // user name
+	WriterName  string `gorm:"not null"`        // user nickname(at that time)
 	IsAnonymous bool   // 是否匿名，仅前端展示使用
 	Title       string
 	Content     string `gorm:"not null"`

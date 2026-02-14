@@ -35,6 +35,10 @@ func NewError(typ ErrorType, detail ...string) *Error {
 
 // Error simple return to web
 func (e *Error) Error() string {
+	if e == nil {
+		return ""
+	}
+
 	detailStr := ""
 	if len(e.Detail) > 0 {
 		detailStr = fmt.Sprintf(", detail: %s", e.Detail)

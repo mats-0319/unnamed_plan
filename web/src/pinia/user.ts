@@ -32,10 +32,10 @@ export let useUserStore = defineStore("user", () => {
 		})
 	}
 
-	function modify(nickname: string, password: string, modifyTkFlag: boolean, totpKey: string): void {
+	function modify(nickname: string, password: string, enable2FA: boolean, totpKey: string): void {
 		let pwdHash = CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex)
 
-		userAxios.modifyUser(nickname, pwdHash, modifyTkFlag, totpKey).then(({}: { data: ModifyUserRes }) => {
+		userAxios.modifyUser(nickname, pwdHash, enable2FA, totpKey).then(({}: { data: ModifyUserRes }) => {
 			log.success("modify user")
 		})
 	}
@@ -53,6 +53,7 @@ export let useUserStore = defineStore("user", () => {
 		userIns.user_name = res.user_name
 		userIns.nickname = res.nickname
 		userIns.is_admin = res.is_admin
+		userIns.enable_2fa = res.enable_2fa
 
 		return userIns
 	}

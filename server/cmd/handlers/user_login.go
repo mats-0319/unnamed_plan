@@ -34,7 +34,7 @@ func Login(ctx *mhttp.Context) {
 		return
 	}
 
-	if len(user.TotpKey) > 0 {
+	if user.Enable2FA {
 		err = verifyTotpCode(req.TotpCode, user.TotpKey)
 		if err != nil {
 			ctx.ResData = err
@@ -52,9 +52,10 @@ func Login(ctx *mhttp.Context) {
 	ctx.Writer.Header().Set(utils.HttpHeader_AccessToken, middleware.GenAccessToken(user.UserName))
 
 	ctx.ResData = &api.LoginRes{
-		UserName: user.UserName,
-		Nickname: user.Nickname,
-		IsAdmin:  user.IsAdmin,
+		UserName:  user.UserName,
+		Nickname:  user.Nickname,
+		IsAdmin:   user.IsAdmin,
+		Enable2FA: user.Enable2FA,
 	}
 }
 
@@ -62,7 +63,7 @@ func Login(ctx *mhttp.Context) {
 func verifyTotpCode(code string, totpKey string) *utils.Error {
 	if len(code) != 6 {
 		e := utils.ErrInvalidTotpCode().WithParam("code", code)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return e
 	}
 
@@ -70,7 +71,7 @@ func verifyTotpCode(code string, totpKey string) *utils.Error {
 	n, err := base32.StdEncoding.Decode(key, []byte(totpKey))
 	if err != nil {
 		e := utils.ErrInvalidTotpCode().WithCause(err)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return e
 	}
 	key = key[:n]
@@ -94,7 +95,7 @@ func verifyTotpCode(code string, totpKey string) *utils.Error {
 
 	if !existFlag {
 		e := utils.ErrWrongTotpCode().WithParam("code", code)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return e
 	}
 

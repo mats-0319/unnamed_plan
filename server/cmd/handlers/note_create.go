@@ -13,7 +13,7 @@ func CreateNote(ctx *mhttp.Context) {
 		return
 	}
 
-	operator, err := dal.GetUser(ctx.User)
+	operator, err := dal.GetUser(ctx.UserName)
 	if err != nil {
 		ctx.ResData = err
 		return

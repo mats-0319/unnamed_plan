@@ -22,7 +22,7 @@ func GetNote(noteID string) (*model.Note, *Error) {
 		} else {
 			e = ErrDBError().WithCause(err)
 		}
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return nil, e
 	}
 
@@ -39,7 +39,7 @@ func CreateNote(note *model.Note) *Error {
 			e = ErrDBError().WithCause(err)
 		}
 
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return e
 	}
 
@@ -51,7 +51,7 @@ func UpdateNote(note *model.Note) *Error {
 	err := qn.WithContext(context.TODO()).Where(qn.ID.Eq(note.ID)).Save(note)
 	if err != nil {
 		e := ErrDBError().WithCause(err)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return e
 	}
 
@@ -63,7 +63,7 @@ func DeleteNote(noteID string) *Error {
 	_, err := qn.WithContext(context.TODO()).Where(qn.NoteID.Eq(noteID)).Delete()
 	if err != nil {
 		e := ErrDBError().WithCause(err)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return e
 	}
 
@@ -80,14 +80,14 @@ func ListNote(page api.Pagination, writer string) (int64, []*model.Note, *Error)
 	amount, err := sql.Count()
 	if err != nil {
 		e := ErrDBError().WithCause(err)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return 0, nil, e
 	}
 
 	res, err := sql.Order(qn.UpdatedAt.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
 	if err != nil {
 		e := ErrDBError().WithCause(err)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return 0, nil, e
 	}
 

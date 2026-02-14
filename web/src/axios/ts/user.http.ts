@@ -5,19 +5,28 @@
 
 import { axiosWrapper } from "./config"
 import { AxiosResponse } from "axios"
+import { Pagination } from "./common.go"
 import {
-	LoginRes,
-	LoginReq,
 	RegisterRes,
 	RegisterReq,
+	LoginRes,
+	LoginReq,
 	ListUserRes,
 	ListUserReq,
 	ModifyUserRes,
 	ModifyUserReq
 } from "./user.go"
-import { Pagination } from "./common.go"
 
 class UserAxios {
+	public register(user_name: string, password: string): Promise<AxiosResponse<RegisterRes>> {
+		let req: RegisterReq = {
+			user_name: user_name,
+			password: password
+		}
+
+		return axiosWrapper.post("/register", req)
+	}
+
 	public login(user_name: string, password: string, totp_code: string): Promise<AxiosResponse<LoginRes>> {
 		let req: LoginReq = {
 			user_name: user_name,
@@ -26,15 +35,6 @@ class UserAxios {
 		}
 
 		return axiosWrapper.post("/login", req)
-	}
-
-	public register(user_name: string, password: string): Promise<AxiosResponse<RegisterRes>> {
-		let req: RegisterReq = {
-			user_name: user_name,
-			password: password
-		}
-
-		return axiosWrapper.post("/register", req)
 	}
 
 	public listUser(page: Pagination): Promise<AxiosResponse<ListUserRes>> {
@@ -48,13 +48,13 @@ class UserAxios {
 	public modifyUser(
 		nickname: string,
 		password: string,
-		modify_tk_flag: boolean,
+		enable_2fa: boolean,
 		totp_key: string
 	): Promise<AxiosResponse<ModifyUserRes>> {
 		let req: ModifyUserReq = {
 			nickname: nickname,
 			password: password,
-			modify_tk_flag: modify_tk_flag,
+			enable_2fa: enable_2fa,
 			totp_key: totp_key
 		}
 

@@ -15,7 +15,7 @@ func ListUser(ctx *mhttp.Context) {
 		return
 	}
 
-	operator, err := dal.GetUser(ctx.User)
+	operator, err := dal.GetUser(ctx.UserName)
 	if err != nil {
 		ctx.ResData = err
 		return
@@ -24,7 +24,7 @@ func ListUser(ctx *mhttp.Context) {
 	if !operator.IsAdmin {
 		e := ErrNeedAdmin().WithParam("operator", operator.UserName)
 		ctx.ResData = e
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return
 	}
 
@@ -47,8 +47,8 @@ func usersFromDBToHttp(users []*model.User) []*api.User {
 			UserName:  v.UserName,
 			Nickname:  v.Nickname,
 			CreatedAt: v.CreatedAt,
-			TotpKey:   v.TotpKey,
 			IsAdmin:   v.IsAdmin,
+			Enable2FA: v.Enable2FA,
 			LastLogin: v.UpdatedAt,
 		}
 	}

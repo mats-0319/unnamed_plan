@@ -12,9 +12,9 @@
 			<el-input v-model="modifyUserReq.password" show-password />
 		</el-form-item>
 
-		<el-form-item label="是否修改TOTP密钥">
-			<el-switch v-model="modifyUserReq.modify_tk_flag" />
-			&emsp;{{ modifyUserReq.modify_tk_flag ? "修改" : "不修改" }}
+		<el-form-item label="是否启用双重因素验证(Two-Factor Authenticate)">
+			<el-switch v-model="modifyUserReq.enable_2fa" />
+			&emsp;{{ modifyUserReq.enable_2fa ? "启用" : "不启用" }}
 		</el-form-item>
 
 		<el-form-item label="TOTP密钥">
@@ -49,7 +49,7 @@ function modifyUser(): void {
 	userStore.modify(
 		modifyUserReq.value.nickname,
 		modifyUserReq.value.password,
-		modifyUserReq.value.modify_tk_flag,
+		modifyUserReq.value.enable_2fa,
 		modifyUserReq.value.totp_key
 	)
 }
@@ -57,8 +57,9 @@ function modifyUser(): void {
 watch(
 	modifyUserReq,
 	(newValue, _) => {
+		// 当前的totp key不提供给前端，所以前端也不判断是否
 		canModifyFlag.value =
-			newValue.nickname != userStore.user.nickname || newValue.password.length > 0 || newValue.modify_tk_flag
+			newValue.nickname != userStore.user.nickname || newValue.password.length > 0 || newValue.enable_2fa
 	},
 	{ deep: true }
 )

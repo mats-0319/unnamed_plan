@@ -31,7 +31,7 @@ type config struct {
 func Initialize() {
 	configIns, err := getDBConfig()
 	if err != nil {
-		mlog.Log("get db config failed", mlog.Field("error", err))
+		mlog.Error("get db config failed", mlog.Field("error", err))
 		os.Exit(1)
 	}
 
@@ -45,13 +45,13 @@ func Initialize() {
 
 	db, err := gorm.Open(postgres.Open(configIns.DSN), gormConfig)
 	if err != nil {
-		mlog.Log("open db failed", mlog.Field("error", err))
+		mlog.Error("open db failed", mlog.Field("error", err))
 		os.Exit(1)
 	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
-		mlog.Log("get sql db failed", mlog.Field("error", err))
+		mlog.Error("get sql db failed", mlog.Field("error", err))
 		os.Exit(1)
 	}
 
@@ -64,7 +64,7 @@ func Initialize() {
 	if isTestMode {
 		logStr += " [test mode]"
 	}
-	mlog.Log(logStr)
+	mlog.Info(logStr)
 }
 
 func getDBConfig() (*config, error) {
@@ -73,7 +73,7 @@ func getDBConfig() (*config, error) {
 	conf := &config{}
 	err := json.Unmarshal(bytes, conf)
 	if err != nil {
-		mlog.Log("deserialize db config failed", mlog.Field("error", err))
+		mlog.Error("deserialize db config failed", mlog.Field("error", err))
 		return nil, err
 	}
 

@@ -1,105 +1,93 @@
 package mlog
 
 import (
-	"fmt"
+	"io"
 	"log"
+	"log/slog"
 	"os"
-	"time"
-
-	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 )
 
-var zLog *zap.Logger
-
 func Initialize() {
-	ws, err := logWriteSyncer()
+	var err error
+	fileIns, err = os.OpenFile("log.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
-		log.Fatalln("init log write syncer failed, error :", err)
+		log.Fatalln("create log file failed, error:", err)
 	}
 
-	coreSlice := make([]zapcore.Core, 0, 2)
-	coreSlice = append(coreSlice, zapcore.NewCore(logEncoder(), ws, logLevel()))
-	coreSlice = append(coreSlice, zapcore.NewCore(logEncoder(), os.Stdout, logLevel()))
+	multiWriter := io.MultiWriter(fileIns, os.Stdout)
+	handlerIns := newHandler(multiWriter, slog.LevelDebug) // todo: log level, from config
 
-	core := zapcore.NewTee(coreSlice...)
-	zLog = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
+	logger := slog.New(handlerIns)
+	slog.SetDefault(logger)
 
-	Log("> Config init.")
-	Log("> Log init.")
+	Info("> Config init.")
+	Info("> Log init.")
 }
 
-func Log(msg string, fields ...string) {
-	fs := make([]zap.Field, len(fields))
-	for i := range fields {
-		fs[i] = zap.String("", fields[i])
+var fileIns *os.File
+
+func Close() {
+	if fileIns != nil {
+		_ = fileIns.Close()
+	}
+}
+
+func Debug(msg string, args ...*LogField) {
+	slog.Debug(msg, fieldsToAnySlice(args)...)
+}
+
+func Info(msg string, args ...*LogField) {
+	slog.Info(msg, fieldsToAnySlice(args)...)
+}
+
+func Warn(msg string, args ...*LogField) {
+	slog.Warn(msg, fieldsToAnySlice(args)...)
+}
+
+func Error(msg string, args ...*LogField) {
+	slog.Error(msg, fieldsToAnySlice(args)...)
+}
+
+type LogField struct {
+	Key   string
+	Value any
+}
+
+func Field(msg string, value any) *LogField {
+	return &LogField{
+		Key:   msg,
+		Value: value,
+	}
+}
+
+func fieldsToAnySlice(fields []*LogField) []any {
+	fs := make([]any, 0, len(fields)*2)
+	for _, field := range fields {
+		fs = append(fs, field.Key, field.Value)
 	}
 
-	zLog.Info(msg, fs...)
+	return fs
 }
 
-// Field 主要用于打印通用error，例如初始化阶段错误等一些不必要包装成后端通用错误的错误
-func Field(msg string, value any) string {
-	res := ""
+// Log 适用于需要通过'WithAttrs'/'WithGroup'定制输出内容、生成新的logger实例的场景
+// 例如：http请求、db操作......
+//
+// 其实可以把slog default logger / slog level复制到这里，在使用过程中就不需要使用slog
+// 用法参考测试代码
+// 已调整为与默认打印函数使用相同的调用层级数（日志中的代码位置一项，使用'mlog.Info()'/'mlog.Log()'均显示为该函数位置）
+func Log(logger *slog.Logger, level slog.Level, msg string, fields ...*LogField) {
+	fs := fieldsToAnySlice(fields)
 
-	switch v := value.(type) {
-	case error:
-		res = fmt.Sprintf("%s - %s", msg, v.Error())
-	//case string:
-	//	res = fmt.Sprintf("%s: %s", msg, v)
-	//case bool:
-	//	res = fmt.Sprintf("%s: %t", msg, v)
-	//case float32, float64:
-	//	res = fmt.Sprintf("%s: %.2f", msg, value)
-	//case int, int8, int16, int32, int64,
-	//	uint, uint8, uint16, uint32, uint64:
-	//	res = fmt.Sprintf("%s: %d", msg, v)
-	default: // regard as struct
-		res = fmt.Sprintf("%s. type: %T, value: %+v", msg, value, value)
-	}
-
-	return res
-}
-
-func logWriteSyncer() (zapcore.WriteSyncer, error) {
-	file, err := os.OpenFile("log.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		log.Println("create log file failed, error:", err)
-		return nil, err
-	}
-
-	return zapcore.AddSync(file), nil
-}
-
-func logEncoder() zapcore.Encoder {
-	return zapcore.NewConsoleEncoder(zapcore.EncoderConfig{
-		// Keys can be anything except the empty string.
-		TimeKey:       "time",
-		LevelKey:      "level",
-		NameKey:       "name",
-		CallerKey:     "caller",
-		MessageKey:    "message",
-		StacktraceKey: "stacktrace",
-		LineEnding:    zapcore.DefaultLineEnding,
-		EncodeLevel:   zapcore.CapitalLevelEncoder,
-		EncodeTime: func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-			enc.AppendString("[" + t.Format("2006-01-02 15:04:05") + "]")
-		},
-		EncodeDuration: zapcore.StringDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
-	})
-}
-
-func logLevel() zapcore.Level {
-	var level zapcore.Level
-	switch mconfig.GetLevel() {
-	case "dev":
-		level = zap.DebugLevel
-	// maybe more levels?
+	switch level {
+	case slog.LevelDebug:
+		logger.Debug(msg, fs...)
+	case slog.LevelInfo:
+		logger.Info(msg, fs...)
+	case slog.LevelWarn:
+		logger.Warn(msg, fs...)
+	case slog.LevelError:
+		logger.Error(msg, fs...)
 	default:
-		level = zap.InfoLevel
+		logger.Error("unknown level: " + level.String())
 	}
-
-	return level
 }

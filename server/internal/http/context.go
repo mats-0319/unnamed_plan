@@ -14,7 +14,7 @@ type Context struct {
 	Request *http.Request
 
 	AccessToken string // 登录成功获得，后续请求均需要在请求头带上该参数
-	User        string // user name
+	UserName    string // user name
 
 	ResData any // expect: *utils.Error / *api.resStruct
 }
@@ -31,7 +31,7 @@ func (ctx *Context) ParseParams(obj any) bool {
 	bodyBytes, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
 		e := ErrServerInternalError().WithCause(err)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		ctx.ResData = e
 		return false
 	}
@@ -39,7 +39,7 @@ func (ctx *Context) ParseParams(obj any) bool {
 	err = json.Unmarshal(bodyBytes, obj)
 	if err != nil {
 		e := ErrJsonUnmarshal().WithCause(err)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		ctx.ResData = e
 		return false
 	}

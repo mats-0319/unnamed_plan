@@ -33,8 +33,6 @@ func loginCase_WrongPwd() string {
 }
 
 func loginCase_WrongTotpCode() string {
-	pwd := utils.CalcSHA256("123456")
-
 	res := httpInvoke(api.URI_Login, fmt.Sprintf(`{"user_name":"user_with_totp","password":"%s","totp_code":"000000"}`, pwd))
 	if res.IsSuccess || res.Err != utils.ErrWrongTotpCode().Error() {
 		return unknownError
@@ -45,7 +43,6 @@ func loginCase_WrongTotpCode() string {
 
 func loginCase_Success(isAdmin bool) func() string {
 	return func() string {
-		pwd := utils.CalcSHA256("123456")
 		userName := "user"
 		if isAdmin {
 			userName = "admin"

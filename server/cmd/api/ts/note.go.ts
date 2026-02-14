@@ -25,7 +25,7 @@ export class Note {
 
 export class ListNoteReq {
     page: Pagination = new Pagination();
-    user_name: string = ""; // 非空表示查询指定用户的note
+    user_name: string = ""; // 非空表示查询指定用户的note，空表示查询全部
 }
 
 export class ListNoteRes {
@@ -33,8 +33,7 @@ export class ListNoteRes {
     notes: Array<Note> = new Array<Note>();
 }
 
-// ModifyNoteReq modify default is old value, only set fields not equal to old values
-// can only modify myself note
+// ModifyNoteReq can only modify myself note(s)
 export class ModifyNoteReq {
     note_id: string = "";
     is_anonymous: boolean = false;
@@ -44,7 +43,7 @@ export class ModifyNoteReq {
 
 export class ModifyNoteRes {}
 
-// DeleteNoteReq can only delete myself note
+// DeleteNoteReq can only delete myself note(s)
 export class DeleteNoteReq {
     note_id: string = "";
 }

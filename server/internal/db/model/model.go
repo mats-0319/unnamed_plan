@@ -11,14 +11,14 @@ type Model struct {
 	CreatedAt int64          `gorm:"autoCreateTime:milli"`
 	UpdatedAt int64          `gorm:"autoUpdateTime:milli"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`
-	//ExportedAt int64          // 需要在导出完成后手动设置该值
+	//ExportedAt int64          // 不适合使用自动编辑
 }
 
 func (m *Model) BeforeCreate(_ *gorm.DB) error {
 	if m.ID == uuid.Nil {
 		newID, err := uuid.NewV7()
 		if err != nil {
-			mlog.Log("generate uuid failed", mlog.Field("error", err))
+			mlog.Error("generate uuid failed", mlog.Field("error", err))
 			return err
 		}
 

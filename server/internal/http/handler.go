@@ -28,16 +28,16 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		return // res body is empty
 	}
 
-	mlog.Log(fmt.Sprintf("| %s | %s |", request.URL.String(), time.Now().String()))
+	mlog.Info(fmt.Sprintf("| %s | %s |", request.URL.String(), time.Now().String()))
 
 	ctx := NewContext(writer, request)
 	defer ctx.response()
 
 	handlerItemIns, ok := h.handlers[request.RequestURI]
 	if !ok {
-		err := ErrUnsupportedUri().WithParam("uri", request.RequestURI)
-		mlog.Log(err.String())
-		ctx.ResData = err
+		e := ErrUnsupportedUri().WithParam("uri", request.RequestURI)
+		mlog.Error(e.String())
+		ctx.ResData = e
 		return
 	}
 
@@ -66,6 +66,6 @@ func (h *Handler) AddHandler(uri string, handlerFunc func(ctx *Context), middlew
 
 func (h *Handler) supportedUri() {
 	for k := range h.handlers {
-		mlog.Log(fmt.Sprintf("| Http Registered: %s", k))
+		mlog.Info("- Http Handler Registered: " + k)
 	}
 }

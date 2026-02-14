@@ -13,9 +13,10 @@ import (
 func main() {
 	mconfig.Initialize()
 	mlog.Initialize()
+	defer mlog.Close()
 	mdb.Initialize()
 
-	mhttp.StartServer(newHandler())
+	mhttp.StartServer(newHandler()) // blocked
 }
 
 func newHandler() *mhttp.Handler {

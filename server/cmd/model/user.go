@@ -6,10 +6,13 @@ import (
 
 type User struct {
 	mdb_model.Model
-	UserName string `gorm:"unique;not null"` // login name
+	UserName string `gorm:"unique;not null"` // login name, can't modify
 	Nickname string `gorm:"unique;not null"` // display name
-	Password string `gorm:"not null"`        // argon2id(hex(sha256(password)), salt)
-	TotpKey  string `gorm:"size:16"`         // 允许为空，需要设置后启用
+	Password string `gorm:"not null"`
 	IsAdmin  bool
+
+	Enable2FA bool
+	TotpKey   string `gorm:"size:16"`
+
 	// last login, use 'user.UpdateAt'
 }

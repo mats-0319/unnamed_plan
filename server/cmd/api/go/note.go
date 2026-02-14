@@ -25,7 +25,7 @@ type Note struct {
 
 type ListNoteReq struct {
 	Page     Pagination `json:"page"`
-	UserName string     `json:"user_name"` // 非空表示查询指定用户的note
+	UserName string     `json:"user_name"` // 非空表示查询指定用户的note，空表示查询全部
 }
 
 type ListNoteRes struct {
@@ -35,8 +35,7 @@ type ListNoteRes struct {
 
 const URI_ModifyNote = "/note/modify"
 
-// ModifyNoteReq modify default is old value, only set fields not equal to old values
-// can only modify myself note
+// ModifyNoteReq can only modify myself note(s)
 type ModifyNoteReq struct {
 	NoteID      string `json:"note_id"`
 	IsAnonymous bool   `json:"is_anonymous"`
@@ -49,7 +48,7 @@ type ModifyNoteRes struct {
 
 const URI_DeleteNote = "/note/delete"
 
-// DeleteNoteReq can only delete myself note
+// DeleteNoteReq can only delete myself note(s)
 type DeleteNoteReq struct {
 	NoteID string `json:"note_id"`
 }

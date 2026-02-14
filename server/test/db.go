@@ -64,23 +64,26 @@ func presetUser() []*model.User {
 
 	return []*model.User{
 		{
-			UserName: "admin",
-			Nickname: "admin",
-			Password: utils.GeneratePwdHash(pwdFromWeb),
-			TotpKey:  "",
-			IsAdmin:  true,
+			UserName:  "admin",
+			Nickname:  "admin",
+			Password:  utils.GeneratePwdHash(pwdFromWeb),
+			IsAdmin:   true,
+			Enable2FA: false,
+			TotpKey:   "",
 		},
 		{
-			UserName: "user",
-			Nickname: "user",
-			Password: utils.GeneratePwdHash(pwdFromWeb),
-			TotpKey:  "",
+			UserName:  "user",
+			Nickname:  "user",
+			Password:  utils.GeneratePwdHash(pwdFromWeb),
+			Enable2FA: false,
+			TotpKey:   "",
 		},
 		{
-			UserName: "user_with_totp",
-			Nickname: "user_with_totp",
-			Password: utils.GeneratePwdHash(pwdFromWeb),
-			TotpKey:  "NVQXE2LP", // base32 of 'mario'
+			UserName:  "user_with_totp",
+			Nickname:  "user_with_totp",
+			Password:  utils.GeneratePwdHash(pwdFromWeb),
+			Enable2FA: true,
+			TotpKey:   "NVQXE2LP", // base32 of 'mario'
 		},
 	}
 }

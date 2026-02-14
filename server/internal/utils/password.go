@@ -57,7 +57,7 @@ func VerifyPassword(password, pwdHash string) *Error {
 	// 使用恒定时间比较防止时序攻击
 	if subtle.ConstantTimeCompare(key, newKey) != 1 {
 		e := ErrWrongPwd().WithParam("old key", key).WithParam("new key", newKey)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return e
 	}
 
@@ -68,7 +68,7 @@ func decodeHash(pwdHash string) (*PasswordManager, []byte, []byte, *Error) {
 	pwdSplit := strings.Split(pwdHash, ".")
 	if len(pwdSplit) != 4 || pwdSplit[0] != "argon2id" {
 		e := ErrInvalidPwd().WithParam("encoded pwd", pwdHash)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return nil, nil, nil, e
 	}
 
@@ -77,21 +77,21 @@ func decodeHash(pwdHash string) (*PasswordManager, []byte, []byte, *Error) {
 	_, err := fmt.Sscanf(pwdSplit[1], "v=%d,m=%d,t=%d,c=%d", &version, &params.Memory, &params.CalcTimes, &params.Threads)
 	if err != nil || version != argon2.Version {
 		e := ErrPwdParams().WithCause(err).WithParam("version", version).WithParam("params", params)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return nil, nil, nil, e
 	}
 
 	salt, err := hex.DecodeString(pwdSplit[2])
 	if err != nil {
 		e := ErrHexDecode().WithCause(err).WithParam("salt", pwdSplit[2])
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return nil, nil, nil, e
 	}
 
 	key, err := hex.DecodeString(pwdSplit[3])
 	if err != nil {
 		e := ErrHexDecode().WithCause(err).WithParam("key", pwdSplit[3])
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return nil, nil, nil, e
 	}
 	params.KeyLength = uint32(len(key))

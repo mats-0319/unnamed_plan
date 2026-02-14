@@ -22,7 +22,7 @@ func (ctx *Context) response() {
 
 	_, err := ctx.Writer.Write(resBytes)
 	if err != nil {
-		mlog.Log("response failed", mlog.Field("error", err))
+		mlog.Error("response failed", mlog.Field("error", err))
 		return
 	}
 }
@@ -45,7 +45,7 @@ func serializeRes(obj any) (int, []byte) {
 	jsonBytes, err := json.Marshal(obj)
 	if err != nil {
 		// 因为这里已经给resBytes定型了，返回错误也没啥能做的，就不返回了
-		mlog.Log("serialize res to json failed", mlog.Field("error", err))
+		mlog.Error("serialize res to json failed", mlog.Field("error", err))
 		return code, nil
 	}
 

@@ -12,22 +12,22 @@ import (
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-// token structure: `hex({"user":[xxx]...}).hex(hash(payload, key))`
+// token structure: `hex({"user_name":[xxx]...}).hex(hash(payload, key))`
 // more: doc/design.md 接口访问令牌
 
 type AccessToken struct {
-	User       string `json:"user"`
+	UserName   string `json:"user_name"`
 	ExpireTime int64  `json:"expire_time"`
 }
 
 func GenAccessToken(userName string) string {
 	tokenBytes, err := json.Marshal(&AccessToken{
-		User:       userName,
+		UserName:   userName,
 		ExpireTime: time.Now().Add(time.Hour * 6).UnixMilli(), // hard code 'expire time' = 6h
 	})
 	if err != nil {
 		e := ErrServerInternalError().WithCause(err)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return ""
 	}
 
@@ -40,21 +40,21 @@ func VerifyAccessToken(ctx *mhttp.Context) *Error {
 	tokenSplit := strings.Split(ctx.AccessToken, ".")
 	if len(tokenSplit) != 2 {
 		e := ErrInvalidAccessToken().WithParam("token", ctx.AccessToken)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return e
 	}
 
 	hash := genTokenHash(tokenSplit[0])
 	if hash != tokenSplit[1] {
 		e := ErrTokenTamperedWith().WithParam("token", ctx.AccessToken)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return e
 	}
 
 	tokenBytes, err := hex.DecodeString(tokenSplit[0])
 	if err != nil {
 		e := ErrInvalidAccessToken().WithCause(err)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return e
 	}
 
@@ -62,18 +62,18 @@ func VerifyAccessToken(ctx *mhttp.Context) *Error {
 	err = json.Unmarshal(tokenBytes, token)
 	if err != nil {
 		e := ErrInvalidAccessToken().WithCause(err)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return e
 	}
 
 	now := time.Now().UnixMilli()
 	if token.ExpireTime < now {
 		e := ErrTokenExpired().WithParam("expire time", token.ExpireTime).WithParam("now", now)
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return e
 	}
 
-	ctx.User = token.User
+	ctx.UserName = token.UserName
 
 	return nil
 }
