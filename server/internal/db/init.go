@@ -2,16 +2,25 @@ package mdb
 
 import (
 	"encoding/json"
+	"flag"
 	"os"
 
 	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
-	mconst "github.com/mats0319/unnamed_plan/server/internal/const"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 )
+
+var isTestMode bool // for api test
+
+func init() {
+	flag.BoolVar(&isTestMode, "t", false, "use different db connection")
+
+	flag.Parse()
+}
 
 type config struct {
 	DSN          string `json:"dsn"`
@@ -19,25 +28,30 @@ type config struct {
 	MaxOpenConns int    `json:"max_open_conns"`
 }
 
-func init() {
+func Initialize() {
 	configIns, err := getDBConfig()
 	if err != nil {
-		mlog.Log("get db config failed", mlog.Field("error", err))
+		mlog.Error("get db config failed", mlog.Field("error", err))
 		os.Exit(1)
 	}
 
-	db, err := gorm.Open(postgres.Open(configIns.DSN), &gorm.Config{
+	gormConfig := &gorm.Config{
 		Logger:                 logger.Default.LogMode(logger.Silent),
 		SkipDefaultTransaction: true,
-	})
+	}
+	if isTestMode {
+		gormConfig.NamingStrategy = schema.NamingStrategy{TablePrefix: "t_"}
+	}
+
+	db, err := gorm.Open(postgres.Open(configIns.DSN), gormConfig)
 	if err != nil {
-		mlog.Log("open db failed", mlog.Field("error", err))
+		mlog.Error("open db failed", mlog.Field("error", err))
 		os.Exit(1)
 	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
-		mlog.Log("get sql db failed", mlog.Field("error", err))
+		mlog.Error("get sql db failed", mlog.Field("error", err))
 		os.Exit(1)
 	}
 
@@ -46,16 +60,20 @@ func init() {
 
 	dal.SetDefault(db)
 
-	mlog.Log("> DB init.")
+	logStr := "> DB init."
+	if isTestMode {
+		logStr += " [test mode]"
+	}
+	mlog.Info(logStr)
 }
 
 func getDBConfig() (*config, error) {
-	bytes := mconfig.GetConfigItem(mconst.UID_DB)
+	bytes := mconfig.GetConfigItem("658e06f7-71d5-4ada-b715-8c1a4489e5d2")
 
 	conf := &config{}
 	err := json.Unmarshal(bytes, conf)
 	if err != nil {
-		mlog.Log("deserialize db config failed", mlog.Field("error", err))
+		mlog.Error("deserialize db config failed", mlog.Field("error", err))
 		return nil, err
 	}
 

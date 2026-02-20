@@ -12,9 +12,9 @@
 			<el-input v-model="modifyUserReq.password" show-password />
 		</el-form-item>
 
-		<el-form-item label="是否修改TOTP密钥">
-			<el-switch v-model="modifyUserReq.modify_tk_flag" />
-			&emsp;{{ modifyUserReq.modify_tk_flag ? "修改" : "不修改" }}
+		<el-form-item label="是否启用双重因素验证(Two-Factor Authenticate)">
+			<el-switch v-model="modifyUserReq.enable_2fa" />
+			&emsp;{{ modifyUserReq.enable_2fa ? "启用" : "不启用" }}
 		</el-form-item>
 
 		<el-form-item label="TOTP密钥">
@@ -22,13 +22,7 @@
 		</el-form-item>
 
 		<el-form-item>
-			<outlined-button
-				details="密码为空表示不修改<br/>
-          修改TOTP密钥且新值为空，表示关闭TOTP功能<br/><br/>
-          昵称、密码、TOTP均无修改时，不可提交"
-				:disabled="!canModifyFlag"
-				@click="modifyUser()"
-			>
+			<outlined-button :details="tips_ModifyUser" :disabled="!canModifyFlag" @click="modifyUser()">
 				修改个人信息
 			</outlined-button>
 		</el-form-item>
@@ -40,6 +34,7 @@ import { ModifyUserReq } from "@/axios/ts/user.go.ts"
 import { onMounted, ref, watch } from "vue"
 import { useUserStore } from "@/pinia/user.ts"
 import OutlinedButton from "@/components/outlined_button.vue"
+import { tips_ModifyUser } from "@/ts/data.ts"
 
 let userStore = useUserStore()
 
@@ -54,7 +49,7 @@ function modifyUser(): void {
 	userStore.modify(
 		modifyUserReq.value.nickname,
 		modifyUserReq.value.password,
-		modifyUserReq.value.modify_tk_flag,
+		modifyUserReq.value.enable_2fa,
 		modifyUserReq.value.totp_key
 	)
 }
@@ -62,8 +57,9 @@ function modifyUser(): void {
 watch(
 	modifyUserReq,
 	(newValue, _) => {
+		// 当前的totp key不提供给前端，所以前端也不判断是否
 		canModifyFlag.value =
-			newValue.nickname != userStore.user.nickname || newValue.password.length > 0 || newValue.modify_tk_flag
+			newValue.nickname != userStore.user.nickname || newValue.password.length > 0 || newValue.enable_2fa
 	},
 	{ deep: true }
 )

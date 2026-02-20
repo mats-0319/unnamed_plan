@@ -3,7 +3,3 @@
 *.exe
 
 build/
-
-server/gateway/gateway
-server/1_user/1_user
-server/2_note/2_note

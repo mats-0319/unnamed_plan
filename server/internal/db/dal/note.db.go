@@ -4,85 +4,90 @@ import (
 	"context"
 	"strings"
 
-	"github.com/mats0319/unnamed_plan/server/internal/db/model"
-	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
+	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
+	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-func GetNote(id uint) (*model.Note, error) {
+func GetNote(noteID string) (*model.Note, *Error) {
 	qn := Q.Note
-	sql := qn.WithContext(context.TODO()).Where(qn.ID.Eq(id))
+	sql := qn.WithContext(context.TODO()).Where(qn.NoteID.Eq(noteID))
 
 	res, err := sql.First()
 	if err != nil {
-		e := NewError(ET_ServerInternalError).WithCause(err)
-		mlog.Log(e.String())
+		var e *Error
+		if strings.Contains(err.Error(), "record not found") {
+			e = ErrNoteNotFound().WithCause(err)
+		} else {
+			e = ErrDBError().WithCause(err)
+		}
+		mlog.Error(e.String())
 		return nil, e
 	}
 
 	return res, nil
 }
 
-func CreateNote(note *model.Note) error {
+func CreateNote(note *model.Note) *Error {
 	err := Q.Note.WithContext(context.TODO()).Create(note)
 	if err != nil {
 		var e *Error
 		if strings.Contains(err.Error(), "violates unique constraint") {
-			e = NewError(ET_ParamsError, ED_NoteExist).WithCause(err)
+			e = ErrNoteExist().WithCause(err)
 		} else {
-			e = NewError(ET_ServerInternalError).WithCause(err)
+			e = ErrDBError().WithCause(err)
 		}
 
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return e
 	}
 
 	return nil
 }
 
-func UpdateNote(note *model.Note) error {
+func UpdateNote(note *model.Note) *Error {
 	qn := Q.Note
 	err := qn.WithContext(context.TODO()).Where(qn.ID.Eq(note.ID)).Save(note)
 	if err != nil {
-		e := NewError(ET_ServerInternalError).WithCause(err)
-		mlog.Log(e.String())
+		e := ErrDBError().WithCause(err)
+		mlog.Error(e.String())
 		return e
 	}
 
 	return nil
 }
 
-func DeleteNote(id uint) error {
+func DeleteNote(noteID string) *Error {
 	qn := Q.Note
-	_, err := qn.WithContext(context.TODO()).Where(qn.ID.Eq(id)).Delete()
+	_, err := qn.WithContext(context.TODO()).Where(qn.NoteID.Eq(noteID)).Delete()
 	if err != nil {
-		e := NewError(ET_ServerInternalError).WithCause(err)
-		mlog.Log(e.String())
+		e := ErrDBError().WithCause(err)
+		mlog.Error(e.String())
 		return e
 	}
 
 	return nil
 }
 
-func ListNote(page api.Pagination, writerID ...uint) (int64, []*model.Note, error) {
+func ListNote(page api.Pagination, writer string) (int64, []*model.Note, *Error) {
 	qn := Q.Note
 	sql := qn.WithContext(context.TODO())
-	if len(writerID) > 0 {
-		sql = sql.Where(qn.WriterID.Eq(writerID[0]))
+	if len(writer) > 0 {
+		sql = sql.Where(qn.Writer.Eq(writer))
 	}
 
 	amount, err := sql.Count()
 	if err != nil {
-		e := NewError(ET_ServerInternalError).WithCause(err)
-		mlog.Log(e.String())
+		e := ErrDBError().WithCause(err)
+		mlog.Error(e.String())
 		return 0, nil, e
 	}
 
 	res, err := sql.Order(qn.UpdatedAt.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
 	if err != nil {
-		e := NewError(ET_ServerInternalError).WithCause(err)
-		mlog.Log(e.String())
+		e := ErrDBError().WithCause(err)
+		mlog.Error(e.String())
 		return 0, nil, e
 	}
 

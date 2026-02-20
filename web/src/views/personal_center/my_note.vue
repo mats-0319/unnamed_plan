@@ -1,6 +1,6 @@
 <template>
 	<div class="pnote-tools">
-		<elevated_button :width="8" @click="beforeCreate()">写小纸条</elevated_button>
+		<elevated_button class="pt-item" @click="beforeCreate()">写小纸条</elevated_button>
 	</div>
 
 	<el-table :data="notes" height="60%">
@@ -105,7 +105,9 @@ import { CreateNoteReq, DeleteNoteReq, ModifyNoteReq, Note } from "@/axios/ts/no
 import { deepCopy, displayTimestamp } from "@/ts/util.ts"
 import { useNoteStore } from "@/pinia/note.ts"
 import Outlined_button from "@/components/outlined_button.vue"
+import { useUserStore } from "@/pinia/user.ts"
 
+let userStore = useUserStore()
 let noteStore = useNoteStore()
 
 let amount = ref<number>(0)
@@ -142,7 +144,7 @@ function create(): void {
 function beforeModify(note: Note): void {
 	originData.value = deepCopy(note)
 	modifyNoteReq.value = {
-		id: note.id,
+		note_id: note.note_id,
 		is_anonymous: note.is_anonymous,
 		title: note.title,
 		content: note.content
@@ -153,7 +155,7 @@ function beforeModify(note: Note): void {
 
 function modify(): void {
 	noteStore.modify(
-		modifyNoteReq.value.id,
+		modifyNoteReq.value.note_id,
 		modifyNoteReq.value.is_anonymous,
 		modifyNoteReq.value.title,
 		modifyNoteReq.value.content,
@@ -167,21 +169,21 @@ function modify(): void {
 function beforeDelete(note: Note): void {
 	originData.value = deepCopy(note)
 	deleteNoteReq.value = {
-		id: note.id
+		note_id: note.note_id
 	}
 
 	showDeleteDialog.value = true
 }
 
 function del(): void {
-	noteStore.del(deleteNoteReq.value.id, () => {
+	noteStore.del(deleteNoteReq.value.note_id, () => {
 		listNote()
 		showDeleteDialog.value = false
 	})
 }
 
 function listNote(pageNum: number = 1): void {
-	noteStore.list(10, pageNum, true, (a: number, n: Array<Note>) => {
+	noteStore.list(10, pageNum, userStore.user.user_name, (a: number, n: Array<Note>) => {
 		amount.value = a
 		notes.value = n
 	})
@@ -210,6 +212,10 @@ watch(
 <style lang="less" scoped>
 .pnote-tools {
 	height: 4rem;
+
+	.pt-item {
+		width: 8rem;
+	}
 }
 
 .el-pagination {

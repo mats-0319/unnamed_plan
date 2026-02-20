@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "format": "eslint --fix"
+    "format": "eslint --fix --format json --output-file ./format_result.json"
   },
   "dependencies": {
     "axios": "^1.13.2",

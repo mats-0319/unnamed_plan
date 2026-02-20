@@ -11,12 +11,7 @@ export let useUserStore = defineStore("user", () => {
 	function register(userName: string, password: string, cb: () => void): void {
 		let pwdHash = CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex)
 
-		userAxios.register(userName, pwdHash).then(({ data }: { data: RegisterRes }) => {
-			if (!data.is_success) {
-				log.fail("register", data.err)
-				return
-			}
-
+		userAxios.register(userName, pwdHash).then(({}: { data: RegisterRes }) => {
 			cb()
 
 			log.success("register")
@@ -29,11 +24,6 @@ export let useUserStore = defineStore("user", () => {
 		let pwdHash = CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex)
 
 		userAxios.login(userName, pwdHash, totpCode).then(({ data }: { data: LoginRes }) => {
-			if (!data.is_success) {
-				log.fail("login", data.err)
-				return
-			}
-
 			user.value = loginResToUser(data)
 
 			cb()
@@ -42,26 +32,16 @@ export let useUserStore = defineStore("user", () => {
 		})
 	}
 
-	function modify(nickname: string, password: string, modifyTkFlag: boolean, totpKey: string): void {
+	function modify(nickname: string, password: string, enable2FA: boolean, totpKey: string): void {
 		let pwdHash = CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex)
 
-		userAxios.modifyUser(nickname, pwdHash, modifyTkFlag, totpKey).then(({ data }: { data: ModifyUserRes }) => {
-			if (!data.is_success) {
-				log.fail("modify user", data.err)
-				return
-			}
-
+		userAxios.modifyUser(nickname, pwdHash, enable2FA, totpKey).then(({}: { data: ModifyUserRes }) => {
 			log.success("modify user")
 		})
 	}
 
 	function list(pageSize: number, pageNum: number, cb: (amount: number, users: Array<User>) => void): void {
 		userAxios.listUser({ size: pageSize, num: pageNum }).then(({ data }: { data: ListUserRes }) => {
-			if (!data.is_success) {
-				log.fail("list user", data.err)
-				return
-			}
-
 			cb(data.amount, data.users)
 
 			log.success("list user")
@@ -70,10 +50,10 @@ export let useUserStore = defineStore("user", () => {
 
 	function loginResToUser(res: LoginRes): User {
 		let userIns = new User()
-		userIns.id = res.user_id
 		userIns.user_name = res.user_name
 		userIns.nickname = res.nickname
 		userIns.is_admin = res.is_admin
+		userIns.enable_2fa = res.enable_2fa
 
 		return userIns
 	}

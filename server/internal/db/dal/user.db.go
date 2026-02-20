@@ -4,78 +4,73 @@ import (
 	"context"
 	"strings"
 
-	"github.com/mats0319/unnamed_plan/server/internal/db/model"
-	api "github.com/mats0319/unnamed_plan/server/internal/http/api/go"
+	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
+	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-// GetUser query user by 'id'/'username', according to value type
-func GetUser[T uint | string](value T) (*model.User, error) {
+func GetUser(userName string) (*model.User, *Error) {
 	qu := Q.User
-	sql := qu.WithContext(context.TODO())
-
-	switch v := any(value).(type) {
-	case uint:
-		sql = sql.Where(qu.ID.Eq(v))
-	case string:
-		sql = sql.Where(qu.UserName.Eq(v))
-	}
-
-	res, err := sql.First()
+	res, err := qu.WithContext(context.TODO()).Where(qu.UserName.Eq(userName)).First()
 	if err != nil {
-		e := NewError(ET_ServerInternalError).WithCause(err)
-		mlog.Log(e.String())
+		var e *Error
+		if strings.Contains(err.Error(), "record not found") {
+			e = ErrUserNotFound().WithCause(err)
+		} else {
+			e = ErrDBError().WithCause(err)
+		}
+		mlog.Error(e.String())
 		return nil, e
 	}
 
 	return res, nil
 }
 
-func CreateUser(user *model.User) error {
+func CreateUser(user *model.User) *Error {
 	err := Q.User.WithContext(context.TODO()).Create(user)
 	if err != nil {
 		var e *Error
 		if strings.Contains(err.Error(), "violates unique constraint") {
-			e = NewError(ET_ParamsError, ED_UserExist).WithCause(err)
+			e = ErrUserExist().WithCause(err)
 		} else {
-			e = NewError(ET_ServerInternalError).WithCause(err)
+			e = ErrDBError().WithCause(err)
 		}
 
-		mlog.Log(e.String())
+		mlog.Error(e.String())
 		return e
 	}
 
 	return nil
 }
 
-func UpdateUser(user *model.User) error {
+func UpdateUser(user *model.User) *Error {
 	qu := Q.User
 	err := qu.WithContext(context.TODO()).Where(qu.ID.Eq(user.ID)).Save(user)
 	if err != nil {
-		e := NewError(ET_ServerInternalError).WithCause(err)
-		mlog.Log(e.String())
+		e := ErrDBError().WithCause(err)
+		mlog.Error(e.String())
 		return e
 	}
 
 	return nil
 }
 
-func ListUsers(page api.Pagination) (int64, []*model.User, error) {
+func ListUser(page api.Pagination) (int64, []*model.User, *Error) {
 	qu := Q.User
 	sql := qu.WithContext(context.TODO())
 
 	amount, err := sql.Count()
 	if err != nil {
-		e := NewError(ET_ServerInternalError).WithCause(err)
-		mlog.Log(e.String())
+		e := ErrDBError().WithCause(err)
+		mlog.Error(e.String())
 		return 0, nil, e
 	}
 
-	res, err := sql.Order(qu.LastLogin.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
+	res, err := sql.Order(qu.UpdatedAt.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
 	if err != nil {
-		e := NewError(ET_ServerInternalError).WithCause(err)
-		mlog.Log(e.String())
+		e := ErrDBError().WithCause(err)
+		mlog.Error(e.String())
 		return 0, nil, e
 	}
 

@@ -8,7 +8,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/mats0319/unnamed_plan/server/internal/db/model"
+	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
@@ -27,12 +27,12 @@ func newNote(db *gorm.DB, opts ...gen.DOOption) note {
 
 	tableName := _note.noteDo.TableName()
 	_note.ALL = field.NewAsterisk(tableName)
-	_note.ID = field.NewUint(tableName, "id")
+	_note.ID = field.NewField(tableName, "id")
 	_note.CreatedAt = field.NewInt64(tableName, "created_at")
 	_note.UpdatedAt = field.NewInt64(tableName, "updated_at")
 	_note.DeletedAt = field.NewField(tableName, "deleted_at")
 	_note.NoteID = field.NewString(tableName, "note_id")
-	_note.WriterID = field.NewUint(tableName, "writer_id")
+	_note.Writer = field.NewString(tableName, "writer")
 	_note.WriterName = field.NewString(tableName, "writer_name")
 	_note.IsAnonymous = field.NewBool(tableName, "is_anonymous")
 	_note.Title = field.NewString(tableName, "title")
@@ -47,12 +47,12 @@ type note struct {
 	noteDo noteDo
 
 	ALL         field.Asterisk
-	ID          field.Uint
+	ID          field.Field
 	CreatedAt   field.Int64
 	UpdatedAt   field.Int64
 	DeletedAt   field.Field
 	NoteID      field.String
-	WriterID    field.Uint
+	Writer      field.String
 	WriterName  field.String
 	IsAnonymous field.Bool
 	Title       field.String
@@ -73,12 +73,12 @@ func (n note) As(alias string) *note {
 
 func (n *note) updateTableName(table string) *note {
 	n.ALL = field.NewAsterisk(table)
-	n.ID = field.NewUint(table, "id")
+	n.ID = field.NewField(table, "id")
 	n.CreatedAt = field.NewInt64(table, "created_at")
 	n.UpdatedAt = field.NewInt64(table, "updated_at")
 	n.DeletedAt = field.NewField(table, "deleted_at")
 	n.NoteID = field.NewString(table, "note_id")
-	n.WriterID = field.NewUint(table, "writer_id")
+	n.Writer = field.NewString(table, "writer")
 	n.WriterName = field.NewString(table, "writer_name")
 	n.IsAnonymous = field.NewBool(table, "is_anonymous")
 	n.Title = field.NewString(table, "title")
@@ -113,7 +113,7 @@ func (n *note) fillFieldMap() {
 	n.fieldMap["updated_at"] = n.UpdatedAt
 	n.fieldMap["deleted_at"] = n.DeletedAt
 	n.fieldMap["note_id"] = n.NoteID
-	n.fieldMap["writer_id"] = n.WriterID
+	n.fieldMap["writer"] = n.Writer
 	n.fieldMap["writer_name"] = n.WriterName
 	n.fieldMap["is_anonymous"] = n.IsAnonymous
 	n.fieldMap["title"] = n.Title

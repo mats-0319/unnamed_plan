@@ -1,0 +1,30 @@
+package handlers
+
+import (
+	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
+	"github.com/mats0319/unnamed_plan/server/cmd/model"
+	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
+	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
+)
+
+func CreateNote(ctx *mhttp.Context) {
+	req := &api.CreateNoteReq{}
+	if !ctx.ParseParams(req) {
+		return
+	}
+
+	operator, err := dal.GetUser(ctx.UserName)
+	if err != nil {
+		ctx.ResData = err
+		return
+	}
+
+	note := model.NewNote(operator.UserName, operator.Nickname, req.IsAnonymous, req.Title, req.Content)
+	err = dal.CreateNote(note)
+	if err != nil {
+		ctx.ResData = err
+		return
+	}
+
+	ctx.ResData = &api.CreateNoteRes{}
+}

@@ -1,10 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
-	"github.com/mats0319/unnamed_plan/server/internal/db/model"
+	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -15,6 +14,7 @@ func main() {
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info), // print all sql
+		//DryRun: true,                                // 获取sql，在禁止外部访问的数据库（正式库）使用
 	})
 	if err != nil {
 		log.Fatalln("open db failed, error: ", err)
@@ -32,17 +32,6 @@ func main() {
 		log.Fatalln("create db table failed, error: ", err)
 	}
 
-	tableNames, err := db.Migrator().GetTables()
-	if err != nil {
-		log.Fatalln("get table names failed, error: ", err)
-	}
-
-	// 修改sequence，设置初始值
-	for _, v := range tableNames {
-		sequence := fmt.Sprintf("%s_id_seq", v)
-		db.Exec(fmt.Sprintf("alter sequence %s restart with 1001;", sequence))
-	}
-
 	db.Create(defaultUsers)
-	//db.Create(testNotes)
+	db.Create(testNotes)
 }

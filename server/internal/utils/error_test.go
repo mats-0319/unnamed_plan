@@ -6,9 +6,9 @@ import (
 )
 
 func TestLogStyle(t *testing.T) {
-	e := NewError(ET_ParamsError, ED_JsonMarshal).WithCause(errors.New("a new error")).
+	e := ErrServerInternalError().WithCause(errors.New("a new error")).
 		WithParam("first param", "first value").
-		WithParam("second param", new(string))
+		WithParam("second param", 10000)
 
 	t.Log(e.String())
 }

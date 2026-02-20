@@ -8,7 +8,7 @@ import (
 
 type Error struct {
 	Typ    ErrorType
-	Detail ErrorDetail
+	Detail string
 	Cause  error
 	Params map[string]any
 	Stack  []uintptr
@@ -16,8 +16,8 @@ type Error struct {
 
 var _ error = (*Error)(nil)
 
-func NewError(typ ErrorType, detail ...ErrorDetail) *Error {
-	errDetail := ED_Empty
+func NewError(typ ErrorType, detail ...string) *Error {
+	errDetail := ""
 	if len(detail) > 0 {
 		errDetail = detail[0]
 	}
@@ -35,6 +35,10 @@ func NewError(typ ErrorType, detail ...ErrorDetail) *Error {
 
 // Error simple return to web
 func (e *Error) Error() string {
+	if e == nil {
+		return ""
+	}
+
 	detailStr := ""
 	if len(e.Detail) > 0 {
 		detailStr = fmt.Sprintf(", detail: %s", e.Detail)

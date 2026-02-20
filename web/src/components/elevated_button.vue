@@ -1,9 +1,5 @@
 <template>
-	<div
-		class="elevated-button color-bg-1 center-hv"
-		:style="{ width: props.width + 'rem' }"
-		:class="{ 'eb-loading': props.loading }"
-	>
+	<div class="elevated-button color-bg-1 center-hv" :class="{ 'eb-loading': props.loading }">
 		<span v-show="!loading"><slot></slot></span>
 		<span v-show="loading">loading...</span>
 	</div>
@@ -11,10 +7,6 @@
 
 <script lang="ts" setup>
 let props = defineProps({
-	width: {
-		type: Number,
-		default: 12
-	},
 	loading: {
 		type: Boolean,
 		default: false

@@ -7,13 +7,11 @@ import (
 	"net/http"
 
 	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
-	mconst "github.com/mats0319/unnamed_plan/server/internal/const"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 )
 
 type config struct {
-	Port           string   `json:"port"`
-	AllowedOrigins []string `json:"allowed_origins"`
+	Port string `json:"port"`
 }
 
 // StartServer is blocked
@@ -23,7 +21,7 @@ func StartServer(handler *Handler) {
 	handler.supportedUri()
 
 	addr := fmt.Sprintf("%s:%s", "0.0.0.0", handler.config.Port)
-	mlog.Log("> Listening at: " + addr)
+	mlog.Info("> Listening at: " + addr)
 
 	err := http.ListenAndServe(addr, handler)
 	if err != nil {
@@ -32,7 +30,7 @@ func StartServer(handler *Handler) {
 }
 
 func getConfig() *config {
-	jsonBytes := mconfig.GetConfigItem(mconst.UID_Http)
+	jsonBytes := mconfig.GetConfigItem("22c4db2e-06d3-4d6a-b43f-c42aa6f57d15")
 
 	res := &config{}
 	err := json.Unmarshal(jsonBytes, res)

@@ -1,0 +1,57 @@
+package handlers
+
+import (
+	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
+	"github.com/mats0319/unnamed_plan/server/cmd/model"
+	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
+	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
+	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
+	. "github.com/mats0319/unnamed_plan/server/internal/utils"
+)
+
+func ListUser(ctx *mhttp.Context) {
+	req := &api.ListUserReq{}
+	if !ctx.ParseParams(req) {
+		return
+	}
+
+	operator, err := dal.GetUser(ctx.UserName)
+	if err != nil {
+		ctx.ResData = err
+		return
+	}
+
+	if !operator.IsAdmin {
+		e := ErrNeedAdmin().WithParam("operator", operator.UserName)
+		ctx.ResData = e
+		mlog.Error(e.String())
+		return
+	}
+
+	count, users, err := dal.ListUser(req.Page)
+	if err != nil {
+		ctx.ResData = err
+		return
+	}
+
+	ctx.ResData = &api.ListUserRes{
+		Amount: count,
+		Users:  usersFromDBToHttp(users),
+	}
+}
+
+func usersFromDBToHttp(users []*model.User) []*api.User {
+	res := make([]*api.User, len(users))
+	for i, v := range users {
+		res[i] = &api.User{
+			UserName:  v.UserName,
+			Nickname:  v.Nickname,
+			CreatedAt: v.CreatedAt,
+			IsAdmin:   v.IsAdmin,
+			Enable2FA: v.Enable2FA,
+			LastLogin: v.UpdatedAt,
+		}
+	}
+
+	return res
+}

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/mats0319/unnamed_plan/server/internal/db/model"
+	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	"gorm.io/gen"
 )
 
