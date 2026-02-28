@@ -22,8 +22,7 @@ func main() {
 func newHandler() *mhttp.Handler {
 	h := &mhttp.Handler{}
 
-	// optimize: into config, if product version use domain name, url -> 'https://api.xxx.com/login'
-	uriPrefix := "/api"
+	uriPrefix := "/api" // even use domain name like 'api.xxx.com/login', nginx will forward req
 
 	// user
 	h.AddHandler(uriPrefix+api.URI_Register, handlers.Register)

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
@@ -97,16 +96,16 @@ func codePosition() string {
 	fs := runtime.CallersFrames(pc)
 	f, _ := fs.Next()
 
-	fileName := filepath.Base(f.File)
-	line := f.Line
-	funcName := f.Function
-
-	shortFuncName := filepath.Base(funcName) // without package name
-	if shortFuncName != "" {
-		funcName = shortFuncName
+	fileName := f.File
+	lastIndex := strings.LastIndex(fileName, "/")
+	if lastIndex >= 0 {
+		index := strings.LastIndex(fileName[:lastIndex], "/")
+		if index >= 0 {
+			fileName = fileName[index+1:]
+		}
 	}
 
-	return fmt.Sprintf("%s:%d %s", fileName, line, funcName)
+	return fmt.Sprintf("%s:%d", fileName, f.Line)
 }
 
 func (h *handler) logAttrs(r slog.Record) string {
@@ -130,12 +129,12 @@ func (h *handler) logAttrs(r slog.Record) string {
 }
 
 func logAttrWithGroups(a slog.Attr, groups []string) string {
-	keyPrefix := ""
+	var keyPrefix strings.Builder
 	for _, group := range groups {
-		keyPrefix += group + "."
+		keyPrefix.WriteString(group + ".")
 	}
 
-	return logAttr(a, keyPrefix)
+	return logAttr(a, keyPrefix.String())
 }
 
 func logAttr(a slog.Attr, keyPrefix string) string {

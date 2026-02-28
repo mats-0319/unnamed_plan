@@ -1,11 +1,13 @@
-package utils
+package password
 
 import (
 	"testing"
+
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 func TestPassword(t *testing.T) {
-	pwdFromWeb := CalcSHA256("123456") // hex(hash('password'))
+	pwdFromWeb := utils.CalcSHA256("123456") // hex(hash('password'))
 	t.Log("> Password From Web: ", pwdFromWeb)
 
 	pwdDB := GeneratePwdHash(pwdFromWeb)

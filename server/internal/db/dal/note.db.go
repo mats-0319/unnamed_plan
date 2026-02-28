@@ -8,16 +8,14 @@ import (
 	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
+	"gorm.io/gorm"
 )
 
 func GetNote(noteID string) (*model.Note, *Error) {
-	qn := Q.Note
-	sql := qn.WithContext(context.TODO()).Where(qn.NoteID.Eq(noteID))
-
-	res, err := sql.First()
+	res, err := Note.WithContext(context.TODO()).Where(Note.NoteID.Eq(noteID)).First()
 	if err != nil {
 		var e *Error
-		if strings.Contains(err.Error(), "record not found") {
+		if err.Error() == gorm.ErrRecordNotFound.Error() {
 			e = ErrNoteNotFound().WithCause(err)
 		} else {
 			e = ErrDBError().WithCause(err)
@@ -30,7 +28,7 @@ func GetNote(noteID string) (*model.Note, *Error) {
 }
 
 func CreateNote(note *model.Note) *Error {
-	err := Q.Note.WithContext(context.TODO()).Create(note)
+	err := Note.WithContext(context.TODO()).Create(note)
 	if err != nil {
 		var e *Error
 		if strings.Contains(err.Error(), "violates unique constraint") {
@@ -47,8 +45,7 @@ func CreateNote(note *model.Note) *Error {
 }
 
 func UpdateNote(note *model.Note) *Error {
-	qn := Q.Note
-	err := qn.WithContext(context.TODO()).Where(qn.ID.Eq(note.ID)).Save(note)
+	err := Note.WithContext(context.TODO()).Where(Note.ID.Eq(note.ID)).Save(note)
 	if err != nil {
 		e := ErrDBError().WithCause(err)
 		mlog.Error(e.String())
@@ -59,8 +56,7 @@ func UpdateNote(note *model.Note) *Error {
 }
 
 func DeleteNote(noteID string) *Error {
-	qn := Q.Note
-	_, err := qn.WithContext(context.TODO()).Where(qn.NoteID.Eq(noteID)).Delete()
+	_, err := Note.WithContext(context.TODO()).Where(Note.NoteID.Eq(noteID)).Delete()
 	if err != nil {
 		e := ErrDBError().WithCause(err)
 		mlog.Error(e.String())
@@ -71,10 +67,9 @@ func DeleteNote(noteID string) *Error {
 }
 
 func ListNote(page api.Pagination, writer string) (int64, []*model.Note, *Error) {
-	qn := Q.Note
-	sql := qn.WithContext(context.TODO())
+	sql := Note.WithContext(context.TODO())
 	if len(writer) > 0 {
-		sql = sql.Where(qn.Writer.Eq(writer))
+		sql = sql.Where(Note.Writer.Eq(writer))
 	}
 
 	amount, err := sql.Count()
@@ -84,12 +79,12 @@ func ListNote(page api.Pagination, writer string) (int64, []*model.Note, *Error)
 		return 0, nil, e
 	}
 
-	res, err := sql.Order(qn.UpdatedAt.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
+	notes, err := sql.Order(Note.UpdatedAt.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
 	if err != nil {
 		e := ErrDBError().WithCause(err)
 		mlog.Error(e.String())
 		return 0, nil, e
 	}
 
-	return amount, res, nil
+	return amount, notes, nil
 }

@@ -8,6 +8,7 @@ import (
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
+	"github.com/mats0319/unnamed_plan/server/internal/utils/password"
 )
 
 func ModifyUser(ctx *mhttp.Context) {
@@ -35,7 +36,7 @@ func ModifyUser(ctx *mhttp.Context) {
 		operator.Nickname = req.Nickname
 	}
 	if len(req.Password) > 0 {
-		err = utils.VerifyPassword(req.Password, operator.Password) // in modify, same pwd is invalid
+		err = password.VerifyPassword(req.Password, operator.Password) // in modify, same pwd is invalid
 		if err == nil {
 			e := utils.ErrSamePwd()
 			ctx.ResData = e
@@ -43,7 +44,7 @@ func ModifyUser(ctx *mhttp.Context) {
 			return
 		}
 
-		operator.Password = utils.GeneratePwdHash(req.Password)
+		operator.Password = password.GeneratePwdHash(req.Password)
 	}
 	err = isValidTotpKey(req.TotpKey)
 	if req.Enable2FA != operator.Enable2FA {

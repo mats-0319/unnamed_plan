@@ -2,25 +2,17 @@ package mdb
 
 import (
 	"encoding/json"
-	"flag"
 	"os"
 
 	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 )
-
-var isTestMode bool // for api test
-
-func init() {
-	flag.BoolVar(&isTestMode, "t", false, "use different db connection")
-
-	flag.Parse()
-}
 
 type config struct {
 	DSN          string `json:"dsn"`
@@ -31,7 +23,6 @@ type config struct {
 func Initialize() {
 	configIns, err := getDBConfig()
 	if err != nil {
-		mlog.Error("get db config failed", mlog.Field("error", err))
 		os.Exit(1)
 	}
 
@@ -39,7 +30,7 @@ func Initialize() {
 		Logger:                 logger.Default.LogMode(logger.Silent),
 		SkipDefaultTransaction: true,
 	}
-	if isTestMode {
+	if utils.IsTestMode {
 		gormConfig.NamingStrategy = schema.NamingStrategy{TablePrefix: "t_"}
 	}
 
@@ -49,26 +40,29 @@ func Initialize() {
 		os.Exit(1)
 	}
 
-	sqlDB, err := db.DB()
-	if err != nil {
-		mlog.Error("get sql db failed", mlog.Field("error", err))
-		os.Exit(1)
-	}
+	// set conns
+	{
+		sqlDB, err := db.DB()
+		if err != nil {
+			mlog.Error("get sql db failed", mlog.Field("error", err))
+			os.Exit(1)
+		}
 
-	sqlDB.SetMaxIdleConns(configIns.MaxIdleConns)
-	sqlDB.SetMaxOpenConns(configIns.MaxOpenConns)
+		sqlDB.SetMaxIdleConns(configIns.MaxIdleConns)
+		sqlDB.SetMaxOpenConns(configIns.MaxOpenConns)
+	}
 
 	dal.SetDefault(db)
 
 	logStr := "> DB init."
-	if isTestMode {
+	if utils.IsTestMode {
 		logStr += " [test mode]"
 	}
 	mlog.Info(logStr)
 }
 
 func getDBConfig() (*config, error) {
-	bytes := mconfig.GetConfigItem("658e06f7-71d5-4ada-b715-8c1a4489e5d2")
+	bytes := mconfig.GetConfigItem(utils.ConfigID_DB)
 
 	conf := &config{}
 	err := json.Unmarshal(bytes, conf)

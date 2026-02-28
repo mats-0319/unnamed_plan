@@ -6,6 +6,7 @@ import (
 	"encoding/base32"
 	"fmt"
 	"math"
+	"slices"
 	"time"
 
 	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
@@ -14,6 +15,7 @@ import (
 	"github.com/mats0319/unnamed_plan/server/internal/http/middleware"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
+	"github.com/mats0319/unnamed_plan/server/internal/utils/password"
 )
 
 func Login(ctx *mhttp.Context) {
@@ -28,7 +30,7 @@ func Login(ctx *mhttp.Context) {
 		return
 	}
 
-	err = utils.VerifyPassword(req.Password, user.Password)
+	err = password.VerifyPassword(req.Password, user.Password)
 	if err != nil {
 		ctx.ResData = err
 		return
@@ -85,15 +87,7 @@ func verifyTotpCode(code string, totpKey string) *utils.Error {
 		calcTotpCode(key, iTob(timestep+1)),
 	}
 
-	existFlag := false
-	for _, v := range validCodes {
-		if code == v {
-			existFlag = true
-			break
-		}
-	}
-
-	if !existFlag {
+	if !slices.Contains(validCodes, code) {
 		e := utils.ErrWrongTotpCode().WithParam("code", code)
 		mlog.Error(e.String())
 		return e

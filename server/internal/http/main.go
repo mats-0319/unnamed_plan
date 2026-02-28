@@ -3,11 +3,12 @@ package mhttp
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
+	"os"
 
 	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 type config struct {
@@ -16,27 +17,31 @@ type config struct {
 
 // StartServer is blocked
 func StartServer(handler *Handler) {
-	handler.config = getConfig()
+	configIns, err := getHttpConfig()
+	if err != nil {
+		os.Exit(1)
+	}
 
-	handler.supportedUri()
+	handler.displayRegisteredUri()
 
-	addr := fmt.Sprintf("%s:%s", "0.0.0.0", handler.config.Port)
+	addr := fmt.Sprintf("127.0.0.1:%s", configIns.Port)
 	mlog.Info("> Listening at: " + addr)
 
-	err := http.ListenAndServe(addr, handler)
+	err = http.ListenAndServe(addr, handler)
 	if err != nil {
-		log.Fatalln("handlers listen and serve failed", err)
+		mlog.Error("handlers listen and serve failed", mlog.Field("error", err))
 	}
 }
 
-func getConfig() *config {
-	jsonBytes := mconfig.GetConfigItem("22c4db2e-06d3-4d6a-b43f-c42aa6f57d15")
+func getHttpConfig() (*config, error) {
+	jsonBytes := mconfig.GetConfigItem(utils.ConfigID_Http)
 
 	res := &config{}
 	err := json.Unmarshal(jsonBytes, res)
 	if err != nil {
-		log.Fatalln("get gateway config failed", err)
+		mlog.Error("deserialize gateway config failed", mlog.Field("error", err))
+		return nil, err
 	}
 
-	return res
+	return res, nil
 }

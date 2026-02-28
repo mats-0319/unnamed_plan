@@ -5,9 +5,12 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	"strings"
+
+	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
 )
 
-func Initialize() {
+func Initialize(isTestMode ...bool) {
 	var err error
 	fileIns, err = os.OpenFile("log.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
@@ -15,7 +18,7 @@ func Initialize() {
 	}
 
 	multiWriter := io.MultiWriter(fileIns, os.Stdout)
-	handlerIns := newHandler(multiWriter, slog.LevelDebug) // todo: log level, from config
+	handlerIns := newHandler(multiWriter, getLogLevel(isTestMode...))
 
 	logger := slog.New(handlerIns)
 	slog.SetDefault(logger)
@@ -90,4 +93,26 @@ func Log(logger *slog.Logger, level slog.Level, msg string, fields ...*LogField)
 	default:
 		logger.Error("unknown level: " + level.String())
 	}
+}
+
+func getLogLevel(isTestMode ...bool) slog.Level {
+	if len(isTestMode) > 0 && isTestMode[0] {
+		return slog.LevelDebug
+	}
+
+	levelStr := mconfig.GetLevel()
+
+	var level slog.Level
+	switch strings.ToLower(levelStr) {
+	case "error":
+		level = slog.LevelError
+	case "warn":
+		level = slog.LevelWarn
+	case "info":
+		level = slog.LevelInfo
+	default: // 'debug' and other unknown levels
+		level = slog.LevelDebug
+	}
+
+	return level
 }

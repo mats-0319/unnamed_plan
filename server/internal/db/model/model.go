@@ -11,7 +11,7 @@ type Model struct {
 	CreatedAt int64          `gorm:"autoCreateTime:milli"`
 	UpdatedAt int64          `gorm:"autoUpdateTime:milli"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`
-	//ExportedAt int64          // 不适合使用自动编辑
+	BackupAt  int64          // 不适合使用自动编辑
 }
 
 func (m *Model) BeforeCreate(_ *gorm.DB) error {

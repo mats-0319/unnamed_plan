@@ -7,7 +7,7 @@ import (
 )
 
 func TestCustomLog(t *testing.T) {
-	Initialize()
+	Initialize(true)
 	defer Close()
 
 	logger := slog.With("key_1", "value_1").
@@ -18,7 +18,7 @@ func TestCustomLog(t *testing.T) {
 }
 
 func TestLogLevel(t *testing.T) {
-	Initialize()
+	Initialize(true)
 	defer Close()
 
 	Debug("debug level log", Field("error", errors.New("debug error")))

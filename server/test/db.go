@@ -6,6 +6,7 @@ import (
 	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
+	"github.com/mats0319/unnamed_plan/server/internal/utils/password"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -66,7 +67,7 @@ func presetUser() []*model.User {
 		{
 			UserName:  "admin",
 			Nickname:  "admin",
-			Password:  utils.GeneratePwdHash(pwdFromWeb),
+			Password:  password.GeneratePwdHash(pwdFromWeb),
 			IsAdmin:   true,
 			Enable2FA: false,
 			TotpKey:   "",
@@ -74,14 +75,14 @@ func presetUser() []*model.User {
 		{
 			UserName:  "user",
 			Nickname:  "user",
-			Password:  utils.GeneratePwdHash(pwdFromWeb),
+			Password:  password.GeneratePwdHash(pwdFromWeb),
 			Enable2FA: false,
 			TotpKey:   "",
 		},
 		{
 			UserName:  "user_with_totp",
 			Nickname:  "user_with_totp",
-			Password:  utils.GeneratePwdHash(pwdFromWeb),
+			Password:  password.GeneratePwdHash(pwdFromWeb),
 			Enable2FA: true,
 			TotpKey:   "NVQXE2LP", // base32 of 'mario'
 		},

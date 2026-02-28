@@ -13,8 +13,8 @@ type Context struct {
 	Writer  http.ResponseWriter
 	Request *http.Request
 
-	AccessToken string // 登录成功获得，后续请求均需要在请求头带上该参数
-	UserName    string // user name
+	AccessToken string // 登录成功后签发，需要身份认证的接口应包含此项
+	UserName    string // parse from 'AccessToken'
 
 	ResData any // expect: *utils.Error / *api.resStruct
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
-	"github.com/mats0319/unnamed_plan/server/internal/utils"
+	"github.com/mats0319/unnamed_plan/server/internal/utils/password"
 )
 
 func Register(ctx *mhttp.Context) {
@@ -14,7 +14,7 @@ func Register(ctx *mhttp.Context) {
 		return
 	}
 
-	pwd := utils.GeneratePwdHash(req.Password)
+	pwd := password.GeneratePwdHash(req.Password)
 
 	user := &model.User{
 		UserName: req.UserName,

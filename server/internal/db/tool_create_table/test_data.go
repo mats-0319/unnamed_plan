@@ -3,29 +3,30 @@ package main
 import (
 	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
+	"github.com/mats0319/unnamed_plan/server/internal/utils/password"
 )
 
 var defaultUsers = []*model.User{
-	newUser("mats0319", "Mario", "", true),
-	newUser("admin", "", "5SSFNNEJUENPCCKP", true),
-	newUser("user", "", "", false),
+	newUser("mats0319", "Mario", true, false, ""),
+	newUser("admin", "", true, true, "5SSFNNEJUENPCCKP"),
+	newUser("user", "", false, false, ""),
 }
 
-func newUser(userName string, nickname string, totpKey string, isAdmin bool) *model.User {
-	pwd := "123456"
-	pwd = utils.CalcSHA256(pwd)
-	pwd = utils.GeneratePwdHash(pwd)
+func newUser(userName string, nickname string, isAdmin bool, enable2FA bool, totpKey string) *model.User {
+	pwd := utils.CalcSHA256("123456")   // pwd from web
+	pwd = password.GeneratePwdHash(pwd) // pwd db
 
 	if len(nickname) < 1 {
 		nickname = userName
 	}
 
 	return &model.User{
-		UserName: userName,
-		Nickname: nickname,
-		Password: pwd,
-		TotpKey:  totpKey,
-		IsAdmin:  isAdmin,
+		UserName:  userName,
+		Nickname:  nickname,
+		Password:  pwd,
+		IsAdmin:   isAdmin,
+		Enable2FA: enable2FA,
+		TotpKey:   totpKey,
 	}
 }
 

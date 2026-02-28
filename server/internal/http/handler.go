@@ -10,7 +10,6 @@ import (
 )
 
 type Handler struct {
-	config   *config
 	handlers map[string]*HandlerItem // uri - handler func
 }
 
@@ -35,7 +34,7 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	handlerItemIns, ok := h.handlers[request.RequestURI]
 	if !ok {
-		e := ErrUnsupportedUri().WithParam("uri", request.RequestURI)
+		e := ErrUnregisteredUri().WithParam("uri", request.RequestURI)
 		mlog.Error(e.String())
 		ctx.ResData = e
 		return
@@ -50,6 +49,7 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		}
 	}
 
+	// business handler
 	handlerItemIns.Func(ctx)
 }
 
@@ -64,7 +64,7 @@ func (h *Handler) AddHandler(uri string, handlerFunc func(ctx *Context), middlew
 	}
 }
 
-func (h *Handler) supportedUri() {
+func (h *Handler) displayRegisteredUri() {
 	for k := range h.handlers {
 		mlog.Info("- Http Handler Registered: " + k)
 	}
