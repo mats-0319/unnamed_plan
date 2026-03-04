@@ -1,37 +1,14 @@
 package main
 
 import (
-	"log"
-
-	"github.com/mats0319/unnamed_plan/server/cmd/model"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	utilsdb "github.com/mats0319/unnamed_plan/server/internal/utils/init_db"
 )
 
 func main() {
-	dsn := "host=115.190.167.134 user=mario password=123456 dbname=test_cloud port=5432 sslmode=disable"
+	dbConfig := utilsdb.DefaultConfig()
+	db := utilsdb.InitDB(dbConfig)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info), // print all sql
-		//DryRun: true,                                // 获取sql，在禁止外部访问的数据库（正式库）使用
-	})
-	if err != nil {
-		log.Fatalln("open db failed, error: ", err)
-	}
-
-	// gorm新增记录，如果一组记录中的某一个已经存在，则后续记录不会处理，所以每次更新测试数据时我们会删除表并重建
-	// 删除表: 如果在dbeaver中已经打开一个表查看其数据，则重建后原本的表无法查看，重新打开即可
-	err = db.Migrator().DropTable(model.ModelList...)
-	if err != nil {
-		log.Fatalln("drop db table failed, error: ", err)
-	}
-
-	err = db.Migrator().CreateTable(model.ModelList...)
-	if err != nil {
-		log.Fatalln("create db table failed, error: ", err)
-	}
-
-	db.Create(defaultUsers)
-	db.Create(testNotes)
+	db.Create(defaultUser)
+	//db.Create(testUser)
+	//db.Create(testNote)
 }

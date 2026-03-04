@@ -12,7 +12,7 @@
 			<el-input v-model="modifyUserReq.password" show-password />
 		</el-form-item>
 
-		<el-form-item label="是否启用双重因素验证(Two-Factor Authenticate)">
+		<el-form-item label="是否启用双重因素验证">
 			<el-switch v-model="modifyUserReq.enable_2fa" />
 			&emsp;{{ modifyUserReq.enable_2fa ? "启用" : "不启用" }}
 		</el-form-item>

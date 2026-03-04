@@ -34,7 +34,7 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	handlerItemIns, ok := h.handlers[request.RequestURI]
 	if !ok {
-		e := ErrUnregisteredUri().WithParam("uri", request.RequestURI)
+		e := ErrUnknownUri().WithParam("uri", request.RequestURI)
 		mlog.Error(e.String())
 		ctx.ResData = e
 		return

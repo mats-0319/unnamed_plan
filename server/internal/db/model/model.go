@@ -1,4 +1,4 @@
-package mdb_model
+package model
 
 import (
 	"github.com/google/uuid"
@@ -26,4 +26,10 @@ func (m *Model) BeforeCreate(_ *gorm.DB) error {
 	}
 
 	return nil
+}
+
+// ModelList use for gorm tools
+var ModelList = []any{
+	&User{},
+	&Note{},
 }

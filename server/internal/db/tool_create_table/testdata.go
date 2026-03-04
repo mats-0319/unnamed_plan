@@ -1,13 +1,16 @@
 package main
 
 import (
-	"github.com/mats0319/unnamed_plan/server/cmd/model"
+	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
 	"github.com/mats0319/unnamed_plan/server/internal/utils/password"
 )
 
-var defaultUsers = []*model.User{
+var defaultUser = []*model.User{
 	newUser("mats0319", "Mario", true, false, ""),
+}
+
+var testUser = []*model.User{
 	newUser("admin", "", true, true, "5SSFNNEJUENPCCKP"),
 	newUser("user", "", false, false, ""),
 }
@@ -30,7 +33,7 @@ func newUser(userName string, nickname string, isAdmin bool, enable2FA bool, tot
 	}
 }
 
-var testNotes = []*model.Note{
+var testNote = []*model.Note{
 	model.NewNote("mats0319", "Mario", false, noteTitle_1, noteContent_1),
 	model.NewNote("mats0319", "Mario", false, noteTitle_2, noteContent_2),
 }

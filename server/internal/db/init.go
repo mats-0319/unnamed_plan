@@ -5,13 +5,10 @@ import (
 	"os"
 
 	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
-	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
-	"gorm.io/gorm/schema"
+	"github.com/mats0319/unnamed_plan/server/internal/utils/flag"
+	utilsdb "github.com/mats0319/unnamed_plan/server/internal/utils/init_db"
 )
 
 type config struct {
@@ -26,36 +23,11 @@ func Initialize() {
 		os.Exit(1)
 	}
 
-	gormConfig := &gorm.Config{
-		Logger:                 logger.Default.LogMode(logger.Silent),
-		SkipDefaultTransaction: true,
-	}
-	if utils.IsTestMode {
-		gormConfig.NamingStrategy = schema.NamingStrategy{TablePrefix: "t_"}
-	}
-
-	db, err := gorm.Open(postgres.Open(configIns.DSN), gormConfig)
-	if err != nil {
-		mlog.Error("open db failed", mlog.Field("error", err))
-		os.Exit(1)
-	}
-
-	// set conns
-	{
-		sqlDB, err := db.DB()
-		if err != nil {
-			mlog.Error("get sql db failed", mlog.Field("error", err))
-			os.Exit(1)
-		}
-
-		sqlDB.SetMaxIdleConns(configIns.MaxIdleConns)
-		sqlDB.SetMaxOpenConns(configIns.MaxOpenConns)
-	}
-
-	dal.SetDefault(db)
+	dbConfig := utilsdb.NewConfig(configIns.DSN, flag.IsTestMode, configIns.MaxIdleConns, configIns.MaxOpenConns)
+	_ = utilsdb.InitDB(dbConfig)
 
 	logStr := "> DB init."
-	if utils.IsTestMode {
+	if flag.IsTestMode {
 		logStr += " [test mode]"
 	}
 	mlog.Info(logStr)

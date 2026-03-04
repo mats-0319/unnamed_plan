@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
-	"github.com/mats0319/unnamed_plan/server/cmd/model"
+	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 	"gorm.io/gorm"

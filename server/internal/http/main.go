@@ -24,7 +24,7 @@ func StartServer(handler *Handler) {
 
 	handler.displayRegisteredUri()
 
-	addr := fmt.Sprintf("127.0.0.1:%s", configIns.Port)
+	addr := fmt.Sprintf("0.0.0.0:%s", configIns.Port)
 	mlog.Info("> Listening at: " + addr)
 
 	err = http.ListenAndServe(addr, handler)

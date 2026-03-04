@@ -8,7 +8,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/mats0319/unnamed_plan/server/cmd/model"
+	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
@@ -31,11 +31,13 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 	_user.CreatedAt = field.NewInt64(tableName, "created_at")
 	_user.UpdatedAt = field.NewInt64(tableName, "updated_at")
 	_user.DeletedAt = field.NewField(tableName, "deleted_at")
+	_user.BackupAt = field.NewInt64(tableName, "backup_at")
 	_user.UserName = field.NewString(tableName, "user_name")
 	_user.Nickname = field.NewString(tableName, "nickname")
 	_user.Password = field.NewString(tableName, "password")
-	_user.TotpKey = field.NewString(tableName, "totp_key")
 	_user.IsAdmin = field.NewBool(tableName, "is_admin")
+	_user.Enable2FA = field.NewBool(tableName, "enable2_fa")
+	_user.TotpKey = field.NewString(tableName, "totp_key")
 
 	_user.fillFieldMap()
 
@@ -50,11 +52,13 @@ type user struct {
 	CreatedAt field.Int64
 	UpdatedAt field.Int64
 	DeletedAt field.Field
+	BackupAt  field.Int64
 	UserName  field.String
 	Nickname  field.String
 	Password  field.String
-	TotpKey   field.String
 	IsAdmin   field.Bool
+	Enable2FA field.Bool
+	TotpKey   field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -75,11 +79,13 @@ func (u *user) updateTableName(table string) *user {
 	u.CreatedAt = field.NewInt64(table, "created_at")
 	u.UpdatedAt = field.NewInt64(table, "updated_at")
 	u.DeletedAt = field.NewField(table, "deleted_at")
+	u.BackupAt = field.NewInt64(table, "backup_at")
 	u.UserName = field.NewString(table, "user_name")
 	u.Nickname = field.NewString(table, "nickname")
 	u.Password = field.NewString(table, "password")
-	u.TotpKey = field.NewString(table, "totp_key")
 	u.IsAdmin = field.NewBool(table, "is_admin")
+	u.Enable2FA = field.NewBool(table, "enable2_fa")
+	u.TotpKey = field.NewString(table, "totp_key")
 
 	u.fillFieldMap()
 
@@ -104,16 +110,18 @@ func (u *user) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (u *user) fillFieldMap() {
-	u.fieldMap = make(map[string]field.Expr, 9)
+	u.fieldMap = make(map[string]field.Expr, 11)
 	u.fieldMap["id"] = u.ID
 	u.fieldMap["created_at"] = u.CreatedAt
 	u.fieldMap["updated_at"] = u.UpdatedAt
 	u.fieldMap["deleted_at"] = u.DeletedAt
+	u.fieldMap["backup_at"] = u.BackupAt
 	u.fieldMap["user_name"] = u.UserName
 	u.fieldMap["nickname"] = u.Nickname
 	u.fieldMap["password"] = u.Password
-	u.fieldMap["totp_key"] = u.TotpKey
 	u.fieldMap["is_admin"] = u.IsAdmin
+	u.fieldMap["enable2_fa"] = u.Enable2FA
+	u.fieldMap["totp_key"] = u.TotpKey
 }
 
 func (u user) clone(db *gorm.DB) user {

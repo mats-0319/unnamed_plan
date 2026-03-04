@@ -21,7 +21,7 @@ func newError(typ ErrorType, detail ...string) func() *Error {
 // 使用invalid表示结构/格式错误，使用wrong表示数据错误
 var (
 	// bad request
-	ErrUnregisteredUri = newError(ET_BadRequest, "Unregistered URI")
+	ErrUnknownUri = newError(ET_BadRequest, "Unknown URI")
 
 	// unauthorized
 	ErrInvalidAccessToken = newError(ET_Unauthorized, "Invalid Access Token")

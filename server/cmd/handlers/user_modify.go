@@ -46,11 +46,13 @@ func ModifyUser(ctx *mhttp.Context) {
 
 		operator.Password = password.GeneratePwdHash(req.Password)
 	}
-	err = isValidTotpKey(req.TotpKey)
 	if req.Enable2FA != operator.Enable2FA {
-		if req.Enable2FA && err != nil { // 想要启用2FA，但是totp key无效
-			ctx.ResData = err
-			return
+		if req.Enable2FA {
+			err = isValidTotpKey(req.TotpKey)
+			if err != nil { // 想要启用2FA，但是totp key无效
+				ctx.ResData = err
+				return
+			}
 		}
 
 		operator.Enable2FA = req.Enable2FA

@@ -3,12 +3,11 @@ package model
 import (
 	"fmt"
 
-	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 type Note struct {
-	mdb_model.Model
+	Model
 	NoteID      string `gorm:"unique;not null"` // 使用其他字段计算获得，可用于保证新增接口幂等性
 	Writer      string `gorm:"not null"`        // user name
 	WriterName  string `gorm:"not null"`        // user nickname(at that time)
