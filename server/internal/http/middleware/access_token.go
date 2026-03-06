@@ -46,7 +46,7 @@ func VerifyAccessToken(ctx *mhttp.Context) *Error {
 
 	hash := genTokenHash(tokenSplit[0])
 	if hash != tokenSplit[1] {
-		e := ErrTokenTamperedWith().WithParam("token", ctx.AccessToken)
+		e := ErrWrongToken().WithParam("token", ctx.AccessToken)
 		mlog.Error(e.String())
 		return e
 	}

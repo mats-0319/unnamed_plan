@@ -27,7 +27,13 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		return // res body is empty
 	}
 
-	mlog.Info(fmt.Sprintf("| %s | %s |", request.URL.String(), time.Now().String()))
+	mlog.Info(fmt.Sprintf("> Receive Request: %s .", request.URL.String()))
+	startTime := time.Now().UnixMilli()
+	defer func() {
+		endTime := time.Now().UnixMilli()
+		handleTime := endTime - startTime
+		mlog.Info(fmt.Sprintf("> Process Request: %s , in %d ms", request.URL.String(), handleTime))
+	}()
 
 	ctx := NewContext(writer, request)
 	defer ctx.response()

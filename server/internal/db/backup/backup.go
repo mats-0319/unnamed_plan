@@ -25,9 +25,9 @@ func Backup[T any](t doBackupRecover[T]) error {
 		return err
 	}
 
-	for _, item := range dbData {
+	for _, record := range dbData {
 		// gen file path
-		index := uuidToIndex(t.ID(item), 16)
+		index := uuidToIndex(t.ID(record), 16) // hard code: max 16 files for each table
 		filePath := fmt.Sprintf("%s%d.json", dir, index)
 
 		// read data from file
@@ -42,19 +42,19 @@ func Backup[T any](t doBackupRecover[T]) error {
 		}
 
 		// set 'backupAt', update file data
-		t.Update(item)
+		t.Update(record)
 
 		isExist := false
 		for i := range fileData {
-			if t.ID(fileData[i]) == t.ID(item) {
-				fileData[i] = item
+			if t.ID(fileData[i]) == t.ID(record) {
+				fileData[i] = record
 				isExist = true
 				break
 			}
 		}
 
-		if !isExist {
-			fileData = append(fileData, item)
+		if !isExist { // 如果是新的待备份数据
+			fileData = append(fileData, record)
 		}
 
 		// write file, update db record
@@ -70,7 +70,8 @@ func Backup[T any](t doBackupRecover[T]) error {
 			return err
 		}
 
-		err = dal.DB().Model(t.Model()).Where("id = ?", t.ID(item)).Save(item).Error
+		// think: if necessary get 'id' from method? (like: where(sprintf("%s = ?", t.idName()), t.id(record)) )
+		err = dal.DB().Model(t.Model()).Where("id = ?", t.ID(record)).Save(record).Error
 		if err != nil {
 			mlog.Error("update db data failed", mlog.Field("error", err))
 			return err

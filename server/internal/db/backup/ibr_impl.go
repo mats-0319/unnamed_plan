@@ -12,6 +12,8 @@ type UserBR struct {
 
 var _ IBackupRecover = (*UserBR)(nil)
 
+//var _ doBackupRecover[*model.User] = (*UserBR)(nil)
+
 func (i *UserBR) Backup() error {
 	return Backup[*model.User](i) // 这里会隐式验证类型是否实现了`doBackupRecover`接口，不需要显式验证
 }
@@ -52,6 +54,8 @@ type NoteBR struct {
 }
 
 var _ IBackupRecover = (*NoteBR)(nil)
+
+//var _ doBackupRecover[*model.Note] = (*NoteBR)(nil)
 
 func (i *NoteBR) Backup() error {
 	return Backup[*model.Note](i)

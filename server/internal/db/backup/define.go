@@ -10,15 +10,15 @@ type IBackupRecover interface {
 }
 
 type BRManager struct {
-	list []IBackupRecover
+	List []IBackupRecover
 }
 
 func NewBRManager(v ...IBackupRecover) *BRManager {
-	return &BRManager{list: v}
+	return &BRManager{List: v}
 }
 
 func (m *BRManager) Backup() error {
-	for _, v := range m.list {
+	for _, v := range m.List {
 		err := v.Backup()
 		if err != nil {
 			return err
@@ -29,7 +29,7 @@ func (m *BRManager) Backup() error {
 }
 
 func (m *BRManager) Recover() error {
-	for _, v := range m.list {
+	for _, v := range m.List {
 		err := v.Recover()
 		if err != nil {
 			return err
@@ -39,6 +39,7 @@ func (m *BRManager) Recover() error {
 	return nil
 }
 
+// 我们提供的备份/恢复方法基于该接口类型的变量，反过来说，如果你实现了该接口，就可以使用我们提供的备份/恢复方法
 type doBackupRecover[T any] interface {
 	Model() T          // *model.User{}
 	EmptySlice() []T   // []*model.User{}

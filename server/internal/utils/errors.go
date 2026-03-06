@@ -25,7 +25,7 @@ var (
 
 	// unauthorized
 	ErrInvalidAccessToken = newError(ET_Unauthorized, "Invalid Access Token")
-	ErrTokenTamperedWith  = newError(ET_Unauthorized, "Access Token has been Tampered With") // hash unmatch
+	ErrWrongToken         = newError(ET_Unauthorized, "Wrong Access Token")
 	ErrTokenExpired       = newError(ET_Unauthorized, "Access Token Expired")
 
 	// server internal error

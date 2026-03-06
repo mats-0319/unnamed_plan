@@ -7,7 +7,7 @@ import (
 )
 
 func TestAccessToken(t *testing.T) {
-	token := GenAccessToken(1001)
+	token := GenAccessToken("user name 1")
 	t.Log("> Token: ", token)
 
 	ctx := &mhttp.Context{AccessToken: token}
@@ -16,5 +16,5 @@ func TestAccessToken(t *testing.T) {
 		t.Error(err.String())
 	}
 
-	t.Logf("> Verified, user id: %d", ctx.UserName)
+	t.Logf("> Verified, user id: %s", ctx.UserName)
 }
