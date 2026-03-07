@@ -24,18 +24,17 @@ func main() {
 	defer mlog.Close()
 	mdb.Initialize()
 
+	ctx, cancel := context.WithCancel(context.Background())
 	brm := backup.NewBRManager(&backup.UserBR{}, &backup.NoteBR{})
 
-	wg := &sync.WaitGroup{}
-	wg.Add(2)
+	var wg sync.WaitGroup
 
-	ctx, cancel := context.WithCancel(context.Background())
-	go autoBackup(ctx, wg, brm)
-	go waitSignal(ctx, wg, brm) // wait SIGUSR1 / SIGUSR2
+	wg.Go(func() { autoBackup(ctx, brm) })
+	wg.Go(func() { waitSignal(ctx, brm) }) // wait SIGUSR1 / SIGUSR2
 
 	mhttp.StartServer(newHandler()) // blocked
-
 	cancel()
+
 	wg.Wait()
 }
 
@@ -59,11 +58,10 @@ func newHandler() *mhttp.Handler {
 	return h
 }
 
-func autoBackup(ctx context.Context, wg *sync.WaitGroup, brm *backup.BRManager) {
+func autoBackup(ctx context.Context, brm *backup.BRManager) {
 	time.Sleep(500 * time.Millisecond)
 
 	mlog.Info("> Goroutine: Auto Backup Start.")
-	defer wg.Done()
 
 	for {
 		// timestamp, unit: second
@@ -87,11 +85,10 @@ func autoBackup(ctx context.Context, wg *sync.WaitGroup, brm *backup.BRManager) 
 	}
 }
 
-func waitSignal(ctx context.Context, wg *sync.WaitGroup, brm *backup.BRManager) {
+func waitSignal(ctx context.Context, brm *backup.BRManager) {
 	time.Sleep(500 * time.Millisecond)
 
 	mlog.Info("> Goroutine: Wait Signal Start.")
-	defer wg.Done()
 
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGUSR1, syscall.SIGUSR2)
