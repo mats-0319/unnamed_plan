@@ -37,6 +37,7 @@ mkdir -p "./build/server/"
   build_server "cmd"
 
   cp "./scripts/restart_server.sh" "./build/restart_server.sh"
+  cp "./scripts/command.md" "./build/command.md"
 
 # build ui
 

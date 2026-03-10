@@ -21,7 +21,7 @@ hash算法：将id每一个byte解析成uint8并相加，得到的结果对16取
 
 ### 备份
 
-`pgrep unnamed_plan_server -f | kill -10`: 向程序发送自定义命令1：备份（`kill -12`是自定义命令2：恢复）
+`pkill unnamed_plan_server -f -10`: 向程序发送自定义命令1：备份（`kill -12`是自定义命令2：恢复）
 
 设置定时任务，每天0点开始备份数据：
 
