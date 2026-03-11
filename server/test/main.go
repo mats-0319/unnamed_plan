@@ -20,7 +20,7 @@ func main() {
 	testApi("Modify Note", api.ModifyNote)
 	testApi("Delete Note", api.DeleteNote)
 
-	dropTable()
+	//dropTable() // do not del testdata during dev
 
 	log.Println("> All Test Passed! ^_^")
 }

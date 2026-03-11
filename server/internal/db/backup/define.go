@@ -41,12 +41,13 @@ func (m *BRManager) Recover() error {
 
 // 我们提供的备份/恢复方法基于该接口类型的变量，反过来说，如果你实现了该接口，就可以使用我们提供的备份/恢复方法
 type doBackupRecover[T any] interface {
-	Model() T          // *model.User{}
-	EmptySlice() []T   // []*model.User{}
-	ID(T) uuid.UUID    //
-	Update(T)          // update T.backupAt
-	Condition() string // "backup_at < updated_at"
-	Dir() string       // "user/"
+	Model() T              // *model.User{}
+	EmptySlice() []T       // []*model.User{}
+	ID(T) uuid.UUID        //
+	Update(T, int64)       // 备份时使用，维护 T.backupAt
+	ColumnNames() []string // 恢复时使用，禁用updateAt字段的自动更新
+	Condition() string     // 备份条件 "backup_at < updated_at"
+	Dir() string           // "user/"
 
 	//DoSomeChangeForTest(T) // 测试用，为了能看出来数据库记录是预设的还是恢复的
 }

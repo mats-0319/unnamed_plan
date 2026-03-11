@@ -9,6 +9,7 @@ import (
 
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
+	"gorm.io/gorm/clause"
 )
 
 func Recover[T any](t doBackupRecover[T]) error {
@@ -65,7 +66,10 @@ func recoverFile[T any](path string, t doBackupRecover[T]) error {
 	//	}
 	//}
 
-	err = dal.DB().Model(t.Model()).Save(fileData).Error
+	err = dal.DB().Model(t.Model()).Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "id"}},
+		DoUpdates: clause.AssignmentColumns(t.ColumnNames()),
+	}).Create(fileData).Error
 	if err != nil {
 		mlog.Error("save file failed", mlog.Field("error", err))
 		return err
