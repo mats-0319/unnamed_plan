@@ -37,8 +37,7 @@ func getDBConfig() (*config, error) {
 	bytes := mconfig.GetConfigItem(utils.ConfigID_DB)
 
 	conf := &config{}
-	err := json.Unmarshal(bytes, conf)
-	if err != nil {
+	if err := json.Unmarshal(bytes, conf); err != nil {
 		mlog.Error("deserialize db config failed", mlog.Field("error", err))
 		return nil, err
 	}

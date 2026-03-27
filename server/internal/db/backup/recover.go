@@ -36,8 +36,7 @@ func Recover[T any](t doBackupRecover[T]) error {
 			continue // ignore not go files
 		}
 
-		err = recoverFile(dir+fileInfo.Name(), t)
-		if err != nil {
+		if err := recoverFile(dir+fileInfo.Name(), t); err != nil {
 			return err
 		}
 	}
@@ -53,8 +52,7 @@ func recoverFile[T any](path string, t doBackupRecover[T]) error {
 	}
 
 	fileData := t.EmptySlice()
-	err = json.Unmarshal(fileBytes, &fileData)
-	if err != nil {
+	if err := json.Unmarshal(fileBytes, &fileData); err != nil {
 		mlog.Error("unmarshal file failed", mlog.Field("error", err))
 		return err
 	}
@@ -66,11 +64,12 @@ func recoverFile[T any](path string, t doBackupRecover[T]) error {
 	//	}
 	//}
 
-	err = dal.DB().Model(t.Model()).Clauses(clause.OnConflict{
+	clauseSkipAutoTime := clause.OnConflict{
 		Columns:   []clause.Column{{Name: "id"}},
-		DoUpdates: clause.AssignmentColumns(t.ColumnNames()),
-	}).Create(fileData).Error
-	if err != nil {
+		DoUpdates: clause.AssignmentColumns(t.ColumnNames()), // all fields
+	}
+
+	if err := dal.DB().Model(t.Model()).Clauses(clauseSkipAutoTime).Create(fileData).Error; err != nil {
 		mlog.Error("save file failed", mlog.Field("error", err))
 		return err
 	}

@@ -16,7 +16,7 @@ const routes: Array<RouteRecordRaw> = [
 		path: "/personal-center",
 		name: "personalCenter",
 		meta: { requireLogin: true },
-		component: () => import("@/views/personal_center/left.vue"),
+		component: () => import("@/views/personal_center/frame.vue"),
 		children: [
 			{
 				path: "",
@@ -37,6 +37,23 @@ const routes: Array<RouteRecordRaw> = [
 				path: "note",
 				name: "pNote",
 				component: () => import("@/views/personal_center/my_note.vue")
+			}
+		]
+	},
+	{
+		path: "/game",
+		name: "game",
+		component: () => import("@/views/game/frame.vue"),
+		children: [
+			{
+				path: "",
+				name: "gDefault",
+				component: () => import("@/views/game/default.vue")
+			},
+			{
+				path: "flip",
+				name: "gFlip",
+				component: () => import("@/views/game/flip.vue")
 			}
 		]
 	},

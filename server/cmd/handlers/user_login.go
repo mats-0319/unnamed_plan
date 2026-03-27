@@ -24,33 +24,29 @@ func Login(ctx *mhttp.Context) {
 		return
 	}
 
-	user, err := dal.GetUser(req.UserName)
-	if err != nil {
-		ctx.ResData = err
+	user, e := dal.GetUser(req.UserName)
+	if e != nil {
+		ctx.ResData = e
 		return
 	}
 
-	err = password.VerifyPassword(req.Password, user.Password)
-	if err != nil {
-		ctx.ResData = err
+	if e := password.VerifyPassword(req.Password, user.Password); e != nil {
+		ctx.ResData = e
 		return
 	}
 
 	if user.Enable2FA {
-		err = verifyTotpCode(req.TotpCode, user.TotpKey)
-		if err != nil {
-			ctx.ResData = err
+		if e := verifyTotpCode(req.TotpCode, user.TotpKey); e != nil {
+			ctx.ResData = e
 			return
 		}
 	}
 
-	err = dal.UpdateUser(user) // modify user.UpdateAt
-	if err != nil {
-		ctx.ResData = err
+	if e := dal.UpdateUser(user); e != nil { // modify user.UpdatedAt
+		ctx.ResData = e
 		return
 	}
 
-	// token
 	ctx.Writer.Header().Set(utils.HttpHeader_AccessToken, middleware.GenAccessToken(user.UserName))
 
 	ctx.ResData = &api.LoginRes{
@@ -61,7 +57,7 @@ func Login(ctx *mhttp.Context) {
 	}
 }
 
-// verifyTotpCode totpKey is base32 encoded
+// verifyTotpCode totpKey should be base32 encoded
 func verifyTotpCode(code string, totpKey string) *utils.Error {
 	if len(code) != 6 {
 		e := utils.ErrInvalidTotpCode().WithParam("code", code)

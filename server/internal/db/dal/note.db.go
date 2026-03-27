@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
 	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
@@ -28,8 +27,7 @@ func GetNote(noteID string) (*model.Note, *Error) {
 }
 
 func CreateNote(note *model.Note) *Error {
-	err := Note.WithContext(context.TODO()).Create(note)
-	if err != nil {
+	if err := Note.WithContext(context.TODO()).Create(note); err != nil {
 		var e *Error
 		if strings.Contains(err.Error(), "violates unique constraint") {
 			e = ErrNoteExist().WithCause(err)
@@ -45,8 +43,7 @@ func CreateNote(note *model.Note) *Error {
 }
 
 func UpdateNote(note *model.Note) *Error {
-	err := Note.WithContext(context.TODO()).Where(Note.ID.Eq(note.ID)).Save(note)
-	if err != nil {
+	if err := Note.WithContext(context.TODO()).Where(Note.ID.Eq(note.ID)).Save(note); err != nil {
 		e := ErrDBError().WithCause(err)
 		mlog.Error(e.String())
 		return e
@@ -66,7 +63,7 @@ func DeleteNote(noteID string) *Error {
 	return nil
 }
 
-func ListNote(page api.Pagination, writer string) (int64, []*model.Note, *Error) {
+func ListNote(pageSize int, pageNum int, writer string) (int64, []*model.Note, *Error) {
 	sql := Note.WithContext(context.TODO())
 	if len(writer) > 0 {
 		sql = sql.Where(Note.Writer.Eq(writer))
@@ -79,7 +76,7 @@ func ListNote(page api.Pagination, writer string) (int64, []*model.Note, *Error)
 		return 0, nil, e
 	}
 
-	notes, err := sql.Order(Note.UpdatedAt.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
+	notes, err := sql.Order(Note.UpdatedAt.Desc()).Limit(pageSize).Offset((pageNum - 1) * pageSize).Find()
 	if err != nil {
 		e := ErrDBError().WithCause(err)
 		mlog.Error(e.String())

@@ -1,13 +1,9 @@
 <template>
-	<div class="personal-center-default center-hv">&lceil;&nbsp;个人中心&nbsp;&rfloor;</div>
+	<default_subpage>个人中心</default_subpage>
 </template>
 
-<script lang="ts" setup></script>
+<script setup lang="ts">
+import Default_subpage from "@/components/default_subpage.vue"
+</script>
 
-<style lang="less" scoped>
-.personal-center-default {
-	height: 100%;
-	font-size: 4rem;
-	font-style: italic;
-}
-</style>
+<style lang="less" scoped></style>

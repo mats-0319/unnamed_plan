@@ -1,12 +1,12 @@
 // Generate File, Should Not Edit.
 // Author : mario. github.com/mats0319
 // Code   : github.com/mats0319/study/go/gocts
-// Version: gocts v0.2.3
+// Version: gocts v0.2.4
 
 import { axiosWrapper } from "./config"
 import { AxiosResponse } from "axios"
-import { Pagination } from "./common.go"
 import { RegisterRes, RegisterReq, LoginRes, LoginReq, ListUserRes, ListUserReq, ModifyUserRes, ModifyUserReq } from "./user.go"
+import { Pagination } from "./common.go"
 
 class UserAxios {
     public register(user_name: string, password: string): Promise<AxiosResponse<RegisterRes>> {

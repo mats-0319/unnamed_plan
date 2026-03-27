@@ -8,13 +8,8 @@ import (
 )
 
 // HmacSHA256 calc hmac-sha256('key', 'content'), return hex(hash)
-func HmacSHA256[T string | []byte](content string, key ...T) string {
-	var k []byte
-	if len(key) > 0 {
-		k = []byte(key[0])
-	}
-
-	hasher := hmac.New(sha256.New, k) // k default nil is ok
+func HmacSHA256[T string | []byte](content string, key T) string {
+	hasher := hmac.New(sha256.New, []byte(key)) // k default nil is ok
 	hasher.Write([]byte(content))
 	bytes := hasher.Sum(nil)
 

@@ -32,4 +32,5 @@ func (m *Model) BeforeCreate(_ *gorm.DB) error {
 var ModelList = []any{
 	&User{},
 	&Note{},
+	&FlipGameScore{},
 }

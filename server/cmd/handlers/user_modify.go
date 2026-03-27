@@ -17,9 +17,9 @@ func ModifyUser(ctx *mhttp.Context) {
 		return
 	}
 
-	operator, err := dal.GetUser(ctx.UserName)
-	if err != nil {
-		ctx.ResData = err
+	operator, e := dal.GetUser(ctx.UserName)
+	if e != nil {
+		ctx.ResData = e
 		return
 	}
 
@@ -36,8 +36,7 @@ func ModifyUser(ctx *mhttp.Context) {
 		operator.Nickname = req.Nickname
 	}
 	if len(req.Password) > 0 {
-		err = password.VerifyPassword(req.Password, operator.Password) // in modify, same pwd is invalid
-		if err == nil {
+		if e := password.VerifyPassword(req.Password, operator.Password); e == nil { // in modify, same pwd is wrong
 			e := utils.ErrSamePwd()
 			ctx.ResData = e
 			mlog.Error(e.String())
@@ -48,9 +47,8 @@ func ModifyUser(ctx *mhttp.Context) {
 	}
 	if req.Enable2FA != operator.Enable2FA {
 		if req.Enable2FA {
-			err = isValidTotpKey(req.TotpKey)
-			if err != nil { // 想要启用2FA，但是totp key无效
-				ctx.ResData = err
+			if e := isValidTotpKey(req.TotpKey); e != nil { // 想要启用2FA，但是totp key无效
+				ctx.ResData = e
 				return
 			}
 		}
@@ -58,18 +56,16 @@ func ModifyUser(ctx *mhttp.Context) {
 		operator.Enable2FA = req.Enable2FA
 	}
 	if modifyTotpKeyFlag {
-		err = isValidTotpKey(req.TotpKey)
-		if err != nil {
-			ctx.ResData = err
+		if e := isValidTotpKey(req.TotpKey); e != nil {
+			ctx.ResData = e
 			return
 		}
 
 		operator.TotpKey = req.TotpKey
 	}
 
-	err = dal.UpdateUser(operator)
-	if err != nil {
-		ctx.ResData = err
+	if e := dal.UpdateUser(operator); e != nil {
+		ctx.ResData = e
 		return
 	}
 

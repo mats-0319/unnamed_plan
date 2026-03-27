@@ -13,12 +13,12 @@ export let useNoteStore = defineStore("note", () => {
 	}
 
 	function list(
+		onlyOperator: boolean,
 		pageSize: number,
 		pageNum: number,
-		userName: string,
 		cb: (amount: number, notes: Array<Note>) => void
 	): void {
-		noteAxios.listNote({ size: pageSize, num: pageNum }, userName).then(({ data }: { data: ListNoteRes }) => {
+		noteAxios.listNote(onlyOperator, { size: pageSize, num: pageNum }).then(({ data }: { data: ListNoteRes }) => {
 			cb(data.amount, data.notes)
 
 			log.success("list note")

@@ -5,6 +5,8 @@
 一个web项目，用来学习web开发和部署，项目会部署到公网，如果[公网地址](https://115.190.167.134)
 不可用，多半是我买的云服务器到期了 ^_^ （2026.9.25）
 
+小游戏需要加载5k资源，预期耗时40秒，这就是2026年29块钱一年的服务器 (・へ・)
+
 ## 使用
 
 如果你想在本地运行该项目，需要以下环境：（版本号为经过测试的推荐版本）
@@ -19,7 +21,7 @@
 
 ## 设计图
 
-> 感谢：[绘图工具](https://excalidraw.com)，[压缩工具](https://tinypng.com)
+> 感谢：[绘图工具](https://excalidraw.com)
 
 todo
 
@@ -31,9 +33,11 @@ todo
 - doc：文档
     - deploy：部署文档，介绍把程序发布到公网的主要步骤（含nginx反向代理配置）
     - design/dev：设计，记录一些系统模块的设计思路与要点
+- game：小游戏，使用ebiten引擎
 - scripts：脚本
-    - build.sh：在本地使用，生成可以部署到云服务器的内容（包括几个服务端程序及启动脚本、web页面）
-    - restart_server.sh：在云服务器使用，启动所有服务端程序
+    - build.sh：在本地使用，生成可以部署到云服务器的内容（包括服务端程序、UI和其他资源）
+    - restart_server.sh：在云服务器使用，（重新）启动所有服务端程序
+    - update_game.sh：重新编译小游戏并将`.wasm/.html/wasm_exec.js`文件移动到指定位置
 - server：服务端代码
     - .run：一些执行配置，例如服务端、服务端测试模式、建表工具、集成测试等
     - cmd：服务端程序启动入口，一些非通用的服务端代码也放在这里了
@@ -50,6 +54,7 @@ todo
     - DAO: Data Access Object，数据访问对象，将数据库操作包装在一起，与业务代码分离。
       主要应用场景有：需要接多个数据库（pg、mysql、sqlite）、数据操作复杂（例如复杂查询，sql写出来上KB的）
 - gocts：自研工具，可以根据go定义的接口结构，生成对应的ts结构（class）和axios client代码。
+- ebiten：go语言2d游戏引擎
 
 - vue3 (html+ts+less)
 - node 24 (corepack-pnpm)

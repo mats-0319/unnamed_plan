@@ -37,6 +37,7 @@ var (
 	ErrJsonMarshal   = newError(ET_ParamsError, "Json Marshal Failed")
 	ErrJsonUnmarshal = newError(ET_ParamsError, "Json Unmarshal Failed")
 	ErrHexDecode     = newError(ET_ParamsError, "Hex Decode Failed")
+	ErrInvalidPage   = newError(ET_ParamsError, "Invalid Pagination")
 
 	// business-user
 	ErrNeedAdmin       = newError(ET_OperatorError, "Need Admin")
@@ -51,6 +52,9 @@ var (
 
 	// business-note
 	ErrNeedOwner = newError(ET_OperatorError, "Not Owner of Data")
+
+	// business-game score
+	ErrInvalidGameName = newError(ET_ParamsError, "Invalid Game Name")
 
 	// db
 	ErrUserExist    = newError(ET_ParamsError, "User Already Exist")

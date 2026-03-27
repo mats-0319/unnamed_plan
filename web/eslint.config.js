@@ -5,7 +5,7 @@ import vueParser from "vue-eslint-parser"
 import tsParser from "@typescript-eslint/parser"
 
 export default defineConfig([
-	globalIgnores(["node_modules/", "dist/"]),
+	globalIgnores(["node_modules/", "dist/", "public/"]),
 	vueTs(),
 	vuePrettier,
 	{

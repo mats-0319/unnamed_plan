@@ -22,3 +22,10 @@ export function displayTimestamp(timestamp: number): string {
 
 	return new Date(timestamp).toLocaleString()
 }
+
+export function randomVisitorName(): string {
+	const array = new Uint32Array(1)
+	crypto.getRandomValues(array)
+
+	return "游客" + array[0].toString().padStart(10, "0").slice(0, 10)
+}

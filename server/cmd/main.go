@@ -25,7 +25,7 @@ func main() {
 	mdb.Initialize()
 
 	ctx, cancel := context.WithCancel(context.Background())
-	brm := backup.NewBRManager(&backup.UserBR{}, &backup.NoteBR{})
+	brm := backup.NewBRManager(&backup.UserBR{}, &backup.NoteBR{}, &backup.FlipGameScore{})
 
 	var wg sync.WaitGroup
 
@@ -51,9 +51,13 @@ func newHandler() *mhttp.Handler {
 
 	// note
 	h.AddHandler(uriPrefix+api.URI_CreateNote, handlers.CreateNote, middleware.VerifyAccessToken)
-	h.AddHandler(uriPrefix+api.URI_ListNote, handlers.ListNote)
+	h.AddHandler(uriPrefix+api.URI_ListNote, handlers.ListNote, middleware.OptionalVerifyAccessToken)
 	h.AddHandler(uriPrefix+api.URI_ModifyNote, handlers.ModifyNote, middleware.VerifyAccessToken)
 	h.AddHandler(uriPrefix+api.URI_DeleteNote, handlers.DeleteNote, middleware.VerifyAccessToken)
+
+	// game score
+	h.AddHandler(uriPrefix+api.URI_ListGameScore, handlers.ListGameScore)
+	h.AddHandler(uriPrefix+api.URI_UploadGameScore, handlers.UploadGameScore, middleware.OptionalVerifyAccessToken)
 
 	return h
 }
@@ -66,7 +70,7 @@ func autoBackup(ctx context.Context, brm *backup.BRManager) {
 	for {
 		// timestamp, unit: second
 		now := time.Now().Unix()
-		tomorrowZero := (now/86400 + 1) * 86400 // 0时区，次日0点
+		tomorrowZero := (now/86400 + 1) * 86400 // 0时区，次日0点，即北京时间每天早上8点
 		remain := tomorrowZero - now
 
 		select {
@@ -75,8 +79,8 @@ func autoBackup(ctx context.Context, brm *backup.BRManager) {
 			return
 		case <-time.After(time.Duration(remain) * time.Second):
 			mlog.Info("> Auto Backup Start ...")
-			err := brm.Backup()
-			if err != nil {
+
+			if err := brm.Backup(); err != nil {
 				mlog.Error("auto backup failed", mlog.Field("error", err))
 			} else {
 				mlog.Info("> Auto Backup Done.")
@@ -103,15 +107,13 @@ func waitSignal(ctx context.Context, brm *backup.BRManager) {
 
 			switch sig {
 			case syscall.SIGUSR1:
-				err := brm.Backup()
-				if err != nil {
+				if err := brm.Backup(); err != nil {
 					mlog.Error("backup failed", mlog.Field("error", err))
 				} else {
 					mlog.Info("> Backup Done.")
 				}
 			case syscall.SIGUSR2:
-				err := brm.Recover()
-				if err != nil {
+				if err := brm.Recover(); err != nil {
 					mlog.Error("recover failed", mlog.Field("error", err))
 				} else {
 					mlog.Info("> Recover Done.")

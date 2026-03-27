@@ -32,9 +32,8 @@ func httpInvoke(uri string, payload string) *mhttp.Response {
 		log.Fatal(err)
 	}
 
-	r := &mhttp.Response{} // 因为会设计失败的用例，所以不判断r.isSuccess
-	err = json.Unmarshal(bodyBytes, r)
-	if err != nil {
+	r := &mhttp.Response{}
+	if err := json.Unmarshal(bodyBytes, r); err != nil {
 		log.Fatal(err)
 	}
 	if r.IsSuccess {
@@ -52,8 +51,7 @@ func httpInvoke(uri string, payload string) *mhttp.Response {
 const unknownError = "unknown error"
 
 func testCase(name string, f func() string) {
-	errStr := f()
-	if len(errStr) < 1 {
+	if errStr := f(); len(errStr) < 1 {
 		log.Printf("- case: %s. Test Passed.\n", name)
 	} else {
 		log.Printf("- case: %s. Test Failed. error: %s\n", name, errStr)

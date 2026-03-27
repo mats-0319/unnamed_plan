@@ -16,39 +16,44 @@ import (
 )
 
 var (
-	Q    = new(Query)
-	Note *note
-	User *user
+	Q             = new(Query)
+	FlipGameScore *flipGameScore
+	Note          *note
+	User          *user
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
+	FlipGameScore = &Q.FlipGameScore
 	Note = &Q.Note
 	User = &Q.User
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db:   db,
-		Note: newNote(db, opts...),
-		User: newUser(db, opts...),
+		db:            db,
+		FlipGameScore: newFlipGameScore(db, opts...),
+		Note:          newNote(db, opts...),
+		User:          newUser(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	Note note
-	User user
+	FlipGameScore flipGameScore
+	Note          note
+	User          user
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db:   db,
-		Note: q.Note.clone(db),
-		User: q.User.clone(db),
+		db:            db,
+		FlipGameScore: q.FlipGameScore.clone(db),
+		Note:          q.Note.clone(db),
+		User:          q.User.clone(db),
 	}
 }
 
@@ -62,21 +67,24 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db:   db,
-		Note: q.Note.replaceDB(db),
-		User: q.User.replaceDB(db),
+		db:            db,
+		FlipGameScore: q.FlipGameScore.replaceDB(db),
+		Note:          q.Note.replaceDB(db),
+		User:          q.User.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
-	Note INoteDo
-	User IUserDo
+	FlipGameScore IFlipGameScoreDo
+	Note          INoteDo
+	User          IUserDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		Note: q.Note.WithContext(ctx),
-		User: q.User.WithContext(ctx),
+		FlipGameScore: q.FlipGameScore.WithContext(ctx),
+		Note:          q.Note.WithContext(ctx),
+		User:          q.User.WithContext(ctx),
 	}
 }
 

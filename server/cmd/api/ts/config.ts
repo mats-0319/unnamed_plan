@@ -1,7 +1,7 @@
 // Generate File, Should Not Edit.
 // Author : mario. github.com/mats0319
 // Code   : github.com/mats0319/study/go/gocts
-// Version: gocts v0.2.3
+// Version: gocts v0.2.4
 
 import axios, { AxiosInstance } from "axios";
 

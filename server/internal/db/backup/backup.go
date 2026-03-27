@@ -13,19 +13,16 @@ import (
 
 func Backup[T any](t doBackupRecover[T]) error {
 	dir := "./backup/" + t.Dir()
-	err := emptyDir(dir)
-	if err != nil {
+	if err := emptyDir(dir); err != nil {
 		mlog.Error("mkdir failed", mlog.Field("error", err))
 		return err
 	}
 
 	var count int64
-	err = dal.DB().Unscoped().Model(t.Model()).Where(t.Condition()).Count(&count).Error
-	if err != nil {
+	if err := dal.DB().Unscoped().Model(t.Model()).Where(t.Condition()).Count(&count).Error; err != nil {
 		mlog.Error("db count failed", mlog.Field("error", err))
 		return err
 	}
-
 	if count < 1 { // no data need backup
 		return nil
 	}
@@ -34,8 +31,7 @@ func Backup[T any](t doBackupRecover[T]) error {
 	pageSize := 100
 	timestamp := time.Now().UnixMilli()
 	for range int(count)/pageSize + 1 {
-		err = doBackup(t, dir, pageSize, timestamp)
-		if err != nil {
+		if err := doBackup(t, dir, pageSize, timestamp); err != nil {
 			return err
 		}
 	}
@@ -45,8 +41,7 @@ func Backup[T any](t doBackupRecover[T]) error {
 
 func doBackup[T any](t doBackupRecover[T], dir string, pageSize int, timestamp int64) error {
 	dbData := t.EmptySlice()
-	err := dal.DB().Unscoped().Model(t.Model()).Where(t.Condition()).Limit(pageSize).Find(&dbData).Error
-	if err != nil {
+	if err := dal.DB().Unscoped().Model(t.Model()).Where(t.Condition()).Limit(pageSize).Find(&dbData).Error; err != nil {
 		mlog.Error("get data need to backup failed", mlog.Field("error", err))
 		return err
 	}
@@ -90,14 +85,12 @@ func doBackup[T any](t doBackupRecover[T], dir string, pageSize int, timestamp i
 			return err
 		}
 
-		err = os.WriteFile(filePath, fileBytes, 0644)
-		if err != nil {
+		if err := os.WriteFile(filePath, fileBytes, 0644); err != nil {
 			mlog.Error("write file failed", mlog.Field("error", err))
 			return err
 		}
 
-		err = dal.DB().Unscoped().Model(record).UpdateColumns(record).Error
-		if err != nil {
+		if err := dal.DB().Unscoped().Model(record).UpdateColumns(record).Error; err != nil {
 			mlog.Error("update db data failed", mlog.Field("error", err))
 			return err
 		}
@@ -116,8 +109,7 @@ func uuidToIndex(id uuid.UUID, max int) int {
 }
 
 func emptyDir(path string) error {
-	err := os.MkdirAll(path, 0777)
-	if err != nil {
+	if err := os.MkdirAll(path, 0777); err != nil {
 		mlog.Error("mkdir failed", mlog.Field("error", err))
 		return err
 	}

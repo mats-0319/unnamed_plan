@@ -14,9 +14,9 @@ func DeleteNote(ctx *mhttp.Context) {
 		return
 	}
 
-	note, err := dal.GetNote(req.NoteID)
-	if err != nil {
-		ctx.ResData = err
+	note, e := dal.GetNote(req.NoteID)
+	if e != nil {
+		ctx.ResData = e
 		return
 	}
 
@@ -27,9 +27,8 @@ func DeleteNote(ctx *mhttp.Context) {
 		return
 	}
 
-	err = dal.DeleteNote(req.NoteID)
-	if err != nil {
-		ctx.ResData = err
+	if e := dal.DeleteNote(req.NoteID); e != nil {
+		ctx.ResData = e
 		return
 	}
 

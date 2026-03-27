@@ -10,6 +10,17 @@ var defaultUser = []*model.User{
 	newUser("mats0319", "Mario", true, false, ""),
 }
 
+var testFlipGameScore = []*model.FlipGameScore{
+	{
+		GameScore: model.GameScore{
+			Score:      10000,
+			Result:     "test result",
+			Player:     "",
+			PlayerName: "visitor 001",
+		},
+	},
+}
+
 var testUser = []*model.User{
 	newUser("admin", "", true, true, "5SSFNNEJUENPCCKP"),
 	newUser("user", "", false, false, ""),

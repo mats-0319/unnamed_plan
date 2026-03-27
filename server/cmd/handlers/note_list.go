@@ -5,6 +5,7 @@ import (
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 func ListNote(ctx *mhttp.Context) {
@@ -13,9 +14,18 @@ func ListNote(ctx *mhttp.Context) {
 		return
 	}
 
-	count, notes, err := dal.ListNote(req.Page, req.UserName)
-	if err != nil {
-		ctx.ResData = err
+	var (
+		count int64
+		notes = make([]*model.Note, 0)
+		e     *utils.Error
+	)
+	if req.OnlyOperator && len(ctx.UserName) > 0 {
+		count, notes, e = dal.ListNote(req.Page.Size, req.Page.Num, ctx.UserName)
+	} else {
+		count, notes, e = dal.ListNote(req.Page.Size, req.Page.Num, "")
+	}
+	if e != nil {
+		ctx.ResData = e
 		return
 	}
 

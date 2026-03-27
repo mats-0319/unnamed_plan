@@ -1,7 +1,7 @@
 // Generate File, Should Not Edit.
 // Author : mario. github.com/mats0319
 // Code   : github.com/mats0319/study/go/gocts
-// Version: gocts v0.2.3
+// Version: gocts v0.2.4
 
 import { Pagination } from "./common.go"
 
@@ -24,8 +24,8 @@ export class Note {
 }
 
 export class ListNoteReq {
+	only_operator: boolean = false
 	page: Pagination = new Pagination()
-	user_name: string = "" // 非空表示查询指定用户的note，空表示查询全部
 }
 
 export class ListNoteRes {

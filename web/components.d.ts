@@ -12,7 +12,10 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Bottom: typeof import('./src/components/bottom.vue')['default']
+    Default_subpage: typeof import('./src/components/default_subpage.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
+    ElCollapse: typeof import('element-plus/es')['ElCollapse']
+    ElCollapseItem: typeof import('element-plus/es')['ElCollapseItem']
     ElDescriptions: typeof import('element-plus/es')['ElDescriptions']
     ElDescriptionsItem: typeof import('element-plus/es')['ElDescriptionsItem']
     ElDialog: typeof import('element-plus/es')['ElDialog']

@@ -24,8 +24,10 @@ type Note struct {
 }
 
 type ListNoteReq struct {
-	Page     Pagination `json:"page"`
-	UserName string     `json:"user_name"` // 非空表示查询指定用户的note，空表示查询全部
+	// 是否仅查询操作员编写的小纸条，需要该值为true且能从请求头解析出操作员用户名才会执行，否则查询全部
+	OnlyOperator bool `json:"only_operator"`
+	
+	Page Pagination `json:"page"`
 }
 
 type ListNoteRes struct {

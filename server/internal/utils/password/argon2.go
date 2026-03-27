@@ -30,11 +30,8 @@ func defaultAlgorithmParams() *AlgorithmParams {
 	}
 }
 
-func GeneratePwdHash(password string, params ...*AlgorithmParams) string {
-	var pm = defaultAlgorithmParams()
-	if len(params) > 1 {
-		pm = params[0]
-	}
+func GeneratePwdHash(password string) string {
+	pm := defaultAlgorithmParams()
 
 	salt := utils.GenerateRandomBytes[[]byte](32)
 	saltHex := hex.EncodeToString(salt)

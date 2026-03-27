@@ -3,7 +3,7 @@ package model
 type User struct {
 	Model
 	UserName string `gorm:"unique;not null"` // login name, can't modify
-	Nickname string `gorm:"unique;not null"` // display name
+	Nickname string `gorm:"not null"`        // display name
 	Password string `gorm:"not null"`
 	IsAdmin  bool
 

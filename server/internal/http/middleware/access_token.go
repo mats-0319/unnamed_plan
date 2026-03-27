@@ -36,46 +36,54 @@ func GenAccessToken(userName string) string {
 	return fmt.Sprintf("%s.%s", tokenHex, genTokenHash(tokenHex))
 }
 
-func VerifyAccessToken(ctx *mhttp.Context) *Error {
-	tokenSplit := strings.Split(ctx.AccessToken, ".")
-	if len(tokenSplit) != 2 {
-		e := ErrInvalidAccessToken().WithParam("token", ctx.AccessToken)
+// OptionalVerifyAccessToken 用于是否登录均可的接口，访问token验证失败不视为错误。
+// 如果验证成功，则后续处理函数能拿到'ctx.UserName'
+func OptionalVerifyAccessToken(ctx *mhttp.Context) *Error {
+	_ = verifyAccessToken(ctx)
+	return nil
+}
+
+func VerifyAccessToken(ctx *mhttp.Context) (e *Error) {
+	e = verifyAccessToken(ctx)
+	if e != nil {
 		mlog.Error(e.String())
-		return e
 	}
 
-	hash := genTokenHash(tokenSplit[0])
-	if hash != tokenSplit[1] {
-		e := ErrWrongToken().WithParam("token", ctx.AccessToken)
-		mlog.Error(e.String())
-		return e
+	return
+}
+
+func verifyAccessToken(ctx *mhttp.Context) (e *Error) {
+	tokenSplit := strings.Split(ctx.AccessToken, ".")
+	if len(tokenSplit) != 2 {
+		e = ErrInvalidAccessToken().WithParam("token", ctx.AccessToken)
+		return
+	}
+
+	if hash := genTokenHash(tokenSplit[0]); hash != tokenSplit[1] {
+		e = ErrWrongToken().WithParam("token", ctx.AccessToken)
+		return
 	}
 
 	tokenBytes, err := hex.DecodeString(tokenSplit[0])
 	if err != nil {
-		e := ErrInvalidAccessToken().WithCause(err)
-		mlog.Error(e.String())
-		return e
+		e = ErrInvalidAccessToken().WithCause(err)
+		return
 	}
 
 	token := &AccessToken{}
-	err = json.Unmarshal(tokenBytes, token)
-	if err != nil {
-		e := ErrInvalidAccessToken().WithCause(err)
-		mlog.Error(e.String())
-		return e
+	if err := json.Unmarshal(tokenBytes, token); err != nil {
+		e = ErrInvalidAccessToken().WithCause(err)
+		return
 	}
 
-	now := time.Now().UnixMilli()
-	if token.ExpireTime < now {
-		e := ErrTokenExpired().WithParam("expire time", token.ExpireTime).WithParam("now", now)
-		mlog.Error(e.String())
-		return e
+	if token.ExpireTime < time.Now().UnixMilli() {
+		e = ErrTokenExpired().WithParam("expire time", token.ExpireTime)
+		return
 	}
 
 	ctx.UserName = token.UserName
 
-	return nil
+	return
 }
 
 var hmacKey = GenerateRandomBytes[[]byte](10)

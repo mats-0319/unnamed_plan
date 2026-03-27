@@ -14,9 +14,9 @@ func ModifyNote(ctx *mhttp.Context) {
 		return
 	}
 
-	note, err := dal.GetNote(req.NoteID)
-	if err != nil {
-		ctx.ResData = err
+	note, e := dal.GetNote(req.NoteID)
+	if e != nil {
+		ctx.ResData = e
 		return
 	}
 
@@ -39,9 +39,8 @@ func ModifyNote(ctx *mhttp.Context) {
 	note.Title = req.Title
 	note.Content = req.Content
 
-	err = dal.UpdateNote(note)
-	if err != nil {
-		ctx.ResData = err
+	if e := dal.UpdateNote(note); e != nil {
+		ctx.ResData = e
 		return
 	}
 

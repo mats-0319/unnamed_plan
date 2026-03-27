@@ -4,6 +4,8 @@
 			<div class="t-title" @click="routerLink('home')">Unnamed Plan Web</div>
 
 			<div v-if="flags.wildScreenFlag" class="t-content">
+				<div class="tc-item center-hv" @click="routerLink('gDefault')">小游戏</div>
+
 				<div class="tc-item center-hv" @click="routerLink('note')">小纸条</div>
 
 				<div class="tc-item center-hv">
@@ -29,6 +31,7 @@
 				</div>
 			</div>
 
+			<!--	移动端只允许查看小纸条	-->
 			<div v-else class="t-content" @click="routerLink('note')">小纸条</div>
 		</div>
 	</div>
@@ -85,7 +88,6 @@ function beforeOpenLoginDialog(): void {
 function login(): void {
 	userStore.login(loginReq.value.user_name, loginReq.value.password, loginReq.value.totp_code, () => {
 		showLoginDialog.value = false
-		routerLink("pDefault")
 	})
 }
 

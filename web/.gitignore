@@ -1,3 +1,7 @@
+public/flip.html
+public/flip.wasm
+public/wasm_exec.js
+
 pnpm-lock.yaml
 pnpm-workspace.yaml
 

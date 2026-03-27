@@ -19,8 +19,7 @@ func NewBRManager(v ...IBackupRecover) *BRManager {
 
 func (m *BRManager) Backup() error {
 	for _, v := range m.List {
-		err := v.Backup()
-		if err != nil {
+		if err := v.Backup(); err != nil {
 			return err
 		}
 	}
@@ -30,8 +29,7 @@ func (m *BRManager) Backup() error {
 
 func (m *BRManager) Recover() error {
 	for _, v := range m.List {
-		err := v.Recover()
-		if err != nil {
+		if err := v.Recover(); err != nil {
 			return err
 		}
 	}

@@ -36,8 +36,7 @@ func (ctx *Context) ParseParams(obj any) bool {
 		return false
 	}
 
-	err = json.Unmarshal(bodyBytes, obj)
-	if err != nil {
+	if err := json.Unmarshal(bodyBytes, obj); err != nil {
 		e := ErrJsonUnmarshal().WithCause(err)
 		mlog.Error(e.String())
 		ctx.ResData = e

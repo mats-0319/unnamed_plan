@@ -105,9 +105,7 @@ import { CreateNoteReq, DeleteNoteReq, ModifyNoteReq, Note } from "@/axios/ts/no
 import { deepCopy, displayTimestamp } from "@/ts/util.ts"
 import { useNoteStore } from "@/pinia/note.ts"
 import Outlined_button from "@/components/outlined_button.vue"
-import { useUserStore } from "@/pinia/user.ts"
 
-let userStore = useUserStore()
 let noteStore = useNoteStore()
 
 let amount = ref<number>(0)
@@ -183,7 +181,7 @@ function del(): void {
 }
 
 function listNote(pageNum: number = 1): void {
-	noteStore.list(10, pageNum, userStore.user.user_name, (a: number, n: Array<Note>) => {
+	noteStore.list(true, 10, pageNum, (a: number, n: Array<Note>) => {
 		amount.value = a
 		notes.value = n
 	})

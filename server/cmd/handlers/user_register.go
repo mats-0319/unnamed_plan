@@ -14,15 +14,13 @@ func Register(ctx *mhttp.Context) {
 		return
 	}
 
-	pwd := password.GeneratePwdHash(req.Password)
-
 	user := &model.User{
 		UserName: req.UserName,
 		Nickname: req.UserName,
-		Password: pwd,
+		Password: password.GeneratePwdHash(req.Password),
 	}
-	err := dal.CreateUser(user)
-	if err != nil {
+
+	if err := dal.CreateUser(user); err != nil {
 		ctx.ResData = err
 		return
 	}

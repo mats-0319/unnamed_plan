@@ -28,8 +28,7 @@ func GetUser(userName string) (*model.User, *Error) {
 }
 
 func CreateUser(user *model.User) *Error {
-	err := User.WithContext(context.TODO()).Create(user)
-	if err != nil {
+	if err := User.WithContext(context.TODO()).Create(user); err != nil {
 		var e *Error
 		if strings.Contains(err.Error(), "violates unique constraint") {
 			e = ErrUserExist().WithCause(err)
@@ -45,8 +44,7 @@ func CreateUser(user *model.User) *Error {
 }
 
 func UpdateUser(user *model.User) *Error {
-	err := User.WithContext(context.TODO()).Where(User.ID.Eq(user.ID)).Save(user)
-	if err != nil {
+	if err := User.WithContext(context.TODO()).Where(User.ID.Eq(user.ID)).Save(user); err != nil {
 		e := ErrDBError().WithCause(err)
 		mlog.Error(e.String())
 		return e

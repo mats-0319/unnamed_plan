@@ -80,7 +80,7 @@ function setCurrentNote(note: Note): void {
 }
 
 function listNote(pageNum: number = 1): void {
-	noteStore.list(10, pageNum, "", (a: number, n: Array<Note>) => {
+	noteStore.list(false, 10, pageNum, (a: number, n: Array<Note>) => {
 		amount.value = a
 		notes.value = n
 		nextPage.value = pageNum + 1

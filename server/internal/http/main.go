@@ -29,8 +29,7 @@ func StartServer(handler *Handler) {
 	addr := fmt.Sprintf("0.0.0.0:%s", configIns.Port)
 	mlog.Info("> Listening at: " + addr)
 
-	err = http.ListenAndServe(addr, handler)
-	if err != nil {
+	if err := http.ListenAndServe(addr, handler); err != nil {
 		mlog.Error("handlers listen and serve failed", mlog.Field("error", err))
 	}
 }
@@ -39,8 +38,7 @@ func getHttpConfig() (*config, error) {
 	jsonBytes := mconfig.GetConfigItem(utils.ConfigID_Http)
 
 	res := &config{}
-	err := json.Unmarshal(jsonBytes, res)
-	if err != nil {
+	if err := json.Unmarshal(jsonBytes, res); err != nil {
 		mlog.Error("deserialize gateway config failed", mlog.Field("error", err))
 		return nil, err
 	}
