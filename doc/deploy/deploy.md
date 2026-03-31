@@ -24,7 +24,7 @@ grant all on database [db name] to [user name];
 \l   // 查看数据库
 ```
 
-### 设置允许外部地址访问
+### 限制访问权限
 
 config file: `/etc/postgresql/16/main/postgresql.conf`(注意版本号)
 add: `listen_address: '*'`
@@ -33,12 +33,13 @@ config file: `/etc/postgresql/16/main/pg_hba.conf`
 add:
 
 ```txt
-host cloud all 127.0.0.1/32 md5     // 允许本机连接cloud数据库
-host cloud all 0.0.0.0/0    reject  // 不允许其他连接访问cloud
-host all   all 0.0.0.0/0    md5     // 允许所有远程连接
+host cloud all 127.0.0.1/32 md5     // 允许本机访问cloud数据库
+host cloud all 0.0.0.0/0    reject  // 不允许其他任何人访问cloud
+host all   all 0.0.0.0/0    md5     // 允许其他所有访问
+// 写在前面的优先级更高，考虑可能是从后往前计算规则，例如本例：允许所有人访问所有数据库-禁止所有人访问cloud-允许本机访问cloud
 ```
 
-数据库可视化工具往往可以通过先登录云服务器再访问的方式，在本地访问远程限制访问的数据库
+数据库可视化工具往往可以通过先登录云服务器再访问的方式，访问远程限制访问的数据库
 
 重启/重载服务：`sudo systemctl restart/reload postgresql`
 
