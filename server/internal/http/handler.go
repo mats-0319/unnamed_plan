@@ -28,11 +28,13 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	mlog.Info(fmt.Sprintf("> Receive Request: %s .", request.URL.String()))
-	startTime := time.Now().UnixMilli()
+	startTime := time.Now()
 	defer func() {
-		endTime := time.Now().UnixMilli()
-		handleTime := endTime - startTime
-		mlog.Info(fmt.Sprintf("> Process Request: %s , in %d ms", request.URL.String(), handleTime))
+		mlog.Info(fmt.Sprintf("> Process Request: %s , in %d ms", request.URL.String(), time.Since(startTime).Milliseconds()))
+
+		if err := recover(); err != nil {
+			mlog.Error("panic", mlog.Field("", err))
+		}
 	}()
 
 	ctx := NewContext(writer, request)
