@@ -23,13 +23,12 @@ onMounted(() => {
 
 	// keep 'login info' during refresh
 	window.addEventListener("beforeunload", () => {
-		sessionStorage.setItem("login_data", JSON.stringify(userStore.user))
+		localStorage.setItem("login_data", JSON.stringify(userStore.user))
 	})
 
-	let loginData = sessionStorage.getItem("login_data")
+	let loginData = localStorage.getItem("login_data")
 	if (loginData) {
 		userStore.user = deepCopy(JSON.parse(loginData))
-		sessionStorage.removeItem("login_data")
 	}
 })
 </script>

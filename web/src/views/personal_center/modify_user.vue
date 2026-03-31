@@ -43,6 +43,7 @@ let canModifyFlag = ref<boolean>(false)
 
 onMounted(() => {
 	modifyUserReq.value.nickname = userStore.user.nickname
+	modifyUserReq.value.enable_2fa = userStore.user.enable_2fa
 })
 
 function modifyUser(): void {
