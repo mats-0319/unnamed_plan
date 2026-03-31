@@ -1,5 +1,7 @@
 import { fileURLToPath, URL } from "node:url"
 import os from "os"
+import path from "path"
+import fs from "fs"
 
 import { defineConfig } from "vite"
 import vue from "@vitejs/plugin-vue"
@@ -18,7 +20,24 @@ export default defineConfig({
 		vueDevTools(),
 
 		AutoImport({ resolvers: [ElementPlusResolver()] }),
-		Components({ resolvers: [ElementPlusResolver()] })
+		Components({ resolvers: [ElementPlusResolver()] }),
+
+		{
+			name: "exclude-wasm-from-dist",
+			apply: "build",
+			closeBundle() {
+				const removeFile = (fileName: string) => {
+					const file = path.resolve(__dirname, "dist/" + fileName)
+					if (fs.existsSync(file)) {
+						fs.unlinkSync(file)
+					}
+				}
+
+				removeFile("flip.wasm")
+				removeFile("flip.html")
+				removeFile("wasm_exec.js")
+			}
+		}
 	],
 	resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
 	clearScreen: false,

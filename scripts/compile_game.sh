@@ -1,6 +1,6 @@
 #!/bin/bash
 # Use At: Local Dev Env
-# Behavior: Rebuild Ebiten Game and 'cp' to its Position
+# Behavior: Compile Ebiten Game and 'cp' to its Position
 
 from_path=$(pwd) # record current path
 
@@ -8,9 +8,9 @@ from_path=$(pwd) # record current path
 cd "$(dirname "$0")" || exit 1
 cd .. || exit 1
 
-# build game
+# compile game
 
-  function build_game() {
+  function compile_game() {
     local game_name="$1"
 
     cd "./game/${game_name}" || exit 1
@@ -33,7 +33,7 @@ cd .. || exit 1
     fi
   }
 
-build_game "flip"
+compile_game "flip"
 
 # back to from path
 cd "$from_path" || exit 1

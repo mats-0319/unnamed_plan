@@ -1,6 +1,6 @@
 <template>
 	<div class="game-flip">
-		<iframe src="/flip.html" width="380" height="610"></iframe>
+		<iframe :src="gameUrl" width="380" height="610"></iframe>
 
 		<div class="gf-score">
 			<el-collapse accordion>
@@ -26,6 +26,8 @@ let gameScoreStore = useGameScoreStore()
 
 let scoreCount = ref<number>(0)
 let topScore = ref<Array<GameScore>>(new Array<GameScore>())
+
+let gameUrl = ref<string>(import.meta.env.Vite_axios_flip_game_url)
 
 onMounted(() => {
 	window.addEventListener("message", handleMessage)

@@ -1,6 +1,14 @@
 # web
 
-使用工具：
+## 说明
+
+wasm文件打包问题：开发阶段使用iframe嵌入`public/flip.html`，而发布以后使用github pages托管的html，所以游戏相关文件不打包进dist
+
+- 为什么使用github pages托管游戏html：因为网络带宽，我购买的服务器网络带宽非常小，下载5k资源需要40多秒
+- 如何使用github pages托管资源文件：在github新建仓库并上传想要托管的资源，在setting-pages里开启部署
+- 如何将游戏文件从dist移除：在打包配置里编写build hock检查并删除指定文件
+
+## 使用工具
 
 - node: 24 (corepack-pnpm:10)
 - vue3 (html ts:5.9 less)
