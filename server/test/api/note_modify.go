@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 
-	api2 "github.com/mats0319/unnamed_plan/server/cmd/api/go"
+	api "github.com/mats0319/unnamed_plan/server/cmd/api/go"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
@@ -16,7 +16,7 @@ func ModifyNote() {
 }
 
 func modifyNoteCase_NoteNotExist() string {
-	res := httpInvoke(api2.URI_ModifyNote, `{"note_id":"not exist","is_anonymous":false,"title":"","content":""}`)
+	res := httpInvoke(api.URI_ModifyNote, `{"note_id":"not exist","is_anonymous":false,"title":"","content":""}`, accessToken_User)
 	if res.IsSuccess || res.Err != utils.ErrNoteNotFound().Error() {
 		return unknownError
 	}
@@ -25,9 +25,7 @@ func modifyNoteCase_NoteNotExist() string {
 }
 
 func modifyNoteCase_NoChanges() string {
-	loginCase_Success(true)()
-
-	res := httpInvoke(api2.URI_ModifyNote, fmt.Sprintf(`{"note_id":"%s","is_anonymous":false,"title":"123","content":"456"}`, noteID))
+	res := httpInvoke(api.URI_ModifyNote, fmt.Sprintf(`{"note_id":"%s","is_anonymous":false,"title":"123","content":"456"}`, noteID), accessToken_Admin)
 	if res.IsSuccess || res.Err != utils.ErrNoChanges().Error() {
 		return unknownError
 	}
@@ -36,9 +34,7 @@ func modifyNoteCase_NoChanges() string {
 }
 
 func modifyNoteCase_NotWriter() string {
-	loginCase_Success(false)()
-
-	res := httpInvoke(api2.URI_ModifyNote, fmt.Sprintf(`{"note_id":"%s","is_anonymous":false,"title":"","content":""}`, noteID)) // 这里借用create接口创建的note
+	res := httpInvoke(api.URI_ModifyNote, fmt.Sprintf(`{"note_id":"%s","is_anonymous":false,"title":"","content":""}`, noteID), accessToken_User)
 	if res.IsSuccess || res.Err != utils.ErrNeedOwner().Error() {
 		return unknownError
 	}
@@ -47,9 +43,7 @@ func modifyNoteCase_NotWriter() string {
 }
 
 func modifyNoteCase_Success() string {
-	loginCase_Success(true)()
-
-	res := httpInvoke(api2.URI_ModifyNote, fmt.Sprintf(`{"note_id":"%s","is_anonymous":true,"title":"123123","content":"456456"}`, noteID))
+	res := httpInvoke(api.URI_ModifyNote, fmt.Sprintf(`{"note_id":"%s","is_anonymous":true,"title":"123123","content":"456456"}`, noteID), accessToken_Admin)
 	if !res.IsSuccess {
 		return res.Err
 	}

@@ -15,7 +15,7 @@ func DeleteNote() {
 }
 
 func deleteNoteCase_NoteNotExist() string {
-	res := httpInvoke(api.URI_DeleteNote, `{"note_id":"not exist"}`)
+	res := httpInvoke(api.URI_DeleteNote, `{"note_id":"not exist"}`, accessToken_User)
 	if res.IsSuccess || res.Err != utils.ErrNoteNotFound().Error() {
 		return unknownError
 	}
@@ -24,9 +24,7 @@ func deleteNoteCase_NoteNotExist() string {
 }
 
 func deleteNoteCase_NotWriter() string {
-	loginCase_Success(false)()
-
-	res := httpInvoke(api.URI_DeleteNote, fmt.Sprintf(`{"note_id":"%s"}`, noteID))
+	res := httpInvoke(api.URI_DeleteNote, fmt.Sprintf(`{"note_id":"%s"}`, noteID), accessToken_User)
 	if res.IsSuccess || res.Err != utils.ErrNeedOwner().Error() {
 		return unknownError
 	}
@@ -35,15 +33,13 @@ func deleteNoteCase_NotWriter() string {
 }
 
 func deleteNoteCase_Success() string {
-	loginCase_Success(true)()
-
-	res := httpInvoke(api.URI_DeleteNote, fmt.Sprintf(`{"note_id":"%s"}`, noteID))
+	res := httpInvoke(api.URI_DeleteNote, fmt.Sprintf(`{"note_id":"%s"}`, noteID), accessToken_Admin)
 	if !res.IsSuccess {
 		return res.Err
 	}
 
-	count, _, err := dal.ListNote(api.Pagination{Size: 10, Num: 1}, "")
-	if count != 0 || err != nil {
+	count, _, err := dal.ListNote(10, 1, "")
+	if err != nil || count != 0 {
 		return unknownError
 	}
 

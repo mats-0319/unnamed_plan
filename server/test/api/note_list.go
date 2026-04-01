@@ -6,23 +6,32 @@ import (
 )
 
 func ListNote() {
-	testCase("success", listNoteCase_Success)
+	testCase("success - visitor", listNoteCase_SuccessVisitor)
+	testCase("success - only operator", listNoteCase_SuccessOnlyOperator)
 }
 
-func listNoteCase_Success() string {
-	res := httpInvoke(api.URI_ListNote, `{"page":{"size":10,"num":1},"user_id":0}`)
+func listNoteCase_SuccessVisitor() string {
+	res := httpInvoke(api.URI_ListNote, `{"page":{"size":10,"num":1},"only_operator":false}`, accessToken_User)
 	if !res.IsSuccess {
 		return res.Err
 	}
 
-	count, data, err := dal.ListNote(api.Pagination{Size: 10, Num: 1}, "")
-	if count != 1 || len(data) != 1 || err != nil {
+	count, _, err := dal.ListNote(10, 1, "")
+	if err != nil || count != 1 {
 		return unknownError
 	}
 
-	// test list notes with given writer
-	count, data, err = dal.ListNote(api.Pagination{Size: 10, Num: 1}, "not exist")
-	if count != 0 || len(data) != 0 || err != nil {
+	return ""
+}
+
+func listNoteCase_SuccessOnlyOperator() string {
+	res := httpInvoke(api.URI_ListNote, `{"page":{"size":10,"num":1},"only_operator":true}`, accessToken_User)
+	if !res.IsSuccess {
+		return res.Err
+	}
+
+	count, _, err := dal.ListNote(10, 1, "not exist")
+	if err != nil || count != 0 {
 		return unknownError
 	}
 

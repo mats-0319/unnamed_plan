@@ -16,22 +16,20 @@ func CreateNote() {
 }
 
 func createNoteCase_Success() string {
-	loginCase_Success(true)()
-
-	res := httpInvoke(api.URI_CreateNote, `{"is_anonymous":false,"title":"123","content":"456"}`)
+	res := httpInvoke(api.URI_CreateNote, `{"is_anonymous":false,"title":"123","content":"456"}`, accessToken_Admin)
 	if !res.IsSuccess {
 		return res.Err
 	}
 
-	// get note id from db
-	note, _ := dal.Q.Note.WithContext(context.TODO()).First()
+	// record 'note id' for later api(s)
+	note, _ := dal.Note.WithContext(context.TODO()).First()
 	if note == nil {
 		return unknownError
 	}
 	noteID = note.NoteID
 
 	data, err := dal.GetNote(noteID)
-	if data == nil || data.Title != "123" || data.Content != "456" || err != nil {
+	if err != nil || data == nil || data.Title != "123" || data.Content != "456" {
 		return unknownError
 	}
 
@@ -39,7 +37,7 @@ func createNoteCase_Success() string {
 }
 
 func createNoteCase_Duplicate() string {
-	res := httpInvoke(api.URI_CreateNote, `{"is_anonymous":false,"title":"123","content":"456"}`)
+	res := httpInvoke(api.URI_CreateNote, `{"is_anonymous":false,"title":"123","content":"456"}`, accessToken_Admin)
 	if res.IsSuccess || res.Err != utils.ErrNoteExist().Error() {
 		return unknownError
 	}

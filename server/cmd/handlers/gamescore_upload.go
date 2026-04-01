@@ -19,7 +19,7 @@ func UploadGameScore(ctx *mhttp.Context) {
 	gameScore.Result = req.Result
 
 	// 填写获得该成绩的玩家信息
-	if len(ctx.UserName) > 0 {
+	if len(ctx.UserName) > 0 { // 已登录：填写用户名和昵称
 		user, err := dal.GetUser(ctx.UserName)
 		if err != nil {
 			ctx.ResData = err
@@ -27,7 +27,7 @@ func UploadGameScore(ctx *mhttp.Context) {
 		}
 		gameScore.Player = user.UserName
 		gameScore.PlayerName = user.Nickname
-	} else {
+	} else { // 未登录：填写前端传的访客id
 		gameScore.PlayerName = req.Player
 	}
 

@@ -10,6 +10,8 @@ import (
 func main() {
 	createTable()
 
+	api.GetAccessToken()
+
 	testApi("Register", api.Register)
 	testApi("Login", api.Login)
 	testApi("List User", api.ListUser)
@@ -19,6 +21,9 @@ func main() {
 	testApi("List Note", api.ListNote)
 	testApi("Modify Note", api.ModifyNote)
 	testApi("Delete Note", api.DeleteNote)
+
+	testApi("List Game Score", api.ListGameScore)
+	testApi("Upload Game Score", api.UploadGameScore)
 
 	//dropTable() // do not del testdata during dev
 

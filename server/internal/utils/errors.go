@@ -29,7 +29,6 @@ var (
 	ErrTokenExpired       = newError(ET_Unauthorized, "Access Token Expired")
 
 	// server internal error
-	// 像一个口袋Error，所有不好分类的错误都可以往里装，例如参数全部由服务端代码生成的json marshal error、DB error
 	ErrServerInternalError = newError(ET_ServerInternalError)
 	ErrDBError             = newError(ET_ServerInternalError, "DB Error")
 
@@ -53,7 +52,7 @@ var (
 	// business-note
 	ErrNeedOwner = newError(ET_OperatorError, "Not Owner of Data")
 
-	// business-game score
+	// business-game
 	ErrInvalidGameName = newError(ET_ParamsError, "Invalid Game Name")
 
 	// db

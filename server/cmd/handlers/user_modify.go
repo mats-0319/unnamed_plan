@@ -74,7 +74,7 @@ func ModifyUser(ctx *mhttp.Context) {
 
 func isValidTotpKey(key string) *utils.Error {
 	bytes, err := base32.StdEncoding.DecodeString(key)
-	if len(key) < 1 || err != nil || len(bytes) > 10 { // 空字符串是有效的base32字符串，但不应该是有效的key
+	if err != nil || !(0 < len(bytes) && len(bytes) <= 10) { // 空字符串是有效的base32字符串，但不应该是有效的key
 		e := utils.ErrInvalidTotpKey().WithParam("totp key", key).WithCause(err)
 		mlog.Error(e.String())
 		return e
