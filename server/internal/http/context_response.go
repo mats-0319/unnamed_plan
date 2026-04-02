@@ -34,7 +34,7 @@ func serializeRes(obj any) (int, []byte) {
 	case *Error:
 		obj = &Response{Err: v.Error()}
 
-		code = getHttpCode(v)
+		code = v.HttpCode
 	default: // *api.resStruct(s)
 		obj = &Response{
 			IsSuccess: true,
@@ -50,19 +50,4 @@ func serializeRes(obj any) (int, []byte) {
 	}
 
 	return code, jsonBytes
-}
-
-func getHttpCode(err *Error) int {
-	code := http.StatusOK
-
-	switch err.Typ {
-	case ET_BadRequest:
-		code = http.StatusBadRequest
-	case ET_Unauthorized:
-		code = http.StatusUnauthorized
-	case ET_ServerInternalError:
-		code = http.StatusInternalServerError
-	}
-
-	return code
 }

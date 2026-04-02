@@ -25,7 +25,7 @@ func loginCase_UserNotExist() string {
 
 func loginCase_WrongPwd() string {
 	res := httpInvoke(api.URI_Login, `{"user_name":"admin","password":"wrong pwd","totp_code":""}`, "")
-	if res.IsSuccess || res.Err != utils.ErrWrongPwd().Error() {
+	if res.IsSuccess || res.Err != utils.ErrWrongPassword().Error() {
 		return unknownError
 	}
 

@@ -45,16 +45,16 @@ func GeneratePwdHash(password string) string {
 
 // VerifyPassword decode 'key' from 'pwd hash', calc 'new key' with 'password', compare two keys
 func VerifyPassword(password, pwdHash string) *utils.Error {
-	params, salt, key, err := decodeHash(pwdHash)
-	if err != nil {
-		return err
+	params, salt, key, e := decodeHash(pwdHash)
+	if e != nil {
+		return e
 	}
 
 	newKey := argon2.IDKey([]byte(password), salt, params.CalcTimes, params.Memory, params.Threads, params.KeyLength)
 
 	// 使用恒定时间比较防止时序攻击
 	if subtle.ConstantTimeCompare(key, newKey) != 1 {
-		e := utils.ErrWrongPwd().WithParam("old key", key).WithParam("new key", newKey)
+		e := utils.ErrWrongPassword().WithParam("old key", key).WithParam("new key", newKey)
 		mlog.Error(e.String())
 		return e
 	}
@@ -65,7 +65,7 @@ func VerifyPassword(password, pwdHash string) *utils.Error {
 func decodeHash(pwdHash string) (*AlgorithmParams, []byte, []byte, *utils.Error) {
 	pwdSplit := strings.Split(pwdHash, ".")
 	if len(pwdSplit) != 4 || pwdSplit[0] != "argon2id" {
-		e := utils.ErrInvalidPwd().WithParam("encoded pwd", pwdHash)
+		e := utils.ErrInvalidPassword().WithParam("encoded pwd", pwdHash)
 		mlog.Error(e.String())
 		return nil, nil, nil, e
 	}
@@ -74,21 +74,21 @@ func decodeHash(pwdHash string) (*AlgorithmParams, []byte, []byte, *utils.Error)
 	params := &AlgorithmParams{}
 	_, err := fmt.Sscanf(pwdSplit[1], "v=%d,m=%d,t=%d,c=%d", &version, &params.Memory, &params.CalcTimes, &params.Threads)
 	if err != nil || version != argon2.Version {
-		e := utils.ErrPwdParams().WithCause(err).WithParam("version", version).WithParam("params", params)
+		e := utils.ErrInvalidPassword().WithCause(err).WithParam("version", version).WithParam("params", params)
 		mlog.Error(e.String())
 		return nil, nil, nil, e
 	}
 
 	salt, err := hex.DecodeString(pwdSplit[2])
 	if err != nil {
-		e := utils.ErrHexDecode().WithCause(err).WithParam("salt", pwdSplit[2])
+		e := utils.ErrInvalidPwdSalt().WithCause(err).WithParam("salt", pwdSplit[2])
 		mlog.Error(e.String())
 		return nil, nil, nil, e
 	}
 
 	key, err := hex.DecodeString(pwdSplit[3])
 	if err != nil {
-		e := utils.ErrHexDecode().WithCause(err).WithParam("key", pwdSplit[3])
+		e := utils.ErrInvalidPwdKey().WithCause(err).WithParam("key", pwdSplit[3])
 		mlog.Error(e.String())
 		return nil, nil, nil, e
 	}

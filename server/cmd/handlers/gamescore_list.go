@@ -16,7 +16,7 @@ func ListGameScore(ctx *mhttp.Context) {
 	}
 
 	if req.Page.Size <= 0 || req.Page.Num <= 0 {
-		e := utils.ErrInvalidPage().WithParam("page size", req.Page.Size).WithParam("page num", req.Page.Num)
+		e := utils.ErrInvalidPagination().WithParam("page size", req.Page.Size).WithParam("page num", req.Page.Num)
 		ctx.ResData = e
 		mlog.Error(e.String())
 		return

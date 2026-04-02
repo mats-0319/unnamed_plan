@@ -68,7 +68,7 @@ func verifyTotpCode(code string, totpKey string) *utils.Error {
 	key := make([]byte, 10)
 	n, err := base32.StdEncoding.Decode(key, []byte(totpKey))
 	if err != nil {
-		e := utils.ErrInvalidTotpCode().WithCause(err)
+		e := utils.ErrInvalidTotpKey().WithCause(err)
 		mlog.Error(e.String())
 		return e
 	}

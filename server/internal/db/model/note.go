@@ -17,18 +17,16 @@ type Note struct {
 }
 
 func NewNote(writer string, writerName string, isAnonymous bool, title string, content string) *Note {
-	noteIns := &Note{
+	payload := fmt.Sprintf(`"writer":%s,"is anonymous":%t,"title":%s,"content":%s`, writer, isAnonymous, title, content)
+
+	noteID := utils.CalcSHA256(payload) // 保证新增接口幂等性
+
+	return &Note{
+		NoteID:      noteID,
 		Writer:      writer,
 		WriterName:  writerName,
 		IsAnonymous: isAnonymous,
 		Title:       title,
 		Content:     content,
 	}
-
-	noteBytes := fmt.Sprintf(`"writer":%s,"writer name":%s,"is anonymous":%t,"title":%s,"content":%s`,
-		noteIns.Writer, noteIns.WriterName, noteIns.IsAnonymous, noteIns.Title, noteIns.Content)
-
-	noteIns.NoteID = utils.CalcSHA256(noteBytes) // 保证新增接口幂等性
-
-	return noteIns
 }

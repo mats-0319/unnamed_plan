@@ -37,7 +37,7 @@ func ModifyUser(ctx *mhttp.Context) {
 	}
 	if len(req.Password) > 0 {
 		if e := password.VerifyPassword(req.Password, operator.Password); e == nil { // in modify, same pwd is wrong
-			e := utils.ErrSamePwd()
+			e := utils.ErrSamePassword()
 			ctx.ResData = e
 			mlog.Error(e.String())
 			return

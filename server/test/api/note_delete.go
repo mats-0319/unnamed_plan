@@ -25,7 +25,7 @@ func deleteNoteCase_NoteNotExist() string {
 
 func deleteNoteCase_NotWriter() string {
 	res := httpInvoke(api.URI_DeleteNote, fmt.Sprintf(`{"note_id":"%s"}`, noteID), accessToken_User)
-	if res.IsSuccess || res.Err != utils.ErrNeedOwner().Error() {
+	if res.IsSuccess || res.Err != utils.ErrPermissionDenied().Error() {
 		return unknownError
 	}
 

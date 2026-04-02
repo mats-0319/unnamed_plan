@@ -22,7 +22,7 @@ func ListUser(ctx *mhttp.Context) {
 	}
 
 	if !operator.IsAdmin {
-		e := ErrNeedAdmin().WithParam("operator", operator.UserName)
+		e := ErrPermissionDenied().WithParam("need admin", operator.UserName)
 		ctx.ResData = e
 		mlog.Error(e.String())
 		return

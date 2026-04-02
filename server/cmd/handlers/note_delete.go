@@ -21,7 +21,7 @@ func DeleteNote(ctx *mhttp.Context) {
 	}
 
 	if ctx.UserName != note.Writer {
-		e := ErrNeedOwner().WithParam("operator", ctx.UserName).WithParam("owner", note.Writer)
+		e := ErrPermissionDenied().WithParam("need owner but get", ctx.UserName)
 		ctx.ResData = e
 		mlog.Error(e.String())
 		return
