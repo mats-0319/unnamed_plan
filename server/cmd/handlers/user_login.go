@@ -24,6 +24,13 @@ func Login(ctx *mhttp.Context) {
 		return
 	}
 
+	if len(req.UserName) < 1 || len(req.Password) < 1 {
+		e := utils.ErrInvalidParams().WithParam("user name", req.UserName).WithParam("password", req.Password)
+		mlog.Error(e.String())
+		ctx.ResData = e
+		return
+	}
+
 	user, e := dal.GetUser(req.UserName)
 	if e != nil {
 		ctx.ResData = e

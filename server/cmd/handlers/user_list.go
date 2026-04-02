@@ -15,6 +15,13 @@ func ListUser(ctx *mhttp.Context) {
 		return
 	}
 
+	if req.Page.Size <= 0 || req.Page.Num <= 0 {
+		e := ErrInvalidParams().WithParam("page size", req.Page.Size).WithParam("page num", req.Page.Num)
+		mlog.Error(e.String())
+		ctx.ResData = e
+		return
+	}
+
 	operator, e := dal.GetUser(ctx.UserName)
 	if e != nil {
 		ctx.ResData = e

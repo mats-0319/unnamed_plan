@@ -5,12 +5,20 @@ import (
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
+	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 func ListNote(ctx *mhttp.Context) {
 	req := &api.ListNoteReq{}
 	if !ctx.ParseParams(req) {
+		return
+	}
+
+	if req.Page.Size <= 0 || req.Page.Num <= 0 {
+		e := utils.ErrInvalidParams().WithParam("page size", req.Page.Size).WithParam("page num", req.Page.Num)
+		mlog.Error(e.String())
+		ctx.ResData = e
 		return
 	}
 

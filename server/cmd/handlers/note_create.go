@@ -5,11 +5,20 @@ import (
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
+	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 func CreateNote(ctx *mhttp.Context) {
 	req := &api.CreateNoteReq{}
 	if !ctx.ParseParams(req) {
+		return
+	}
+
+	if len(req.Content) < 1 {
+		e := utils.ErrInvalidParams().WithParam("content", req.Content)
+		mlog.Error(e.String())
+		ctx.ResData = e
 		return
 	}
 

@@ -17,7 +17,7 @@ var (
 	// params error (1)
 	// general (00) / db (01)
 	ErrDeserializeHttpReqParam = newBusinessError(10001, "Deserialize Http Request Param Failed")
-	ErrInvalidPagination       = newBusinessError(10002, "Invalid Pagination")
+	ErrInvalidParams           = newBusinessError(10002, "Invalid Params")
 	ErrUserExist               = newBusinessError(10101, "User Already Exist")
 	ErrNoteExist               = newBusinessError(10102, "Note Already Exist")
 	ErrUserNotFound            = newBusinessError(10103, "User Not Found")
