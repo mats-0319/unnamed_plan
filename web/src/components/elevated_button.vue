@@ -1,16 +1,16 @@
 <template>
-	<div class="elevated-button color-bg-1 center-hv" :class="{ 'eb-loading': props.loading }">
-		<span v-show="!loading"><slot></slot></span>
-		<span v-show="loading">loading...</span>
-	</div>
+  <div class="elevated-button color-bg-1 center-hv" :class="{ 'eb-loading': props.loading }">
+    <span v-show="!loading"><slot /></span>
+    <span v-show="loading">loading...</span>
+  </div>
 </template>
 
 <script lang="ts" setup>
 let props = defineProps({
-	loading: {
-		type: Boolean,
-		default: false
-	}
+    loading: {
+        type: Boolean,
+        default: false,
+    },
 })
 </script>
 

@@ -11,7 +11,7 @@ import "./index.less"
 import { initInterceptors } from "@/axios/ts/config_extend.ts"
 
 initInterceptors((): void => {
-	router.replace({ name: "home", params: { v: "1" } }) // distinguish 'login error' router to 'home' with others
+    router.replace({ name: "home", params: { v: "1" } }) // distinguish 'login error' router to 'home' with others
 })
 
 const app = createApp(App)

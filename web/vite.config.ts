@@ -14,50 +14,50 @@ import { ElementPlusResolver } from "unplugin-vue-components/resolvers"
 
 // https://vite.dev/config/
 export default defineConfig({
-	envPrefix: "Vite_",
-	plugins: [
-		vue(),
-		vueDevTools(),
+    envPrefix: "Vite_",
+    plugins: [
+        vue(),
+        vueDevTools(),
 
-		AutoImport({ resolvers: [ElementPlusResolver()] }),
-		Components({ resolvers: [ElementPlusResolver()] }),
+        AutoImport({ resolvers: [ElementPlusResolver()] }),
+        Components({ resolvers: [ElementPlusResolver()] }),
 
-		{
-			name: "exclude-wasm-from-dist",
-			apply: "build",
-			closeBundle() {
-				const removeFile = (fileName: string) => {
-					const file = path.resolve(__dirname, "dist/" + fileName)
-					if (fs.existsSync(file)) {
-						fs.unlinkSync(file)
-					}
-				}
+        {
+            name: "exclude-wasm-from-dist",
+            apply: "build",
+            closeBundle() {
+                const removeFile = (fileName: string) => {
+                    const file = path.resolve(__dirname, "dist/" + fileName)
+                    if (fs.existsSync(file)) {
+                        fs.unlinkSync(file)
+                    }
+                }
 
-				removeFile("flip.wasm")
-				removeFile("flip.html")
-				removeFile("wasm_exec.js")
-			}
-		}
-	],
-	resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
-	clearScreen: false,
-	server: {
-		host: getLocalIP(),
-		port: 20319,
-		open: true
-	}
+                removeFile("flip.wasm")
+                removeFile("flip.html")
+                removeFile("wasm_exec.js")
+            },
+        },
+    ],
+    resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
+    clearScreen: false,
+    server: {
+        host: getLocalIP(),
+        port: 20319,
+        open: true,
+    },
 })
 
 export function getLocalIP(): string {
-	const networks = os.networkInterfaces()
-	for (let key in networks) {
-		// @ts-ignore
-		for (let ins of networks[key]) {
-			if (ins.family === "IPv4" && !ins.internal) {
-				return ins.address
-			}
-		}
-	}
+    const networks = os.networkInterfaces()
+    for (const key in networks) {
+    // @ts-ignore
+        for (const ins of networks[key]) {
+            if (ins.family === "IPv4" && !ins.internal) {
+                return ins.address
+            }
+        }
+    }
 
-	return "127.0.0.1"
+    return "127.0.0.1"
 }

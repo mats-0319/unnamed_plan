@@ -1,26 +1,26 @@
 <template>
-	<div class="note color-bg-0 center-hv">
-		<stacked_cards class="n-card color-bg-1">
-			<div class="nc-content">
-				<p class="ncc-title">
-					小纸条<span class="ncct-right">{{ currentNum }} / {{ amount }}</span>
-				</p>
+  <div class="note color-bg-0 center-hv">
+    <stacked_cards class="n-card color-bg-1">
+      <div class="nc-content">
+        <p class="ncc-title">
+          小纸条<span class="ncct-right">{{ currentNum }} / {{ amount }}</span>
+        </p>
 
-				<el-form class="ncc-form" v-model="currentNote" label-width="20%">
-					<el-form-item label="ID">{{ currentNote.note_id }}</el-form-item>
-					<el-form-item label="作者">{{ currentNote.is_anonymous ? "-" : currentNote.writer }}</el-form-item>
-					<el-form-item label="主题">{{ currentNote.title }}</el-form-item>
-					<el-form-item label="内容">{{ currentNote.content }}</el-form-item>
-					<el-form-item label="写作时间">{{ displayTimestamp(currentNote.created_at) }}</el-form-item>
-					<el-form-item label="修改时间">{{ displayTimestamp(currentNote.updated_at) }}</el-form-item>
-				</el-form>
-			</div>
-		</stacked_cards>
+        <el-form v-model="currentNote" class="ncc-form" label-width="20%">
+          <el-form-item label="ID">{{ currentNote.note_id }}</el-form-item>
+          <el-form-item label="作者">{{ currentNote.is_anonymous ? "-" : currentNote.writer }}</el-form-item>
+          <el-form-item label="主题">{{ currentNote.title }}</el-form-item>
+          <el-form-item label="内容">{{ currentNote.content }}</el-form-item>
+          <el-form-item label="写作时间">{{ displayTimestamp(currentNote.created_at) }}</el-form-item>
+          <el-form-item label="修改时间">{{ displayTimestamp(currentNote.updated_at) }}</el-form-item>
+        </el-form>
+      </div>
+    </stacked_cards>
 
-		<elevated_button class="n-options" :loading="nextLoadingFlag" @click="nextNote"> 下一张 </elevated_button>
-	</div>
+    <elevated_button class="n-options" :loading="nextLoadingFlag" @click="nextNote">下一张</elevated_button>
+  </div>
 
-	<bottom />
+  <bottom />
 </template>
 
 <script lang="ts" setup>
@@ -43,50 +43,48 @@ let currentNum = ref<number>(0)
 let nextLoadingFlag = ref<boolean>(false)
 
 onMounted(() => {
-	listNote()
+    listNote()
 })
 
 function nextNote(): void {
-	nextLoadingFlag.value = true
+    nextLoadingFlag.value = true
 
-	let currentIndex = -1
-	for (let i = 0; i < notes.value.length; i++) {
-		if (currentNote.value.note_id == notes.value[i].note_id) {
-			currentIndex = i
-			break
-		}
-	}
+    let currentIndex = -1
+    for (let i = 0; i < notes.value.length; i++) {
+        if (currentNote.value.note_id == notes.value[i].note_id) {
+            currentIndex = i
+            break
+        }
+    }
 
-	// 如果当前已经是列表的最后一个小纸条了，则获取下一页
-	if (currentIndex >= 0 && currentIndex == notes.value.length - 1) {
-		if (currentNum.value >= amount.value) {
-			listNote()
-			currentNum.value = 0
-		} else {
-			listNote(nextPage.value)
-		}
-		return
-	}
-
-	// 这里可以兼容`currentIndex=-1`的情况，不需要单独处理
-	setCurrentNote(notes.value[currentIndex + 1])
+    // 下一张
+    if (currentIndex >= 0 && currentIndex == notes.value.length - 1) { // 如果当前已经是列表的最后一个小纸条了
+        if (currentNum.value >= amount.value) { // 没有下一页了，从头开始
+            listNote()
+            currentNum.value = 0
+        } else { // 还有下一页
+            listNote(nextPage.value)
+        }
+    } else {
+        setCurrentNote(notes.value[currentIndex + 1]) // 这里可以兼容`currentIndex=-1`的情况，不需要单独处理
+    }
 }
 
 function setCurrentNote(note: Note): void {
-	currentNote.value = note
-	currentNum.value++
+    currentNote.value = note
+    currentNum.value++
 
-	nextLoadingFlag.value = false
+    nextLoadingFlag.value = false
 }
 
 function listNote(pageNum: number = 1): void {
-	noteStore.list(false, 10, pageNum, (a: number, n: Array<Note>) => {
-		amount.value = a
-		notes.value = n
-		nextPage.value = pageNum + 1
+    noteStore.list(false, 10, pageNum, (a: number, n: Array<Note>) => {
+        amount.value = a
+        notes.value = n
+        nextPage.value = pageNum + 1
 
-		setCurrentNote(n.length > 0 ? n[0] : new Note())
-	})
+        setCurrentNote(n.length > 0 ? n[0] : new Note())
+    })
 }
 </script>
 

@@ -1,7 +1,7 @@
 <template>
-	<div class="stacked-cards">
-		<slot></slot>
-	</div>
+  <div class="stacked-cards">
+    <slot />
+  </div>
 </template>
 
 <script lang="ts" setup></script>

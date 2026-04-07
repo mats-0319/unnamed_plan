@@ -9,30 +9,30 @@ import { UploadGameScoreRes, UploadGameScoreReq, GameName, ListGameScoreRes, Lis
 import { Pagination } from "./common.go"
 
 class GameAxios {
-	public uploadGameScore(
-		game_name: GameName,
-		score: number,
-		result: string,
-		player: string
-	): Promise<AxiosResponse<UploadGameScoreRes>> {
-		let req: UploadGameScoreReq = {
-			game_name: game_name,
-			score: score,
-			result: result,
-			player: player
-		}
+    public uploadGameScore(
+        game_name: GameName,
+        score: number,
+        result: string,
+        player: string,
+    ): Promise<AxiosResponse<UploadGameScoreRes>> {
+        const req: UploadGameScoreReq = {
+            game_name: game_name,
+            score: score,
+            result: result,
+            player: player,
+        }
 
-		return axiosWrapper.post("/game-score/upload", req)
-	}
+        return axiosWrapper.post("/game-score/upload", req)
+    }
 
-	public listGameScore(game_name: GameName, page: Pagination): Promise<AxiosResponse<ListGameScoreRes>> {
-		let req: ListGameScoreReq = {
-			game_name: game_name,
-			page: page
-		}
+    public listGameScore(game_name: GameName, page: Pagination): Promise<AxiosResponse<ListGameScoreRes>> {
+        const req: ListGameScoreReq = {
+            game_name: game_name,
+            page: page,
+        }
 
-		return axiosWrapper.post("/game-score/list", req)
-	}
+        return axiosWrapper.post("/game-score/list", req)
+    }
 }
 
 export const gameAxios: GameAxios = new GameAxios()

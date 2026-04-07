@@ -1,21 +1,21 @@
 <template>
-	<div class="personal-center color-bg-0">
-		<div class="p-left">
-			<elevated_button class="pl-item" v-if="userStore.user.is_admin" @click="routerLink('pListUser')">
-				查看用户
-			</elevated_button>
+  <div class="personal-center color-bg-0">
+    <div class="p-left">
+      <elevated_button v-if="userStore.user.is_admin" class="pl-item" @click="routerLink('pListUser')">
+        查看用户
+      </elevated_button>
 
-			<elevated_button class="pl-item" @click="routerLink('pModifyUser')"> 修改个人信息 </elevated_button>
+      <elevated_button class="pl-item" @click="routerLink('pModifyUser')">修改个人信息</elevated_button>
 
-			<elevated_button class="pl-item" @click="routerLink('pNote')"> 我的小纸条 </elevated_button>
-		</div>
+      <elevated_button class="pl-item" @click="routerLink('pNote')">我的小纸条</elevated_button>
+    </div>
 
-		<el-divider direction="vertical"></el-divider>
+    <el-divider direction="vertical" />
 
-		<div class="p-right">
-			<router-view />
-		</div>
-	</div>
+    <div class="p-right">
+      <router-view />
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>

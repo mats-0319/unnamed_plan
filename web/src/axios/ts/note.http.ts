@@ -6,60 +6,60 @@
 import { axiosWrapper } from "./config"
 import { AxiosResponse } from "axios"
 import {
-	CreateNoteRes,
-	CreateNoteReq,
-	ListNoteRes,
-	ListNoteReq,
-	ModifyNoteRes,
-	ModifyNoteReq,
-	DeleteNoteRes,
-	DeleteNoteReq
+    CreateNoteRes,
+    CreateNoteReq,
+    ListNoteRes,
+    ListNoteReq,
+    ModifyNoteRes,
+    ModifyNoteReq,
+    DeleteNoteRes,
+    DeleteNoteReq,
 } from "./note.go"
 import { Pagination } from "./common.go"
 
 class NoteAxios {
-	public createNote(is_anonymous: boolean, title: string, content: string): Promise<AxiosResponse<CreateNoteRes>> {
-		let req: CreateNoteReq = {
-			is_anonymous: is_anonymous,
-			title: title,
-			content: content
-		}
+    public createNote(is_anonymous: boolean, title: string, content: string): Promise<AxiosResponse<CreateNoteRes>> {
+        const req: CreateNoteReq = {
+            is_anonymous: is_anonymous,
+            title: title,
+            content: content,
+        }
 
-		return axiosWrapper.post("/note/create", req)
-	}
+        return axiosWrapper.post("/note/create", req)
+    }
 
-	public listNote(only_operator: boolean, page: Pagination): Promise<AxiosResponse<ListNoteRes>> {
-		let req: ListNoteReq = {
-			only_operator: only_operator,
-			page: page
-		}
+    public listNote(only_operator: boolean, page: Pagination): Promise<AxiosResponse<ListNoteRes>> {
+        const req: ListNoteReq = {
+            only_operator: only_operator,
+            page: page,
+        }
 
-		return axiosWrapper.post("/note/list", req)
-	}
+        return axiosWrapper.post("/note/list", req)
+    }
 
-	public modifyNote(
-		note_id: string,
-		is_anonymous: boolean,
-		title: string,
-		content: string
-	): Promise<AxiosResponse<ModifyNoteRes>> {
-		let req: ModifyNoteReq = {
-			note_id: note_id,
-			is_anonymous: is_anonymous,
-			title: title,
-			content: content
-		}
+    public modifyNote(
+        note_id: string,
+        is_anonymous: boolean,
+        title: string,
+        content: string,
+    ): Promise<AxiosResponse<ModifyNoteRes>> {
+        const req: ModifyNoteReq = {
+            note_id: note_id,
+            is_anonymous: is_anonymous,
+            title: title,
+            content: content,
+        }
 
-		return axiosWrapper.post("/note/modify", req)
-	}
+        return axiosWrapper.post("/note/modify", req)
+    }
 
-	public deleteNote(note_id: string): Promise<AxiosResponse<DeleteNoteRes>> {
-		let req: DeleteNoteReq = {
-			note_id: note_id
-		}
+    public deleteNote(note_id: string): Promise<AxiosResponse<DeleteNoteRes>> {
+        const req: DeleteNoteReq = {
+            note_id: note_id,
+        }
 
-		return axiosWrapper.post("/note/delete", req)
-	}
+        return axiosWrapper.post("/note/delete", req)
+    }
 }
 
 export const noteAxios: NoteAxios = new NoteAxios()

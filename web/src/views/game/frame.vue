@@ -1,15 +1,15 @@
 <template>
-	<div class="game color-bg-0">
-		<div class="g-left">
-			<elevated_button class="gl-item" @click="routerLink('gFlip')">Flip</elevated_button>
-		</div>
+  <div class="game color-bg-0">
+    <div class="g-left">
+      <elevated_button class="gl-item" @click="routerLink('gFlip')">Flip</elevated_button>
+    </div>
 
-		<el-divider direction="vertical"></el-divider>
+    <el-divider direction="vertical" />
 
-		<div class="g-right">
-			<router-view />
-		</div>
-	</div>
+    <div class="g-right">
+      <router-view />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">

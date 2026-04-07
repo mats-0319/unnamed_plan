@@ -1,5 +1,7 @@
 <template>
-	<div class="default-subpage center-hv">&lceil;&nbsp;<slot></slot>&nbsp;&rfloor;</div>
+  <div class="default-subpage center-hv">
+    &lceil;&nbsp;<slot />&nbsp;&rfloor;
+  </div>
 </template>
 
 <style lang="less" scoped>

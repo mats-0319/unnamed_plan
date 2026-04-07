@@ -1,6 +1,6 @@
 <template>
-	<top />
-	<router-view />
+  <top />
+  <router-view />
 </template>
 
 <script setup lang="ts">
@@ -14,22 +14,22 @@ let flags = useFlagStore()
 let userStore = useUserStore()
 
 onMounted(() => {
-	// on re-size screen width
-	flags.onScreenWidthChanged(screen.width)
+    // on re-size screen width
+    flags.onScreenWidthChanged(screen.width)
 
-	window.addEventListener("resize", () => {
-		flags.onScreenWidthChanged(screen.width)
-	})
+    window.addEventListener("resize", () => {
+        flags.onScreenWidthChanged(screen.width)
+    })
 
-	// keep 'login info' during refresh
-	window.addEventListener("beforeunload", () => {
-		localStorage.setItem("login_data", JSON.stringify(userStore.user))
-	})
+    // keep 'login info' during refresh
+    window.addEventListener("beforeunload", () => {
+        localStorage.setItem("login_data", JSON.stringify(userStore.user))
+    })
 
-	let loginData = localStorage.getItem("login_data")
-	if (loginData) {
-		userStore.user = deepCopy(JSON.parse(loginData))
-	}
+    let loginData = localStorage.getItem("login_data")
+    if (loginData) {
+        userStore.user = deepCopy(JSON.parse(loginData))
+    }
 })
 </script>
 

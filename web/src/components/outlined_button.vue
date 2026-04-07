@@ -1,25 +1,25 @@
 <template>
-	<div class="outlined-button">
-		<div class="ob-box center-hv" :class="{ 'ob-disabled': props.disabled }">
-			&emsp;<span class="obb-text"><slot></slot></span>&emsp;
-		</div>
+  <div class="outlined-button">
+    <div class="ob-box center-hv" :class="{ 'ob-disabled': props.disabled }">
+			&emsp;<span class="obb-text"><slot /></span>&emsp;
+    </div>
 
-		<div v-if="props.details.length > 0" class="ob-details">
-			<el-tooltip :content="props.details" placement="top" raw-content> &nbsp;?&nbsp; </el-tooltip>
-		</div>
-	</div>
+    <div v-if="props.details.length > 0" class="ob-details">
+      <el-tooltip :content="props.details" placement="top" raw-content>&nbsp;?&nbsp;</el-tooltip>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 let props = defineProps({
-	details: {
-		type: String,
-		default: ""
-	},
-	disabled: {
-		type: Boolean,
-		default: false
-	}
+    details: {
+        type: String,
+        default: ""
+    },
+    disabled: {
+        type: Boolean,
+        default: false
+    }
 })
 </script>
 

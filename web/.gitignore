@@ -5,7 +5,7 @@ public/wasm_exec.js
 pnpm-lock.yaml
 pnpm-workspace.yaml
 
-format_result.json
+format_result.html
 
 # Logs
 logs
