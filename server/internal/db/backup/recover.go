@@ -12,12 +12,12 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func Recover[T any](t doBackupRecover[T]) error {
+func Recover[T any](t doBackupRecover[T]) {
 	dir := "./recover/" + t.Dir()
 	entry, err := os.ReadDir(dir)
 	if err != nil {
 		mlog.Error(fmt.Sprintf("read dir '%s' failed, error: %v", dir, err))
-		return err
+		return
 	}
 
 	for i := range entry {
@@ -33,15 +33,13 @@ func Recover[T any](t doBackupRecover[T]) error {
 		}
 
 		if !strings.HasSuffix(fileInfo.Name(), ".json") {
-			continue // ignore not go files
+			continue // ignore not json files
 		}
 
 		if err := recoverFile(dir+fileInfo.Name(), t); err != nil {
-			return err
+			return
 		}
 	}
-
-	return nil
 }
 
 func recoverFile[T any](path string, t doBackupRecover[T]) error {
@@ -57,12 +55,8 @@ func recoverFile[T any](path string, t doBackupRecover[T]) error {
 		return err
 	}
 
-	// 仅测试使用，为了方便看出一条数据库记录是预设的，还是恢复的
-	//{
-	//	for i := range fileData {
-	//		t.DoSomeChangeForTest(fileData[i])
-	//	}
-	//}
+	// 仅测试使用，为了方便看出一条数据库记录是不是通过该函数恢复的
+	//t.DoSomeChangesForTest(fileData)
 
 	clauseSkipAutoTime := clause.OnConflict{
 		Columns:   []clause.Column{{Name: "id"}},

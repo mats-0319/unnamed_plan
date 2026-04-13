@@ -11,8 +11,7 @@ func TestAccessToken(t *testing.T) {
 	t.Log("> Token: ", token)
 
 	ctx := &mhttp.Context{AccessToken: token}
-	err := VerifyAccessToken(ctx)
-	if err != nil {
+	if err := VerifyAccessToken(ctx); err != nil {
 		t.Error(err.String())
 	}
 

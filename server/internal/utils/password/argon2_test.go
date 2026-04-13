@@ -7,14 +7,13 @@ import (
 )
 
 func TestPassword(t *testing.T) {
-	pwdFromWeb := utils.CalcSHA256("123456") // hex(hash('password'))
-	t.Log("> Password From Web: ", pwdFromWeb)
+	pwdSHA256 := utils.CalcSHA256("123456") // hex(hash('password'))
+	t.Log("> Password From Web: ", pwdSHA256)
 
-	pwdDB := GeneratePwdHash(pwdFromWeb)
-	t.Log("> Password To DB: ", pwdDB)
+	pwdArgon2 := GeneratePassword(pwdSHA256)
+	t.Log("> Password To DB: ", pwdArgon2)
 
-	err := VerifyPassword(pwdFromWeb, pwdDB)
-	if err != nil {
+	if err := VerifyPassword(pwdSHA256, pwdArgon2); err != nil {
 		t.Fatal(err.String())
 	}
 	t.Log("> Verified.")

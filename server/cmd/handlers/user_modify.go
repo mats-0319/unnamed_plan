@@ -43,7 +43,7 @@ func ModifyUser(ctx *mhttp.Context) {
 			return
 		}
 
-		operator.Password = password.GeneratePwdHash(req.Password)
+		operator.Password = password.GeneratePassword(req.Password)
 	}
 	if req.Enable2FA != operator.Enable2FA {
 		if req.Enable2FA {

@@ -15,7 +15,6 @@ const URI_Login = "/login"
 type LoginReq struct {
 	UserName string `json:"user_name"`
 	Password string `json:"password"`
-	TotpCode string `json:"totp_code"`
 }
 
 type LoginRes struct {
@@ -25,10 +24,19 @@ type LoginRes struct {
 	Enable2FA bool   `json:"enable_2fa"`
 }
 
+const URI_LoginTotp = "/login-totp"
+
+type LoginTotpReq struct {
+	UserName string `json:"user_name"`
+	TotpCode string `json:"totp_code"`
+}
+
+type LoginTotpRes struct{}
+
 const URI_ListUser = "/user/list"
 
 type User struct {
-	UserName  string `json:"user_name"` // login name
+	UserName  string `json:"user_name"` // login name, can't modify
 	Nickname  string `json:"nickname"`  // display name
 	CreatedAt int64  `json:"created_at"`
 	IsAdmin   bool   `json:"is_admin"`
@@ -50,7 +58,7 @@ const URI_ModifyUser = "/user/modify"
 // ModifyUserReq string类型的属性为空，视为不修改对应字段
 type ModifyUserReq struct {
 	Nickname  string `json:"nickname"`
-	Password  string `json:"password"` // hex(sha256('text')), check: can't be same
+	Password  string `json:"password"`
 	Enable2FA bool   `json:"enable_2fa"`
 	TotpKey   string `json:"totp_key"`
 }

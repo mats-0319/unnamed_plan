@@ -37,21 +37,18 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		}
 	}()
 
-	ctx := NewContext(writer, request)
-	defer ctx.response()
-
 	handlerItemIns, ok := h.handlers[request.RequestURI]
 	if !ok {
-		e := ErrInvalidUri().WithParam("uri", request.RequestURI)
-		mlog.Error(e.String())
-		ctx.ResData = e
+		mlog.Error(ErrInvalidUri().Error())
 		return
 	}
 
+	ctx := NewContext(writer, request)
+	defer ctx.response()
+
 	// middlewares
 	for i := range handlerItemIns.Middlewares {
-		err := handlerItemIns.Middlewares[i](ctx)
-		if err != nil { // log in middleware
+		if err := handlerItemIns.Middlewares[i](ctx); err != nil { // log in middleware
 			ctx.ResData = err
 			return
 		}

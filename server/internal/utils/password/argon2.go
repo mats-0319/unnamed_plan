@@ -19,6 +19,7 @@ type AlgorithmParams struct {
 	Memory    uint32 // 使用内存
 	Threads   uint8  // 使用线程数
 	KeyLength uint32
+	Salt      []byte
 }
 
 func defaultAlgorithmParams() *AlgorithmParams {
@@ -27,34 +28,32 @@ func defaultAlgorithmParams() *AlgorithmParams {
 		Memory:    64 * 1024, // 64 MB
 		Threads:   1,
 		KeyLength: 32,
+		Salt:      utils.GenerateRandomBytes[[]byte](32),
 	}
 }
 
-func GeneratePwdHash(password string) string {
-	pm := defaultAlgorithmParams()
+func GeneratePassword(pwdSHA256 string) (pwdArgon2 string) {
+	params := defaultAlgorithmParams()
 
-	salt := utils.GenerateRandomBytes[[]byte](32)
-	saltHex := hex.EncodeToString(salt)
+	key := argon2.IDKey([]byte(pwdSHA256), params.Salt, params.CalcTimes, params.Memory, params.Threads, params.KeyLength)
 
-	key := argon2.IDKey([]byte(password), salt, pm.CalcTimes, pm.Memory, pm.Threads, pm.KeyLength)
-	keyHex := hex.EncodeToString(key)
+	pwdArgon2 = fmt.Sprintf("argon2id.v=%d,m=%d,t=%d,c=%d.%s.%s", argon2.Version,
+		params.Memory, params.CalcTimes, params.Threads, hex.EncodeToString(params.Salt), hex.EncodeToString(key))
 
-	return fmt.Sprintf("argon2id.v=%d,m=%d,t=%d,c=%d.%s.%s",
-		argon2.Version, pm.Memory, pm.CalcTimes, pm.Threads, saltHex, keyHex)
+	return
 }
 
-// VerifyPassword decode 'key' from 'pwd hash', calc 'new key' with 'password', compare two keys
-func VerifyPassword(password, pwdHash string) *utils.Error {
-	params, salt, key, e := decodeHash(pwdHash)
+// VerifyPassword decode 'key' from 'pwdArgon2', calc 'new key' with 'pwdSHA256', compare two keys
+func VerifyPassword(pwdSHA256 string, pwdArgon2 string) *utils.Error {
+	params, oldKey, e := decodeHash(pwdArgon2)
 	if e != nil {
 		return e
 	}
 
-	newKey := argon2.IDKey([]byte(password), salt, params.CalcTimes, params.Memory, params.Threads, params.KeyLength)
+	newKey := argon2.IDKey([]byte(pwdSHA256), params.Salt, params.CalcTimes, params.Memory, params.Threads, params.KeyLength)
 
-	// 使用恒定时间比较防止时序攻击
-	if subtle.ConstantTimeCompare(key, newKey) != 1 {
-		e := utils.ErrWrongPassword().WithParam("old key", key).WithParam("new key", newKey)
+	if subtle.ConstantTimeCompare(oldKey, newKey) != 1 { // 使用恒定时间比较防止时序攻击
+		e := utils.ErrWrongPassword().WithParam("old key", oldKey).WithParam("new key", newKey)
 		mlog.Error(e.String())
 		return e
 	}
@@ -62,37 +61,37 @@ func VerifyPassword(password, pwdHash string) *utils.Error {
 	return nil
 }
 
-func decodeHash(pwdHash string) (*AlgorithmParams, []byte, []byte, *utils.Error) {
+func decodeHash(pwdHash string) (params *AlgorithmParams, oldKey []byte, e *utils.Error) {
 	pwdSplit := strings.Split(pwdHash, ".")
 	if len(pwdSplit) != 4 || pwdSplit[0] != "argon2id" {
-		e := utils.ErrInvalidPassword().WithParam("encoded pwd", pwdHash)
+		e = utils.ErrInvalidPassword().WithParam("encoded pwd", pwdHash)
 		mlog.Error(e.String())
-		return nil, nil, nil, e
+		return
 	}
 
 	var version int
-	params := &AlgorithmParams{}
+	params = &AlgorithmParams{}
 	_, err := fmt.Sscanf(pwdSplit[1], "v=%d,m=%d,t=%d,c=%d", &version, &params.Memory, &params.CalcTimes, &params.Threads)
 	if err != nil || version != argon2.Version {
-		e := utils.ErrInvalidPassword().WithCause(err).WithParam("version", version).WithParam("params", params)
+		e = utils.ErrInvalidPassword().WithCause(err).WithParam("version", version).WithParam("params", params)
 		mlog.Error(e.String())
-		return nil, nil, nil, e
+		return
 	}
 
-	salt, err := hex.DecodeString(pwdSplit[2])
+	params.Salt, err = hex.DecodeString(pwdSplit[2])
 	if err != nil {
-		e := utils.ErrInvalidPwdSalt().WithCause(err).WithParam("salt", pwdSplit[2])
+		e = utils.ErrInvalidPwdSalt().WithCause(err).WithParam("salt", pwdSplit[2])
 		mlog.Error(e.String())
-		return nil, nil, nil, e
+		return
 	}
 
 	key, err := hex.DecodeString(pwdSplit[3])
 	if err != nil {
-		e := utils.ErrInvalidPwdKey().WithCause(err).WithParam("key", pwdSplit[3])
+		e = utils.ErrInvalidPwdKey().WithCause(err).WithParam("key", pwdSplit[3])
 		mlog.Error(e.String())
-		return nil, nil, nil, e
+		return
 	}
 	params.KeyLength = uint32(len(key))
 
-	return params, salt, key, nil
+	return
 }

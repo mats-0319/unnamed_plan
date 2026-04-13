@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
 	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
@@ -53,7 +52,7 @@ func UpdateUser(user *model.User) *Error {
 	return nil
 }
 
-func ListUser(page api.Pagination) (int64, []*model.User, *Error) {
+func ListUser(pageSize int, pageNum int) (int64, []*model.User, *Error) {
 	sql := User.WithContext(context.TODO())
 
 	amount, err := sql.Count()
@@ -63,7 +62,7 @@ func ListUser(page api.Pagination) (int64, []*model.User, *Error) {
 		return 0, nil, e
 	}
 
-	users, err := sql.Order(User.UpdatedAt.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
+	users, err := sql.Order(User.UpdatedAt.Desc()).Limit(pageSize).Offset((pageNum - 1) * pageSize).Find()
 	if err != nil {
 		e := ErrDBError().WithCause(err)
 		mlog.Error(e.String())

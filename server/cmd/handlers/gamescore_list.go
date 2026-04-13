@@ -32,6 +32,7 @@ func ListGameScore(ctx *mhttp.Context) {
 		count, records, e = dal.ListFlipGameScore(req.Page.Size, req.Page.Num)
 	default:
 		e = utils.ErrInvalidGameName().WithParam("game name", req.GameName)
+		mlog.Error(e.String())
 	}
 	if e != nil {
 		ctx.ResData = e

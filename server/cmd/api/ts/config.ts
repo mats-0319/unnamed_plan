@@ -1,13 +1,13 @@
 // Generate File, Should Not Edit.
 // Author : mario. github.com/mats0319
 // Code   : github.com/mats0319/study/go/gocts
-// Version: gocts v0.2.4
+// Version: gocts v0.2.5
 
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance } from "axios"
 
 export const axiosWrapper: AxiosInstance = axios.create({
 	baseURL: getBaseUrl(),
-	timeout: 3000
+	timeout: 3000,
 })
 
 // getBaseUrl according to dev/product env & local ipv4 addr, set 'baseURL'

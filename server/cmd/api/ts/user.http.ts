@@ -1,11 +1,11 @@
 // Generate File, Should Not Edit.
 // Author : mario. github.com/mats0319
 // Code   : github.com/mats0319/study/go/gocts
-// Version: gocts v0.2.4
+// Version: gocts v0.2.5
 
 import { axiosWrapper } from "./config"
 import { AxiosResponse } from "axios"
-import { RegisterRes, RegisterReq, LoginRes, LoginReq, ListUserRes, ListUserReq, ModifyUserRes, ModifyUserReq } from "./user.go"
+import { RegisterRes, RegisterReq, LoginRes, LoginReq, LoginTotpRes, LoginTotpReq, ListUserRes, ListUserReq, ModifyUserRes, ModifyUserReq } from "./user.go"
 import { Pagination } from "./common.go"
 
 class UserAxios {
@@ -18,14 +18,22 @@ class UserAxios {
         return axiosWrapper.post("/register", req)
     }
 
-    public login(user_name: string, password: string, totp_code: string): Promise<AxiosResponse<LoginRes>> {
+    public login(user_name: string, password: string): Promise<AxiosResponse<LoginRes>> {
         let req: LoginReq = {
             user_name: user_name,
             password: password,
-            totp_code: totp_code,
         }
 
         return axiosWrapper.post("/login", req)
+    }
+
+    public loginTotp(user_name: string, totp_code: string): Promise<AxiosResponse<LoginTotpRes>> {
+        let req: LoginTotpReq = {
+            user_name: user_name,
+            totp_code: totp_code,
+        }
+
+        return axiosWrapper.post("/login-totp", req)
     }
 
     public listUser(page: Pagination): Promise<AxiosResponse<ListUserRes>> {

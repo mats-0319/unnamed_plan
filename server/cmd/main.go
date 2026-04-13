@@ -79,12 +79,8 @@ func autoBackup(ctx context.Context, brm *backup.BRManager) {
 			return
 		case <-time.After(time.Duration(remain) * time.Second):
 			mlog.Info("> Auto Backup Start ...")
-
-			if err := brm.Backup(); err != nil {
-				mlog.Error("auto backup failed", mlog.Field("error", err))
-			} else {
-				mlog.Info("> Auto Backup Done.")
-			}
+			brm.Backup()
+			mlog.Info("> Auto Backup Done.")
 		}
 	}
 }
@@ -94,30 +90,24 @@ func waitSignal(ctx context.Context, brm *backup.BRManager) {
 
 	mlog.Info("> Goroutine: Wait Signal Start.")
 
-	ch := make(chan os.Signal, 1)
-	signal.Notify(ch, syscall.SIGUSR1, syscall.SIGUSR2)
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGUSR1, syscall.SIGUSR2)
 
 	for {
 		select {
 		case <-ctx.Done():
 			mlog.Info("> Goroutine: Wait Signal Exit.")
 			return
-		case sig := <-ch:
+		case sig := <-sigCh:
 			mlog.Info("> Received Signal: " + sig.String())
 
 			switch sig {
 			case syscall.SIGUSR1:
-				if err := brm.Backup(); err != nil {
-					mlog.Error("backup failed", mlog.Field("error", err))
-				} else {
-					mlog.Info("> Backup Done.")
-				}
+				brm.Backup()
+				mlog.Info("> Backup Done.")
 			case syscall.SIGUSR2:
-				if err := brm.Recover(); err != nil {
-					mlog.Error("recover failed", mlog.Field("error", err))
-				} else {
-					mlog.Info("> Recover Done.")
-				}
+				brm.Recover()
+				mlog.Info("> Recover Done.")
 			}
 		}
 	}

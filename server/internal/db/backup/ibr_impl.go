@@ -13,12 +13,12 @@ var _ IBackupRecover = (*UserBR)(nil)
 
 //var _ doBackupRecover[*model.User] = (*UserBR)(nil)
 
-func (u *UserBR) Backup() error {
-	return Backup[*model.User](u) // 这里会隐式验证类型是否实现了`doBackupRecover`接口，不需要显式验证
+func (u *UserBR) Backup() {
+	Backup[*model.User](u) // 这里会隐式验证类型是否实现了`doBackupRecover`接口，不需要显式验证
 }
 
-func (u *UserBR) Recover() error {
-	return Recover[*model.User](u)
+func (u *UserBR) Recover() {
+	Recover[*model.User](u)
 }
 
 func (u *UserBR) Model() *model.User {
@@ -61,8 +61,10 @@ func (u *UserBR) Dir() string {
 	return "user/"
 }
 
-func (u *UserBR) DoSomeChangeForTest(data *model.User) {
-	data.Nickname = "Recover - " + data.Nickname
+func (u *UserBR) DoSomeChangesForTest(users []*model.User) {
+	for _, user := range users {
+		user.Nickname = "Recover - " + user.Nickname
+	}
 }
 
 type NoteBR struct {
@@ -72,12 +74,12 @@ var _ IBackupRecover = (*NoteBR)(nil)
 
 //var _ doBackupRecover[*model.Note] = (*NoteBR)(nil)
 
-func (n *NoteBR) Backup() error {
-	return Backup[*model.Note](n)
+func (n *NoteBR) Backup() {
+	Backup[*model.Note](n)
 }
 
-func (n *NoteBR) Recover() error {
-	return Recover[*model.Note](n)
+func (n *NoteBR) Recover() {
+	Recover[*model.Note](n)
 }
 
 func (n *NoteBR) Model() *model.Note {
@@ -120,22 +122,24 @@ func (n *NoteBR) Dir() string {
 	return "note/"
 }
 
-func (n *NoteBR) DoSomeChangeForTest(data *model.Note) {
-	data.WriterName = "Recover - " + data.WriterName
+func (n *NoteBR) DoSomeChangesForTest(notes []*model.Note) {
+	for _, note := range notes {
+		note.WriterName = "Recover - " + note.WriterName
+	}
 }
 
 type FlipGameScore struct{}
 
 var _ IBackupRecover = (*FlipGameScore)(nil)
 
-var _ doBackupRecover[*model.FlipGameScore] = (*FlipGameScore)(nil)
+//var _ doBackupRecover[*model.FlipGameScore] = (*FlipGameScore)(nil)
 
-func (f *FlipGameScore) Backup() error {
-	return Backup[*model.FlipGameScore](f)
+func (f *FlipGameScore) Backup() {
+	Backup[*model.FlipGameScore](f)
 }
 
-func (f *FlipGameScore) Recover() error {
-	return Recover[*model.FlipGameScore](f)
+func (f *FlipGameScore) Recover() {
+	Recover[*model.FlipGameScore](f)
 }
 
 func (f *FlipGameScore) Model() *model.FlipGameScore {
@@ -176,6 +180,8 @@ func (f *FlipGameScore) Dir() string {
 	return "flip_game_score/"
 }
 
-func (f *FlipGameScore) DoSomeChangeForTest(data *model.FlipGameScore) {
-	data.PlayerName = "Recover - " + data.PlayerName
+func (f *FlipGameScore) DoSomeChangesForTest(scores []*model.FlipGameScore) {
+	for _, score := range scores {
+		score.PlayerName = "Recover - " + score.PlayerName
+	}
 }

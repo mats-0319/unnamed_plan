@@ -1,12 +1,12 @@
 // Generate File, Should Not Edit.
 // Author : mario. github.com/mats0319
 // Code   : github.com/mats0319/study/go/gocts
-// Version: gocts v0.2.4
+// Version: gocts v0.2.5
 
 import { axiosWrapper } from "./config"
 import { AxiosResponse } from "axios"
-import { UploadGameScoreRes, UploadGameScoreReq, GameName, ListGameScoreRes, ListGameScoreReq } from "./game.go"
 import { Pagination } from "./common.go"
+import { UploadGameScoreRes, UploadGameScoreReq, GameName, ListGameScoreRes, ListGameScoreReq } from "./game.go"
 
 class GameAxios {
     public uploadGameScore(game_name: GameName, score: number, result: string, player: string): Promise<AxiosResponse<UploadGameScoreRes>> {

@@ -15,6 +15,11 @@ import (
 // token structure: `hex({"user_name":[xxx]...}).hex(hash(payload, key))`
 // more: doc/design.md 接口访问令牌
 
+// 关于接口应如何使用验证中间件的说明：
+// 1. 必须登录后可调用的接口：使用验证中间件，例如写小纸条
+// 2. 是否登录均可调用，对访客/用户的处理逻辑相同的接口：不使用中间件，例如注册、登录
+// 3. 是否登录均可调用，对访客/用户的处理逻辑不同的接口：使用可选验证中间件，例如上传游戏成绩
+
 type AccessToken struct {
 	UserName   string `json:"user_name"`
 	ExpireTime int64  `json:"expire_time"`
@@ -23,7 +28,7 @@ type AccessToken struct {
 func GenAccessToken(userName string) string {
 	tokenBytes, err := json.Marshal(&AccessToken{
 		UserName:   userName,
-		ExpireTime: time.Now().Add(time.Hour * 6).UnixMilli(), // hard code 'expire time' = 6h
+		ExpireTime: time.Now().Add(time.Hour * 12).UnixMilli(), // hard code 'expire time' = 12h
 	})
 	if err != nil {
 		e := ErrServerInternalError().WithCause(err)
@@ -37,20 +42,13 @@ func GenAccessToken(userName string) string {
 }
 
 // OptionalVerifyAccessToken 用于访客和用户均可使用的接口，访问token验证失败视为访客、验证成功可以拿到`ctx.userName`。
-// 接口应如何使用验证中间件的说明：
-// 1. 不需要登录的接口：不使用中间件，例如注册、登录
-//   - 因为不需要登录，所以此时没有用户身份，所有调用者都是访客
-//
-// 2. 必须登录后可调用的接口：使用验证中间件，例如写小纸条
-// 3. 是否登录均可调用、且对访客/用户的处理逻辑不同的接口：使用可选验证中间件，例如上传游戏成绩
 func OptionalVerifyAccessToken(ctx *mhttp.Context) *Error {
 	_ = verifyAccessToken(ctx)
 	return nil
 }
 
 func VerifyAccessToken(ctx *mhttp.Context) (e *Error) {
-	e = verifyAccessToken(ctx)
-	if e != nil {
+	if e = verifyAccessToken(ctx); e != nil {
 		mlog.Error(e.String())
 	}
 

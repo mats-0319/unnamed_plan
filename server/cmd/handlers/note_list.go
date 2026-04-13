@@ -22,16 +22,12 @@ func ListNote(ctx *mhttp.Context) {
 		return
 	}
 
-	var (
-		count int64
-		notes = make([]*model.Note, 0)
-		e     *utils.Error
-	)
+	writer := ""
 	if req.OnlyOperator && len(ctx.UserName) > 0 {
-		count, notes, e = dal.ListNote(req.Page.Size, req.Page.Num, ctx.UserName)
-	} else {
-		count, notes, e = dal.ListNote(req.Page.Size, req.Page.Num, "")
+		writer = ctx.UserName
 	}
+
+	count, notes, e := dal.ListNote(req.Page.Size, req.Page.Num, writer)
 	if e != nil {
 		ctx.ResData = e
 		return

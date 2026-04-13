@@ -24,37 +24,28 @@ func TestBackupRecover(t *testing.T) {
 	brm := NewBRManager(&UserBR{}, &NoteBR{})
 
 	// test backup
-	err := brm.Backup()
-	if err != nil {
-		os.Exit(1)
-	}
+	brm.Backup()
 
 	mlog.Info("> Backup done.")
 
 	// prepare recover data
-	err = prepareRecoverData()
-	if err != nil {
+	if err := prepareRecoverData(); err != nil {
 		os.Exit(1)
 	}
 
 	// test recover
-	err = brm.Recover()
-	if err != nil {
-		os.Exit(1)
-	}
+	brm.Recover()
 
 	mlog.Info("> Recover done.")
 }
 
 func prepareRecoverData() error {
-	err := os.RemoveAll("./recover/")
-	if err != nil {
+	if err := os.RemoveAll("./recover/"); err != nil {
 		mlog.Error("remove dir failed", mlog.Field("error", err))
 		return err
 	}
 
-	err = os.Rename("./backup/", "./recover/")
-	if err != nil {
+	if err := os.Rename("./backup/", "./recover/"); err != nil {
 		mlog.Error("rename folder failed", mlog.Field("error", err))
 		return err
 	}
@@ -67,13 +58,11 @@ func initDB() {
 	dbConfig.IsTestMode = true
 	db := utilsdb.InitDB(dbConfig)
 
-	err := db.Migrator().DropTable(model.ModelList...)
-	if err != nil {
+	if err := db.Migrator().DropTable(model.ModelList...); err != nil {
 		log.Fatalln("drop db table failed, error: ", err)
 	}
 
-	err = db.Migrator().CreateTable(model.ModelList...)
-	if err != nil {
+	if err := db.Migrator().CreateTable(model.ModelList...); err != nil {
 		log.Fatalln("create db table failed, error: ", err)
 	}
 

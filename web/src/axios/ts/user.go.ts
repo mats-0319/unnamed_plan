@@ -1,7 +1,7 @@
 // Generate File, Should Not Edit.
 // Author : mario. github.com/mats0319
 // Code   : github.com/mats0319/study/go/gocts
-// Version: gocts v0.2.4
+// Version: gocts v0.2.5
 
 import { Pagination } from "./common.go"
 
@@ -15,7 +15,6 @@ export class RegisterRes {}
 export class LoginReq {
     user_name: string = ""
     password: string = ""
-    totp_code: string = ""
 }
 
 export class LoginRes {
@@ -25,8 +24,15 @@ export class LoginRes {
     enable_2fa: boolean = false
 }
 
+export class LoginTotpReq {
+    user_name: string = ""
+    totp_code: string = ""
+}
+
+export class LoginTotpRes {}
+
 export class User {
-    user_name: string = "" // login name
+    user_name: string = "" // login name, can't modify
     nickname: string = "" // display name
     created_at: number = 0
     is_admin: boolean = false
@@ -46,7 +52,7 @@ export class ListUserRes {
 // ModifyUserReq string类型的属性为空，视为不修改对应字段
 export class ModifyUserReq {
     nickname: string = ""
-    password: string = "" // hex(sha256('text')), check: can't be same
+    password: string = ""
     enable_2fa: boolean = false
     totp_key: string = ""
 }

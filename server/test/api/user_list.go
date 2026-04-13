@@ -26,7 +26,7 @@ func listUserCase_Success() string {
 		return res.Err
 	}
 
-	count, _, err := dal.ListUser(api.Pagination{Size: 10, Num: 1})
+	count, _, err := dal.ListUser(10, 1)
 	if count != 4 || err != nil {
 		return unknownError
 	}

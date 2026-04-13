@@ -35,7 +35,7 @@ func ListUser(ctx *mhttp.Context) {
 		return
 	}
 
-	count, users, e := dal.ListUser(req.Page)
+	count, users, e := dal.ListUser(req.Page.Size, req.Page.Num)
 	if e != nil {
 		ctx.ResData = e
 		return

@@ -26,7 +26,7 @@ func Register(ctx *mhttp.Context) {
 	user := &model.User{
 		UserName: req.UserName,
 		Nickname: req.UserName,
-		Password: password.GeneratePwdHash(req.Password),
+		Password: password.GeneratePassword(req.Password),
 	}
 
 	if err := dal.CreateUser(user); err != nil {

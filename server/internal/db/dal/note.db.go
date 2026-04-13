@@ -53,8 +53,7 @@ func UpdateNote(note *model.Note) *Error {
 }
 
 func DeleteNote(noteID string) *Error {
-	_, err := Note.WithContext(context.TODO()).Where(Note.NoteID.Eq(noteID)).Delete()
-	if err != nil {
+	if _, err := Note.WithContext(context.TODO()).Where(Note.NoteID.Eq(noteID)).Delete(); err != nil {
 		e := ErrDBError().WithCause(err)
 		mlog.Error(e.String())
 		return e
