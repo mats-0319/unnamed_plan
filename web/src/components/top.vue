@@ -46,9 +46,9 @@
         <el-input v-model="loginReq.password" show-password />
       </el-form-item>
 
-      <el-form-item label="TOTP Code">
-        <el-input v-model="loginReq.totp_code" />
-      </el-form-item>
+      <!--      <el-form-item label="TOTP Code">-->
+      <!--        <el-input v-model="loginReq.totp_code" />-->
+      <!--      </el-form-item>-->
 
       <el-form-item>
         <outlined-button :details="tips_RegisterUser" :disabled="!canLoginFlag" @click="register">
@@ -86,7 +86,7 @@ function beforeOpenLoginDialog(): void {
 }
 
 function login(): void {
-    userStore.login(loginReq.value.user_name, loginReq.value.password, loginReq.value.totp_code, () => {
+    userStore.login(loginReq.value.user_name, loginReq.value.password, () => {
         showLoginDialog.value = false
     })
 }
@@ -100,9 +100,6 @@ function register(): void {
 function exitLogin(): void {
     userStore.exitLogin()
     routerLink("home")
-    localStorage.removeItem("user_id")
-    localStorage.removeItem("access_token")
-    localStorage.removeItem("login_data")
 }
 
 watch(

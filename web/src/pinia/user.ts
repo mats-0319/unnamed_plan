@@ -16,14 +16,14 @@ export const useUserStore = defineStore("user", () => {
 
             log.success("register")
 
-            login(userName, password, "", () => {})
+            login(userName, password, () => {})
         })
     }
 
-    function login(userName: string, password: string, totpCode: string, cb: () => void): void {
+    function login(userName: string, password: string, cb: () => void): void {
         const pwdHash = CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex)
 
-        userAxios.login(userName, pwdHash, totpCode).then(({ data }: { data: LoginRes }) => {
+        userAxios.login(userName, pwdHash).then(({ data }: { data: LoginRes }) => {
             user.value = loginResToUser(data)
 
             cb()
@@ -64,6 +64,8 @@ export const useUserStore = defineStore("user", () => {
 
     function exitLogin(): void {
         user.value = new User()
+        localStorage.removeItem("access_token")
+        localStorage.removeItem("login_data")
     }
 
     return { user, register, login, modify, list, isLogin, exitLogin }
