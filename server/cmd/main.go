@@ -46,6 +46,7 @@ func newHandler() *mhttp.Handler {
 	// user
 	h.AddHandler(uriPrefix+api.URI_Register, handlers.Register)
 	h.AddHandler(uriPrefix+api.URI_Login, handlers.Login)
+	h.AddHandler(uriPrefix+api.URI_LoginTotp, handlers.LoginTotp)
 	h.AddHandler(uriPrefix+api.URI_ListUser, handlers.ListUser, middleware.VerifyAccessToken)
 	h.AddHandler(uriPrefix+api.URI_ModifyUser, handlers.ModifyUser, middleware.VerifyAccessToken)
 

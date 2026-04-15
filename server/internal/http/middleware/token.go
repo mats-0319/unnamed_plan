@@ -20,16 +20,37 @@ import (
 // 2. 是否登录均可调用，对访客/用户的处理逻辑相同的接口：不使用中间件，例如注册、登录
 // 3. 是否登录均可调用，对访客/用户的处理逻辑不同的接口：使用可选验证中间件，例如上传游戏成绩
 
-type AccessToken struct {
-	UserName   string `json:"user_name"`
-	ExpireTime int64  `json:"expire_time"`
+type Token struct {
+	UserName   string    `json:"user_name"`
+	Type       TokenType `json:"type"`
+	ExpireTime int64     `json:"expire_time"`
 }
 
-func GenAccessToken(userName string) string {
-	tokenBytes, err := json.Marshal(&AccessToken{
+type TokenType int8
+
+const (
+	TokenType_ApiAccessToken TokenType = 1
+	TokenType_MfaToken                 = 2
+)
+
+func GenerateApiAccessToken(userName string) string {
+	return generateToken(&Token{
 		UserName:   userName,
+		Type:       TokenType_ApiAccessToken,
 		ExpireTime: time.Now().Add(time.Hour * 12).UnixMilli(), // hard code 'expire time' = 12h
 	})
+}
+
+func GenerateMfaToken(userName string) string {
+	return generateToken(&Token{
+		UserName:   userName,
+		Type:       TokenType_MfaToken,
+		ExpireTime: time.Now().Add(time.Minute * 5).UnixMilli(), // hard code 'expire time' = 5min
+	})
+}
+
+func generateToken(token *Token) string {
+	tokenBytes, err := json.Marshal(token)
 	if err != nil {
 		e := ErrServerInternalError().WithCause(err)
 		mlog.Error(e.String())
@@ -73,7 +94,7 @@ func verifyAccessToken(ctx *mhttp.Context) (e *Error) {
 		return
 	}
 
-	token := &AccessToken{}
+	token := &Token{}
 	if err := json.Unmarshal(tokenBytes, token); err != nil {
 		e = ErrDeserializeAccessToken().WithCause(err)
 		return

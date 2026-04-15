@@ -27,6 +27,12 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		return // res body is empty
 	}
 
+	handlerItemIns, ok := h.handlers[request.RequestURI]
+	if !ok {
+		mlog.Error(ErrInvalidUri().Error(), mlog.Field("uri", request.URL.String()))
+		return
+	}
+
 	mlog.Info(fmt.Sprintf("> Receive Request: %s .", request.URL.String()))
 	startTime := time.Now()
 	defer func() {
@@ -36,12 +42,6 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 			mlog.Error("panic", mlog.Field("", err))
 		}
 	}()
-
-	handlerItemIns, ok := h.handlers[request.RequestURI]
-	if !ok {
-		mlog.Error(ErrInvalidUri().Error())
-		return
-	}
 
 	ctx := NewContext(writer, request)
 	defer ctx.response()

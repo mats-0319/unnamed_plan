@@ -42,19 +42,21 @@ func Login(ctx *mhttp.Context) {
 		return
 	}
 
-	//if user.Enable2FA {
-	//	if e := verifyTotpCode(req.TotpCode, user.TotpKey); e != nil {
-	//		ctx.ResData = e
-	//		return
-	//	}
-	//}
+	if user.Enable2FA {
+		ctx.ResData = &api.LoginRes{Enable2FA: true}
+		return
+		//if e := verifyTotpCode(req.TotpCode, user.TotpKey); e != nil {
+		//	ctx.ResData = e
+		//	return
+		//}
+	}
 
 	if e := dal.UpdateUser(user); e != nil { // modify user.UpdatedAt
 		ctx.ResData = e
 		return
 	}
 
-	ctx.Writer.Header().Set(utils.HttpHeader_AccessToken, middleware.GenAccessToken(user.UserName))
+	ctx.Writer.Header().Set(utils.HttpHeader_AccessToken, middleware.GenerateApiAccessToken(user.UserName))
 
 	ctx.ResData = &api.LoginRes{
 		UserName:  user.UserName,

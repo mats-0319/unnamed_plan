@@ -7,7 +7,7 @@ import (
 )
 
 func TestAccessToken(t *testing.T) {
-	token := GenAccessToken("user name 1")
+	token := GenerateApiAccessToken("user name 1")
 	t.Log("> Token: ", token)
 
 	ctx := &mhttp.Context{AccessToken: token}
