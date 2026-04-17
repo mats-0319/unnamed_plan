@@ -7,13 +7,13 @@ import (
 )
 
 func PresetUser() []*model.User {
-	pwdFromWeb := utils.CalcSHA256("123456")
+	pwdSHA256 := utils.CalcSHA256("123456")
 
 	return []*model.User{
 		{
 			UserName:  "admin",
 			Nickname:  "admin",
-			Password:  password.GeneratePassword(pwdFromWeb),
+			Password:  password.GeneratePassword(pwdSHA256),
 			IsAdmin:   true,
 			Enable2FA: false,
 			TotpKey:   "",
@@ -21,14 +21,14 @@ func PresetUser() []*model.User {
 		{
 			UserName:  "user",
 			Nickname:  "user",
-			Password:  password.GeneratePassword(pwdFromWeb),
+			Password:  password.GeneratePassword(pwdSHA256),
 			Enable2FA: false,
 			TotpKey:   "",
 		},
 		{
 			UserName:  "user_with_totp",
 			Nickname:  "user_with_totp",
-			Password:  password.GeneratePassword(pwdFromWeb),
+			Password:  password.GeneratePassword(pwdSHA256),
 			Enable2FA: true,
 			TotpKey:   "NVQXE2LP", // base32 of 'mario'
 		},

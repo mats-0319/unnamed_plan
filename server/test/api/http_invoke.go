@@ -15,15 +15,15 @@ import (
 var accessToken_Admin = ""
 var accessToken_User = ""
 
-var pwd = utils.CalcSHA256("123456")
+var pwdSHA256 = utils.CalcSHA256("123456")
 
 func GetAccessToken() {
-	r := httpInvoke(api.URI_Login, fmt.Sprintf(`{"user_name":"admin","password":"%s","totp_code":""}`, pwd), "")
+	r := httpInvoke(api.URI_Login, fmt.Sprintf(`{"user_name":"admin","password":"%s"}`, pwdSHA256), "")
 	if r.IsSuccess {
 		accessToken_Admin = r.AccessToken
 	}
 
-	r = httpInvoke(api.URI_Login, fmt.Sprintf(`{"user_name":"user","password":"%s","totp_code":""}`, pwd), "")
+	r = httpInvoke(api.URI_Login, fmt.Sprintf(`{"user_name":"user","password":"%s"}`, pwdSHA256), "")
 	if r.IsSuccess {
 		accessToken_User = r.AccessToken
 	}
@@ -33,6 +33,9 @@ type TestResponse struct {
 	IsSuccess   bool   `json:"is_success"`
 	Err         string `json:"err"`
 	AccessToken string `json:"access_token"`
+	Data        struct {
+		MfaToken string `json:"mfa_token"`
+	} `json:"data"`
 }
 
 func httpInvoke(uri string, payload string, token string) *TestResponse {

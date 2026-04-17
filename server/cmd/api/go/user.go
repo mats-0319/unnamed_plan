@@ -22,13 +22,13 @@ type LoginRes struct {
 	Nickname  string `json:"nickname"`
 	IsAdmin   bool   `json:"is_admin"`
 	Enable2FA bool   `json:"enable_2fa"`
-	MfaToken  string `json:"mfa_token"` // empty if disable 2fa
+	MfaToken  string `json:"mfa_token"` // empty when disable 2fa
 }
 
 const URI_LoginTotp = "/login-totp"
 
 type LoginTotpReq struct {
-	UserName string `json:"user_name"`
+	MfaToken string `json:"mfa_token"`
 	TotpCode string `json:"totp_code"`
 }
 

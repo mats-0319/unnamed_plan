@@ -1,72 +1,80 @@
 import { defineStore } from "pinia"
-import { ListUserRes, LoginRes, ModifyUserRes, RegisterRes, User } from "@/axios/ts/user.go.ts"
+import { ListUserRes, LoginRes, LoginTotpRes, ModifyUserRes, RegisterRes, User } from "@/axios/ts/user.go.ts"
 import { ref } from "vue"
 import CryptoJs from "crypto-js"
 import { userAxios } from "@/axios/ts/user.http.ts"
 import { log } from "@/ts/log.ts"
 
 export const useUserStore = defineStore("user", () => {
-    const user = ref<User>(new User())
+	const user = ref<User>(new User())
 
-    function register(userName: string, password: string, cb: () => void): void {
-        const pwdHash = CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex)
+	function register(userName: string, password: string, cb: () => void): void {
+		const pwdHash = CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex)
 
-        userAxios.register(userName, pwdHash).then(({}: { data: RegisterRes }) => {
-            cb()
+		userAxios.register(userName, pwdHash).then(({}: { data: RegisterRes }) => {
+			cb()
 
-            log.success("register")
+			log.success("register")
 
-            login(userName, password, () => {})
-        })
-    }
+			login(userName, password, () => {
+			})
+		})
+	}
 
-    function login(userName: string, password: string, cb: () => void): void {
-        const pwdHash = CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex)
+	function login(userName: string, password: string, cb: () => void): void {
+		const pwdHash = CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex)
 
-        userAxios.login(userName, pwdHash).then(({ data }: { data: LoginRes }) => {
-            user.value = loginResToUser(data)
+		userAxios.login(userName, pwdHash).then(({ data }: { data: LoginRes }) => {
+			user.value = loginResToUser(data)
 
-            cb()
+			cb()
 
-            log.success("login")
-        })
-    }
+			log.success("login")
+		})
+	}
 
-    function modify(nickname: string, password: string, enable2FA: boolean, totpKey: string): void {
-        const pwdHash = CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex)
+	function loginTotp(mfaToken: string, totpCode: string, cb: () => void): void {
+		userAxios.loginTotp(mfaToken, totpCode).then(({ data }: { data: LoginTotpRes }) => {
+			cb()
+			console.log(data)
+		})
+	}
 
-        userAxios.modifyUser(nickname, pwdHash, enable2FA, totpKey).then(({}: { data: ModifyUserRes }) => {
-            log.success("modify user")
-        })
-    }
+	function modify(nickname: string, password: string, enable2FA: boolean, totpKey: string): void {
+		const pwdHash = CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex)
 
-    function list(pageSize: number, pageNum: number, cb: (amount: number, users: Array<User>) => void): void {
-        userAxios.listUser({ size: pageSize, num: pageNum }).then(({ data }: { data: ListUserRes }) => {
-            cb(data.amount, data.users)
+		userAxios.modifyUser(nickname, pwdHash, enable2FA, totpKey).then(({}: { data: ModifyUserRes }) => {
+			log.success("modify user")
+		})
+	}
 
-            log.success("list user")
-        })
-    }
+	function list(pageSize: number, pageNum: number, cb: (amount: number, users: Array<User>) => void): void {
+		userAxios.listUser({ size: pageSize, num: pageNum }).then(({ data }: { data: ListUserRes }) => {
+			cb(data.amount, data.users)
 
-    function loginResToUser(res: LoginRes): User {
-        const userIns = new User()
-        userIns.user_name = res.user_name
-        userIns.nickname = res.nickname
-        userIns.is_admin = res.is_admin
-        userIns.enable_2fa = res.enable_2fa
+			log.success("list user")
+		})
+	}
 
-        return userIns
-    }
+	function loginResToUser(res: LoginRes): User {
+		const userIns = new User()
+		userIns.user_name = res.user_name
+		userIns.nickname = res.nickname
+		userIns.is_admin = res.is_admin
+		userIns.enable_2fa = res.enable_2fa
 
-    function isLogin(): boolean {
-        return user.value.user_name.length > 0
-    }
+		return userIns
+	}
 
-    function exitLogin(): void {
-        user.value = new User()
-        localStorage.removeItem("access_token")
-        localStorage.removeItem("login_data")
-    }
+	function isLogin(): boolean {
+		return user.value.user_name.length > 0
+	}
 
-    return { user, register, login, modify, list, isLogin, exitLogin }
+	function exitLogin(): void {
+		user.value = new User()
+		localStorage.removeItem("access_token")
+		localStorage.removeItem("login_data")
+	}
+
+	return { user, register, login, loginTotp, modify, list, isLogin, exitLogin }
 })

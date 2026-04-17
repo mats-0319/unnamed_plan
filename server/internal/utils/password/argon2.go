@@ -85,13 +85,13 @@ func decodeHash(pwdHash string) (params *AlgorithmParams, oldKey []byte, e *util
 		return
 	}
 
-	key, err := hex.DecodeString(pwdSplit[3])
+	oldKey, err = hex.DecodeString(pwdSplit[3])
 	if err != nil {
 		e = utils.ErrInvalidPwdKey().WithCause(err).WithParam("key", pwdSplit[3])
 		mlog.Error(e.String())
 		return
 	}
-	params.KeyLength = uint32(len(key))
+	params.KeyLength = uint32(len(oldKey))
 
 	return
 }

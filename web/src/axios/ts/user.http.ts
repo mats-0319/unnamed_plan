@@ -27,9 +27,9 @@ class UserAxios {
         return axiosWrapper.post("/login", req)
     }
 
-    public loginTotp(user_name: string, totp_code: string): Promise<AxiosResponse<LoginTotpRes>> {
+    public loginTotp(mfa_token: string, totp_code: string): Promise<AxiosResponse<LoginTotpRes>> {
         let req: LoginTotpReq = {
-            user_name: user_name,
+            mfa_token: mfa_token,
             totp_code: totp_code,
         }
 

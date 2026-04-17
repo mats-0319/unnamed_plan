@@ -22,14 +22,20 @@ export class LoginRes {
     nickname: string = ""
     is_admin: boolean = false
     enable_2fa: boolean = false
+    mfa_token: string = "" // empty when disable 2fa
 }
 
 export class LoginTotpReq {
-    user_name: string = ""
+    mfa_token: string = ""
     totp_code: string = ""
 }
 
-export class LoginTotpRes {}
+export class LoginTotpRes {
+    user_name: string = ""
+    nickname: string = ""
+    is_admin: boolean = false
+    enable_2fa: boolean = false
+}
 
 export class User {
     user_name: string = "" // login name, can't modify

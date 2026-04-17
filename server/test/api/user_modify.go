@@ -25,7 +25,7 @@ func modifyUserCase_NoChanges() string {
 }
 
 func modifyUserCase_SamePwd() string {
-	res := httpInvoke(api.URI_ModifyUser, fmt.Sprintf(`{"nickname":"","password":"%s","enable_2fa":false,"totp_key":""}`, pwd), accessToken_User)
+	res := httpInvoke(api.URI_ModifyUser, fmt.Sprintf(`{"nickname":"","password":"%s","enable_2fa":false,"totp_key":""}`, pwdSHA256), accessToken_User)
 	if res.IsSuccess || res.Err != utils.ErrSamePassword().Error() {
 		return unknownError
 	}

@@ -42,11 +42,17 @@ func GenerateApiAccessToken(userName string) string {
 }
 
 func GenerateMfaToken(userName string) string {
-	return generateToken(&Token{
+	tokenIns := &Token{
 		UserName:   userName,
 		Type:       TokenType_MfaToken,
 		ExpireTime: time.Now().Add(time.Minute * 5).UnixMilli(), // hard code 'expire time' = 5min
-	})
+	}
+
+	token := generateToken(tokenIns)
+
+	NewMfaToken(userName, token, tokenIns.ExpireTime)
+
+	return token
 }
 
 func generateToken(token *Token) string {
@@ -97,6 +103,11 @@ func verifyAccessToken(ctx *mhttp.Context) (e *Error) {
 	token := &Token{}
 	if err := json.Unmarshal(tokenBytes, token); err != nil {
 		e = ErrDeserializeAccessToken().WithCause(err)
+		return
+	}
+
+	if token.Type != TokenType_ApiAccessToken {
+		e = ErrInvalidAccessToken().WithParam("token type", token.Type)
 		return
 	}
 

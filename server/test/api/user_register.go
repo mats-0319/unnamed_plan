@@ -14,7 +14,7 @@ func Register() {
 }
 
 func registerCase_Duplicate() string {
-	res := httpInvoke(api.URI_Register, `{"user_name":"admin","password":""}`, "")
+	res := httpInvoke(api.URI_Register, `{"user_name":"admin","password":"123"}`, "")
 	if res.IsSuccess || res.Err != utils.ErrUserExist().Error() {
 		return unknownError
 	}
@@ -23,7 +23,7 @@ func registerCase_Duplicate() string {
 }
 
 func registerCase_Success() string {
-	res := httpInvoke(api.URI_Register, fmt.Sprintf(`{"user_name":"new_user","password":"%s"}`, pwd), "")
+	res := httpInvoke(api.URI_Register, fmt.Sprintf(`{"user_name":"new_user","password":"%s"}`, pwdSHA256), "")
 	if !res.IsSuccess {
 		return res.Err
 	}

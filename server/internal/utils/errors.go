@@ -11,6 +11,12 @@ var (
 	ErrDecodeAccessToken      = newError(401, 40103, "Decode Access Token Failed")
 	ErrDeserializeAccessToken = newError(401, 40104, "Deserialize Access Token Failed")
 	ErrAccessTokenExpired     = newError(401, 40105, "Access Token Expired")
+	ErrInvalidMfaToken        = newError(401, 40106, "Invalid MFA Token")
+	ErrDecodeMfaToken         = newError(401, 40107, "Decode MFA Token Failed")
+	ErrDeserializeMfaToken    = newError(401, 40108, "Deserialize MFA Token Failed")
+	ErrNoMfaToken             = newError(401, 40109, "Input User Name and Password First")
+	ErrWrongMfaToken          = newError(401, 40110, "Wrong MFA Token")
+	ErrMfaTokenExpired        = newError(401, 40111, "MFA Token Expired")
 	ErrServerInternalError    = newError(500, 50001, "Sever Internal Error")
 	ErrDBError                = newError(500, 50002, "DB Error")
 

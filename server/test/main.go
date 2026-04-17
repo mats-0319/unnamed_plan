@@ -8,6 +8,8 @@ import (
 
 // start server with flag '-t' to use test db connection
 func main() {
+	log.Println("> Test Start ...")
+
 	createTable()
 
 	api.GetAccessToken()
