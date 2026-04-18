@@ -13,7 +13,8 @@
         </div>
 
         <div class="tc-item center-hv">
-          <outlined-button v-show="!userStore.isLogin()" @click="beforeOpenLoginDialog()">登录</outlined-button>
+          <outlined-button v-show="!userStore.isLogin()" @click="beforeOpenLoginDialog()">登录
+          </outlined-button>
           <div v-show="userStore.isLogin()">
             <el-dropdown placement="bottom-end">
               <template #default>
@@ -46,16 +47,25 @@
         <el-input v-model="loginReq.password" show-password />
       </el-form-item>
 
-      <!--      <el-form-item label="TOTP Code">-->
-      <!--        <el-input v-model="loginReq.totp_code" />-->
-      <!--      </el-form-item>-->
-
       <el-form-item>
         <outlined-button :details="tips_RegisterUser" :disabled="!canLoginFlag" @click="register">
           注册新用户
         </outlined-button>
       </el-form-item>
     </el-form>
+
+    <el-dialog v-model="showLoginTotpDialog" title="MFA" append-to-body>
+      <el-form v-model="loginTotpReq" labelWidth="20%">
+        <el-form-item label="TOTP Code">
+          <el-input v-model="loginTotpReq.totp_code" />
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <el-button @click="showLoginTotpDialog = false">取消</el-button>
+        <el-button type="primary" :disabled="!canLoginTotpFlag" @click="loginTotp()">确认</el-button>
+      </template>
+    </el-dialog>
 
     <template #footer>
       <el-button @click="showLoginDialog = false">取消</el-button>
@@ -70,7 +80,7 @@ import { ref, watch } from "vue"
 import { useFlagStore } from "@/pinia/flag.ts"
 import OutlinedButton from "@/components/outlined_button.vue"
 import { routerLink } from "@/ts/util.ts"
-import { LoginReq } from "@/axios/ts/user.go.ts"
+import { LoginReq, LoginTotpReq } from "@/axios/ts/user.go.ts"
 import { tips_RegisterUser } from "@/ts/data.ts"
 
 let flags = useFlagStore()
@@ -80,13 +90,36 @@ let showLoginDialog = ref<boolean>(false)
 let canLoginFlag = ref<boolean>(false)
 let loginReq = ref<LoginReq>(new LoginReq())
 
+let showLoginTotpDialog = ref<boolean>(false)
+let canLoginTotpFlag = ref<boolean>(false)
+let loginTotpReq = ref<LoginTotpReq>(new LoginTotpReq())
+
 function beforeOpenLoginDialog(): void {
     loginReq.value = new LoginReq()
     showLoginDialog.value = true
 }
 
 function login(): void {
-    userStore.login(loginReq.value.user_name, loginReq.value.password, () => {
+    userStore.login(loginReq.value.user_name, loginReq.value.password, (mfaToken: string) => {
+        if (mfaToken.length < 1) {
+            showLoginDialog.value = false
+            return
+        }
+
+        beforeOpenLoginTotpDialog(mfaToken)
+    })
+}
+
+function beforeOpenLoginTotpDialog(mfaToken: string): void {
+    loginTotpReq.value = new LoginTotpReq()
+    loginTotpReq.value.mfa_token = mfaToken
+
+    showLoginTotpDialog.value = true
+}
+
+function loginTotp(): void {
+    userStore.loginTotp(loginTotpReq.value.mfa_token, loginTotpReq.value.totp_code, () => {
+        showLoginTotpDialog.value = false
         showLoginDialog.value = false
     })
 }
@@ -106,6 +139,14 @@ watch(
     loginReq,
     (newValue, _) => {
         canLoginFlag.value = newValue.user_name.length > 0 && newValue.password.length > 0
+    },
+    { deep: true }
+)
+
+watch(
+    loginTotpReq,
+    (newValue, _) => {
+        canLoginTotpFlag.value = newValue.mfa_token.length > 0 && newValue.totp_code.length > 0
     },
     { deep: true }
 )
