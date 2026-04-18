@@ -8,6 +8,7 @@ interface ImportMetaEnv {
     DEV: boolean
     readonly Vite_axios_base_url: string
     readonly Vite_axios_flip_game_url: string
+    readonly Vite_package_version: string
 }
 
 interface ImportMeta {

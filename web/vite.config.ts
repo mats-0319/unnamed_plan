@@ -12,8 +12,11 @@ import AutoImport from "unplugin-auto-import/vite"
 import Components from "unplugin-vue-components/vite"
 import { ElementPlusResolver } from "unplugin-vue-components/resolvers"
 
+import packageJson from "./package.json"
+
 // https://vite.dev/config/
 export default defineConfig({
+    define: { "import.meta.env.Vite_package_version": JSON.stringify(packageJson.version) },
     envPrefix: "Vite_",
     plugins: [
         vue(),
@@ -36,22 +39,22 @@ export default defineConfig({
                 removeFile("flip.wasm")
                 removeFile("flip.html")
                 removeFile("wasm_exec.js")
-            },
-        },
+            }
+        }
     ],
     resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
     clearScreen: false,
     server: {
         host: getLocalIP(),
         port: 20319,
-        open: true,
-    },
+        open: true
+    }
 })
 
 export function getLocalIP(): string {
     const networks = os.networkInterfaces()
     for (const key in networks) {
-    // @ts-ignore
+        // @ts-ignore
         for (const ins of networks[key]) {
             if (ins.family === "IPv4" && !ins.internal) {
                 return ins.address

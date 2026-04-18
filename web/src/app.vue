@@ -14,6 +14,8 @@ let flags = useFlagStore()
 let userStore = useUserStore()
 
 onMounted(() => {
+    console.log("version: " + import.meta.env.Vite_package_version)
+
     // on re-size screen width
     flags.onScreenWidthChanged(screen.width)
 

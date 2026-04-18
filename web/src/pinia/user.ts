@@ -21,11 +21,10 @@ export const useUserStore = defineStore("user", () => {
 
     function login(userName: string, password: string, cb: (mfaToken: string) => void): void {
         userAxios.login(userName, calcSHA256(password)).then(({ data }: { data: LoginRes }) => {
-            user.value = loginResToUser(data)
-
             cb(data.mfa_token)
 
             if (!data.enable_2fa) { // disable MFA
+                user.value = loginResToUser(data)
                 log.success("login")
             }
         })
