@@ -55,17 +55,16 @@ func VerifyPassword(pwdSHA256 string, pwdArgon2 string) *utils.Error {
 	if subtle.ConstantTimeCompare(oldKey, newKey) != 1 { // 使用恒定时间比较防止时序攻击
 		// 这里不打印错误，因为部分应用场景要求密码验证不能通过（例如修改密码时，新、旧密码不能一样）
 		// 换句话说，假设这里打印错误，那么在修改密码时，即使一切正确执行，控制台也会报错
-		e := utils.ErrWrongPassword().WithParam("old key", oldKey).WithParam("new key", newKey)
-		return e
+		return utils.ErrWrongPassword().WithParam("old key", oldKey).WithParam("new key", newKey)
 	}
 
 	return nil
 }
 
-func decodeHash(pwdHash string) (params *AlgorithmParams, oldKey []byte, e *utils.Error) {
-	pwdSplit := strings.Split(pwdHash, ".")
+func decodeHash(pwdArgon2 string) (params *AlgorithmParams, oldKey []byte, e *utils.Error) {
+	pwdSplit := strings.Split(pwdArgon2, ".")
 	if len(pwdSplit) != 4 || pwdSplit[0] != "argon2id" {
-		e = utils.ErrInvalidPassword().WithParam("encoded pwd", pwdHash)
+		e = utils.ErrInvalidPassword().WithParam("encoded pwd", pwdArgon2)
 		mlog.Error(e.String())
 		return
 	}

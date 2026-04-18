@@ -24,8 +24,8 @@ func ModifyUser(ctx *mhttp.Context) {
 	}
 
 	modifyNicknameFlag := len(req.Nickname) > 0 && req.Nickname != operator.Nickname
-	modifyTotpKeyFlag := len(req.TotpKey) > 0 && req.TotpKey != operator.TotpKey
-	if !modifyNicknameFlag && len(req.Password) < 1 && req.Enable2FA == operator.Enable2FA && !modifyTotpKeyFlag {
+	modifyTOTPKeyFlag := len(req.TOTPKey) > 0 && req.TOTPKey != operator.TOTPKey
+	if !modifyNicknameFlag && len(req.Password) < 1 && req.EnableMFA == operator.EnableMFA && !modifyTOTPKeyFlag {
 		e := utils.ErrNoChanges().WithParam("operator", operator.UserName)
 		ctx.ResData = e
 		mlog.Error(e.String())
@@ -45,23 +45,16 @@ func ModifyUser(ctx *mhttp.Context) {
 
 		operator.Password = password.GeneratePassword(req.Password)
 	}
-	if req.Enable2FA != operator.Enable2FA {
-		if req.Enable2FA {
-			if e := isValidTotpKey(req.TotpKey); e != nil { // 想要启用2FA，但是totp key无效
-				ctx.ResData = e
-				return
-			}
-		}
-
-		operator.Enable2FA = req.Enable2FA
-	}
-	if modifyTotpKeyFlag {
-		if e := isValidTotpKey(req.TotpKey); e != nil {
+	if modifyTOTPKeyFlag {
+		if e := isValidTOTPKey(req.TOTPKey); e != nil {
 			ctx.ResData = e
 			return
 		}
 
-		operator.TotpKey = req.TotpKey
+		operator.TOTPKey = req.TOTPKey
+	}
+	if req.EnableMFA != operator.EnableMFA {
+		operator.EnableMFA = req.EnableMFA // 先判断totp key，到这里就不用重复判断其有效性了
 	}
 
 	if e := dal.UpdateUser(operator); e != nil {
@@ -72,10 +65,10 @@ func ModifyUser(ctx *mhttp.Context) {
 	ctx.ResData = &api.ModifyUserRes{}
 }
 
-func isValidTotpKey(key string) *utils.Error {
+func isValidTOTPKey(key string) *utils.Error {
 	bytes, err := base32.StdEncoding.DecodeString(key)
 	if err != nil || !(0 < len(bytes) && len(bytes) <= 10) { // 空字符串是有效的base32字符串，但不应该是有效的key
-		e := utils.ErrInvalidTotpKey().WithParam("totp key", key).WithCause(err)
+		e := utils.ErrInvalidTOTPKey().WithParam("totp key", key).WithCause(err)
 		mlog.Error(e.String())
 		return e
 	}

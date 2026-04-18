@@ -36,22 +36,23 @@ func CreateFlipGameScore(gameScore *model.FlipGameScore) *utils.Error {
 	return nil
 }
 
-func ListFlipGameScore(pageSize int, pageNum int) (int64, []*model.FlipGameScore, *utils.Error) {
+func ListFlipGameScore(pageSize int, pageNum int) (count int64, records []*model.FlipGameScore, e *utils.Error) {
 	sql := FlipGameScore.WithContext(context.TODO())
 
-	count, err := sql.Count()
+	var err error
+	count, err = sql.Count()
 	if err != nil {
-		e := utils.ErrDBError().WithCause(err)
+		e = utils.ErrDBError().WithCause(err)
 		mlog.Error(e.String())
-		return 0, nil, e
+		return
 	}
 
-	records, err := sql.Order(FlipGameScore.Score.Desc()).Offset(pageSize * (pageNum - 1)).Limit(pageSize).Find()
+	records, err = sql.Order(FlipGameScore.Score.Desc()).Offset(pageSize * (pageNum - 1)).Limit(pageSize).Find()
 	if err != nil {
-		e := utils.ErrDBError().WithCause(err)
+		e = utils.ErrDBError().WithCause(err)
 		mlog.Error(e.String())
-		return 0, nil, e
+		return
 	}
 
-	return count, records, nil
+	return
 }

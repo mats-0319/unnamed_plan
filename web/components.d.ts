@@ -12,7 +12,6 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Bottom: typeof import('./src/components/bottom.vue')['default']
-    Default_subpage: typeof import('./src/components/default_subpage.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCollapse: typeof import('element-plus/es')['ElCollapse']
     ElCollapseItem: typeof import('element-plus/es')['ElCollapseItem']
@@ -31,12 +30,14 @@ declare module 'vue' {
     ElSwitch: typeof import('element-plus/es')['ElSwitch']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
-    ElText: typeof import('element-plus/es')['ElText']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     Outlined_button: typeof import('./src/components/outlined_button.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Stacked_cards: typeof import('./src/components/stacked_cards.vue')['default']
+    Subpage_default: typeof import('./src/components/subpage_default.vue')['default']
+    Subpage_frame: typeof import('./src/components/subpage_frame.vue')['default']
+    SubpageDefault: typeof import('./src/components/subpage_default.vue')['default']
     Top: typeof import('./src/components/top.vue')['default']
   }
 }

@@ -19,6 +19,7 @@ func GetUser(userName string) (*model.User, *Error) {
 		} else {
 			e = ErrDBError().WithCause(err)
 		}
+
 		mlog.Error(e.String())
 		return nil, e
 	}
@@ -52,22 +53,23 @@ func UpdateUser(user *model.User) *Error {
 	return nil
 }
 
-func ListUser(pageSize int, pageNum int) (int64, []*model.User, *Error) {
+func ListUser(pageSize int, pageNum int) (count int64, records []*model.User, e *Error) {
 	sql := User.WithContext(context.TODO())
 
-	amount, err := sql.Count()
+	var err error
+	count, err = sql.Count()
 	if err != nil {
-		e := ErrDBError().WithCause(err)
+		e = ErrDBError().WithCause(err)
 		mlog.Error(e.String())
-		return 0, nil, e
+		return
 	}
 
-	users, err := sql.Order(User.UpdatedAt.Desc()).Limit(pageSize).Offset((pageNum - 1) * pageSize).Find()
+	records, err = sql.Order(User.UpdatedAt.Desc()).Limit(pageSize).Offset((pageNum - 1) * pageSize).Find()
 	if err != nil {
-		e := ErrDBError().WithCause(err)
+		e = ErrDBError().WithCause(err)
 		mlog.Error(e.String())
-		return 0, nil, e
+		return
 	}
 
-	return amount, users, nil
+	return
 }

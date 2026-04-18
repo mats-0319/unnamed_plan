@@ -5,7 +5,6 @@ import (
 )
 
 type IBackupRecover interface {
-	// 备份/恢复出现的错误不需要向上冒泡
 	Backup()
 	Recover()
 }

@@ -39,7 +39,7 @@ func TestAccessTokenExceptions(t *testing.T) {
 	// wrong token type
 	tokenWrongType := generateToken(&Token{
 		UserName:   "test user name",
-		Type:       TokenType_MfaToken,
+		Type:       TokenType_MFAToken,
 		ExpireTime: time.Now().Add(time.Hour).UnixMilli(),
 	})
 
@@ -67,20 +67,20 @@ func TestMfaToken(t *testing.T) {
 	for i := range 1000 {
 		t := &Token{
 			UserName:   fmt.Sprintf("test user name %d", i),
-			Type:       TokenType_MfaToken,
+			Type:       TokenType_MFAToken,
 			ExpireTime: lastMinute,
 		}
 
 		token := generateToken(t)
 
-		NewMfaToken(t.UserName, token, lastMinute)
+		NewMFAToken(t.UserName, token, lastMinute)
 	}
 
 	// 测试基本功能
-	validToken := GenerateMfaToken("test user name")
+	validToken := GenerateMFAToken("test user name")
 	tokenCountBeforeClear := len(mtm.Data)
 
-	if err := VerifyMfaToken("test user name", validToken); err != nil {
+	if err := VerifyMFAToken("test user name", validToken); err != nil {
 		t.Error(err.String())
 	}
 

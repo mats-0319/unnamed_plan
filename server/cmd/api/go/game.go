@@ -1,12 +1,12 @@
 package api
 
-const URI_UploadGameScore = "/game-score/upload"
-
 type GameName int8
 
 const (
 	GameName_Flip GameName = 1
 )
+
+const URI_UploadGameScore = "/game-score/upload"
 
 type UploadGameScoreReq struct {
 	GameName GameName `json:"game_name"`

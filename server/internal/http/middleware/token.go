@@ -30,7 +30,7 @@ type TokenType int8
 
 const (
 	TokenType_ApiAccessToken TokenType = 1
-	TokenType_MfaToken                 = 2
+	TokenType_MFAToken                 = 2
 )
 
 func GenerateApiAccessToken(userName string) string {
@@ -41,16 +41,16 @@ func GenerateApiAccessToken(userName string) string {
 	})
 }
 
-func GenerateMfaToken(userName string) string {
+func GenerateMFAToken(userName string) string {
 	tokenIns := &Token{
 		UserName:   userName,
-		Type:       TokenType_MfaToken,
+		Type:       TokenType_MFAToken,
 		ExpireTime: time.Now().Add(time.Minute * 5).UnixMilli(), // hard code 'expire time' = 5min
 	}
 
 	token := generateToken(tokenIns)
 
-	NewMfaToken(userName, token, tokenIns.ExpireTime)
+	NewMFAToken(userName, token, tokenIns.ExpireTime)
 
 	return token
 }
@@ -74,14 +74,16 @@ func OptionalVerifyAccessToken(ctx *mhttp.Context) *Error {
 	return nil
 }
 
-func VerifyAccessToken(ctx *mhttp.Context) (e *Error) {
-	if e = verifyAccessToken(ctx); e != nil {
+func VerifyAccessToken(ctx *mhttp.Context) *Error {
+	if e := verifyAccessToken(ctx); e != nil {
 		mlog.Error(e.String())
+		return e
 	}
 
-	return
+	return nil
 }
 
+// verifyAccessToken 函数内不打印错误，因为部分场景允许验证错误（例如上方的可选验证函数）
 func verifyAccessToken(ctx *mhttp.Context) (e *Error) {
 	tokenSplit := strings.Split(ctx.AccessToken, ".")
 	if len(tokenSplit) != 2 {

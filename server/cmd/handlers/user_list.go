@@ -42,8 +42,8 @@ func ListUser(ctx *mhttp.Context) {
 	}
 
 	ctx.ResData = &api.ListUserRes{
-		Amount: count,
-		Users:  usersFromDBToHttp(users),
+		Count: count,
+		Users: usersFromDBToHttp(users),
 	}
 }
 
@@ -55,7 +55,7 @@ func usersFromDBToHttp(users []*model.User) []*api.User {
 			Nickname:  v.Nickname,
 			CreatedAt: v.CreatedAt,
 			IsAdmin:   v.IsAdmin,
-			Enable2FA: v.Enable2FA,
+			EnableMFA: v.EnableMFA,
 			LastLogin: v.UpdatedAt,
 		}
 	}

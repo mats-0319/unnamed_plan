@@ -23,8 +23,8 @@ func newUser(userName string, nickname string, isAdmin bool, enable2FA bool, tot
 		Nickname:  nickname,
 		Password:  pwdArgon2,
 		IsAdmin:   isAdmin,
-		Enable2FA: enable2FA,
-		TotpKey:   totpKey,
+		EnableMFA: enable2FA,
+		TOTPKey:   totpKey,
 	}
 }
 

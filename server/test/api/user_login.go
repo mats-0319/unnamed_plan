@@ -57,7 +57,7 @@ func loginCase_SuccessEnable2fa() string {
 	}
 
 	totpCode := calcTotpCode([]byte("mario"), iTob(time.Now().Unix()/30))
-	res = httpInvoke(api.URI_LoginTotp, fmt.Sprintf(`{"mfa_token":"%s","totp_code":"%s"}`, mfaToken, totpCode), "")
+	res = httpInvoke(api.URI_LoginMFA, fmt.Sprintf(`{"mfa_token":"%s","totp_code":"%s"}`, mfaToken, totpCode), "")
 	if !res.IsSuccess {
 		return res.Err
 	}

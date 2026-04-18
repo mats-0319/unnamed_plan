@@ -35,19 +35,20 @@ func Login(ctx *mhttp.Context) {
 		return
 	}
 
-	if user.Enable2FA {
-		ctx.ResData = &api.LoginRes{Enable2FA: true, MfaToken: middleware.GenerateMfaToken(user.UserName)}
+	if user.EnableMFA {
+		ctx.ResData = &api.LoginRes{EnableMFA: true, MFAToken: middleware.GenerateMFAToken(user.UserName)}
 
 		return
 	}
 
 	_ = dal.UpdateUser(user) // modify user.UpdatedAt
 
-	ctx.Writer.Header().Set(utils.HttpHeader_AccessToken, middleware.GenerateApiAccessToken(user.UserName))
+	ctx.Writer.Header().Set(utils.HTTPHeader_AccessToken, middleware.GenerateApiAccessToken(user.UserName))
 
 	ctx.ResData = &api.LoginRes{
-		UserName: user.UserName,
-		Nickname: user.Nickname,
-		IsAdmin:  user.IsAdmin,
+		UserName:  user.UserName,
+		Nickname:  user.Nickname,
+		IsAdmin:   user.IsAdmin,
+		EnableMFA: false,
 	}
 }

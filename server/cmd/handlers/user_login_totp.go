@@ -17,26 +17,26 @@ import (
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-func LoginTotp(ctx *mhttp.Context) {
-	req := &api.LoginTotpReq{}
+func LoginMFA(ctx *mhttp.Context) {
+	req := &api.LoginMFAReq{}
 	if !ctx.ParseParams(req) {
 		return
 	}
 
-	if len(req.MfaToken) < 1 || len(req.TotpCode) < 1 {
-		e := utils.ErrInvalidParams().WithParam("mfa token", req.MfaToken).WithParam("totp code", req.TotpCode)
-		mlog.Error(e.String())
+	if len(req.MFAToken) < 1 || len(req.TOTPCode) < 1 {
+		e := utils.ErrInvalidParams().WithParam("mfa token", req.MFAToken).WithParam("totp code", req.TOTPCode)
 		ctx.ResData = e
+		mlog.Error(e.String())
 		return
 	}
 
-	userName, e := middleware.DecodeUserNameFromMfaToken(req.MfaToken)
+	userName, e := middleware.DecodeUserNameFromMFAToken(req.MFAToken)
 	if e != nil {
 		ctx.ResData = e
 		return
 	}
 
-	if e := middleware.VerifyMfaToken(userName, req.MfaToken); e != nil {
+	if e := middleware.VerifyMFAToken(userName, req.MFAToken); e != nil {
 		ctx.ResData = e
 		return
 	}
@@ -47,27 +47,27 @@ func LoginTotp(ctx *mhttp.Context) {
 		return
 	}
 
-	if e := verifyTotpCode(req.TotpCode, user.TotpKey); e != nil {
+	if e := verifyTOTPCode(req.TOTPCode, user.TOTPKey); e != nil {
 		ctx.ResData = e
 		return
 	}
 
 	_ = dal.UpdateUser(user) // modify user.UpdatedAt
 
-	ctx.Writer.Header().Set(utils.HttpHeader_AccessToken, middleware.GenerateApiAccessToken(user.UserName))
+	ctx.Writer.Header().Set(utils.HTTPHeader_AccessToken, middleware.GenerateApiAccessToken(user.UserName))
 
-	ctx.ResData = &api.LoginTotpRes{
+	ctx.ResData = &api.LoginMFARes{
 		UserName:  user.UserName,
 		Nickname:  user.Nickname,
 		IsAdmin:   user.IsAdmin,
-		Enable2FA: user.Enable2FA,
+		EnableMFA: user.EnableMFA,
 	}
 }
 
-// verifyTotpCode totpKey should be base32 encoded
-func verifyTotpCode(code string, totpKey string) *utils.Error {
+// verifyTOTPCode totpKey should be base32 encoded
+func verifyTOTPCode(code string, totpKey string) *utils.Error {
 	if len(code) != 6 {
-		e := utils.ErrInvalidTotpCode().WithParam("code", code)
+		e := utils.ErrInvalidTOTPCode().WithParam("code", code)
 		mlog.Error(e.String())
 		return e
 	}
@@ -75,7 +75,7 @@ func verifyTotpCode(code string, totpKey string) *utils.Error {
 	key := make([]byte, 10)
 	n, err := base32.StdEncoding.Decode(key, []byte(totpKey))
 	if err != nil {
-		e := utils.ErrInvalidTotpKey().WithCause(err)
+		e := utils.ErrInvalidTOTPKey().WithCause(err)
 		mlog.Error(e.String())
 		return e
 	}
@@ -85,13 +85,13 @@ func verifyTotpCode(code string, totpKey string) *utils.Error {
 
 	// allow last/current/next totp code
 	validCodes := []string{
-		calcTotpCode(key, iTob(timestep-1)),
-		calcTotpCode(key, iTob(timestep)),
-		calcTotpCode(key, iTob(timestep+1)),
+		calcTOTPCode(key, iTob(timestep-1)),
+		calcTOTPCode(key, iTob(timestep)),
+		calcTOTPCode(key, iTob(timestep+1)),
 	}
 
 	if !slices.Contains(validCodes, code) {
-		e := utils.ErrWrongTotpCode().WithParam("code", code)
+		e := utils.ErrWrongTOTPCode().WithParam("code", code)
 		mlog.Error(e.String())
 		return e
 	}
@@ -99,7 +99,7 @@ func verifyTotpCode(code string, totpKey string) *utils.Error {
 	return nil
 }
 
-func calcTotpCode(key []byte, content []byte) string {
+func calcTOTPCode(key []byte, content []byte) string {
 	hasher := hmac.New(sha1.New, key)
 	hasher.Write(content)
 	hmacHash := hasher.Sum(nil)

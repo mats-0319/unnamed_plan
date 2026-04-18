@@ -15,22 +15,22 @@ func PresetUser() []*model.User {
 			Nickname:  "admin",
 			Password:  password.GeneratePassword(pwdSHA256),
 			IsAdmin:   true,
-			Enable2FA: false,
-			TotpKey:   "",
+			EnableMFA: false,
+			TOTPKey:   "",
 		},
 		{
 			UserName:  "user",
 			Nickname:  "user",
 			Password:  password.GeneratePassword(pwdSHA256),
-			Enable2FA: false,
-			TotpKey:   "",
+			EnableMFA: false,
+			TOTPKey:   "",
 		},
 		{
 			UserName:  "user_with_totp",
 			Nickname:  "user_with_totp",
 			Password:  password.GeneratePassword(pwdSHA256),
-			Enable2FA: true,
-			TotpKey:   "NVQXE2LP", // base32 of 'mario'
+			EnableMFA: true,
+			TOTPKey:   "NVQXE2LP", // base32 of 'mario'
 		},
 	}
 }

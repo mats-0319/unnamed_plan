@@ -1,5 +1,5 @@
 import { defineStore } from "pinia"
-import { ListUserRes, LoginRes, LoginTotpRes, ModifyUserRes, RegisterRes, User } from "@/axios/ts/user.go.ts"
+import { ListUserRes, LoginRes, LoginMFARes, ModifyUserRes, RegisterRes, User } from "@/axios/ts/user.go.ts"
 import { ref } from "vue"
 import CryptoJs from "crypto-js"
 import { userAxios } from "@/axios/ts/user.http.ts"
@@ -23,15 +23,15 @@ export const useUserStore = defineStore("user", () => {
         userAxios.login(userName, calcSHA256(password)).then(({ data }: { data: LoginRes }) => {
             cb(data.mfa_token)
 
-            if (!data.enable_2fa) { // disable MFA
+            if (!data.enable_mfa) { // disable MFA
                 user.value = loginResToUser(data)
                 log.success("login")
             }
         })
     }
 
-    function loginTotp(mfaToken: string, totpCode: string, cb: () => void): void {
-        userAxios.loginTotp(mfaToken, totpCode).then(({ data }: { data: LoginTotpRes }) => {
+    function loginMFA(mfaToken: string, totpCode: string, cb: () => void): void {
+        userAxios.loginMFA(mfaToken, totpCode).then(({ data }: { data: LoginMFARes }) => {
             user.value = loginResToUser(data)
 
             cb()
@@ -46,20 +46,20 @@ export const useUserStore = defineStore("user", () => {
         })
     }
 
-    function list(pageSize: number, pageNum: number, cb: (amount: number, users: Array<User>) => void): void {
+    function list(pageSize: number, pageNum: number, cb: (count: number, users: Array<User>) => void): void {
         userAxios.listUser({ size: pageSize, num: pageNum }).then(({ data }: { data: ListUserRes }) => {
-            cb(data.amount, data.users)
+            cb(data.count, data.users)
 
             log.success("list user")
         })
     }
 
-    function loginResToUser(res: LoginRes | LoginTotpRes): User {
+    function loginResToUser(res: LoginRes | LoginMFARes): User {
         const userIns = new User()
         userIns.user_name = res.user_name
         userIns.nickname = res.nickname
         userIns.is_admin = res.is_admin
-        userIns.enable_2fa = res.enable_2fa
+        userIns.enable_mfa = res.enable_mfa
 
         return userIns
     }
@@ -78,5 +78,5 @@ export const useUserStore = defineStore("user", () => {
         return password.length > 0 ? CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex) : ""
     }
 
-    return { user, register, login, loginTotp, modify, list, isLogin, exitLogin }
+    return { user, register, login, loginMFA, modify, list, isLogin, exitLogin }
 })

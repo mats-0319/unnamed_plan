@@ -21,20 +21,20 @@ export class LoginRes {
     user_name: string = ""
     nickname: string = ""
     is_admin: boolean = false
-    enable_2fa: boolean = false
+    enable_mfa: boolean = false
     mfa_token: string = "" // empty when disable 2fa
 }
 
-export class LoginTotpReq {
+export class LoginMFAReq {
     mfa_token: string = ""
     totp_code: string = ""
 }
 
-export class LoginTotpRes {
+export class LoginMFARes {
     user_name: string = ""
     nickname: string = ""
     is_admin: boolean = false
-    enable_2fa: boolean = false
+    enable_mfa: boolean = false
 }
 
 export class User {
@@ -42,7 +42,7 @@ export class User {
     nickname: string = "" // display name
     created_at: number = 0
     is_admin: boolean = false
-    enable_2fa: boolean = false
+    enable_mfa: boolean = false
     last_login: number = 0 // timestamp, unit: milli
 }
 
@@ -51,7 +51,7 @@ export class ListUserReq {
 }
 
 export class ListUserRes {
-    amount: number = 0 // 符合查询条件的用户总数
+    count: number = 0 // 符合查询条件的用户总数
     users: Array<User> = new Array<User>()
 }
 
@@ -59,7 +59,7 @@ export class ListUserRes {
 export class ModifyUserReq {
     nickname: string = ""
     password: string = ""
-    enable_2fa: boolean = false
+    enable_mfa: boolean = false
     totp_key: string = ""
 }
 

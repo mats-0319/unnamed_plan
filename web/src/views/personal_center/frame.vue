@@ -1,13 +1,13 @@
 <template>
   <div class="personal-center color-bg-0">
     <div class="p-left">
-      <elevated_button v-if="userStore.user.is_admin" class="pl-item" @click="routerLink('pListUser')">
+      <elevated-button v-if="userStore.user.is_admin" class="pl-item" @click="routerLink('pListUser')">
         查看用户
-      </elevated_button>
+      </elevated-button>
 
-      <elevated_button class="pl-item" @click="routerLink('pModifyUser')">修改个人信息</elevated_button>
+      <elevated-button class="pl-item" @click="routerLink('pModifyUser')">修改个人信息</elevated-button>
 
-      <elevated_button class="pl-item" @click="routerLink('pNote')">我的小纸条</elevated_button>
+      <elevated-button class="pl-item" @click="routerLink('pNote')">我的小纸条</elevated-button>
     </div>
 
     <el-divider direction="vertical" />
@@ -21,7 +21,7 @@
 <script lang="ts" setup>
 import { routerLink } from "@/ts/util.ts"
 import { useUserStore } from "@/pinia/user.ts"
-import Elevated_button from "@/components/elevated_button.vue"
+import ElevatedButton from "@/components/elevated_button.vue"
 
 let userStore = useUserStore()
 </script>

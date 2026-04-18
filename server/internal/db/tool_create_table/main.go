@@ -12,7 +12,7 @@ func main() {
 	db := utilsdb.InitDB(dbConfig)
 
 	if err := db.Migrator().DropTable(model.ModelList...); err != nil {
-		fmt.Println("drop table failed, err: ", err)
+		fmt.Println("-drop table failed, err: ", err) // 不加横杠ide会将其识别为命令
 		return
 	}
 

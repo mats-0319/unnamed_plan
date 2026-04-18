@@ -35,7 +35,7 @@ func modifyUserCase_SamePwd() string {
 
 func modifyUserCase_InvalidTotpKey() string {
 	res := httpInvoke(api.URI_ModifyUser, `{"nickname":"","password":"","enable_2fa":true,"totp_key":"123"}`, accessToken_User)
-	if res.IsSuccess || res.Err != utils.ErrInvalidTotpKey().Error() {
+	if res.IsSuccess || res.Err != utils.ErrInvalidTOTPKey().Error() {
 		return unknownError
 	}
 

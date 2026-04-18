@@ -48,8 +48,8 @@ func (u *UserBR) ColumnNames() []string {
 		dal.User.Nickname.ColumnName().String(),
 		dal.User.Password.ColumnName().String(),
 		dal.User.IsAdmin.ColumnName().String(),
-		dal.User.Enable2FA.ColumnName().String(),
-		dal.User.TotpKey.ColumnName().String(),
+		dal.User.EnableMFA.ColumnName().String(),
+		dal.User.TOTPKey.ColumnName().String(),
 	}
 }
 

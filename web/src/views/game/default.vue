@@ -1,7 +1,7 @@
 <template>
-  <default_subpage>小游戏</default_subpage>
+  <subpage-default>小游戏</subpage-default>
 </template>
 
 <script setup lang="ts">
-import Default_subpage from "@/components/default_subpage.vue"
+import SubpageDefault from "@/components/subpage_default.vue"
 </script>

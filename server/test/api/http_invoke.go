@@ -44,7 +44,7 @@ func httpInvoke(uri string, payload string, token string) *TestResponse {
 		log.Fatal(err)
 	}
 
-	req.Header.Set(utils.HttpHeader_AccessToken, token)
+	req.Header.Set(utils.HTTPHeader_AccessToken, token)
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -63,7 +63,7 @@ func httpInvoke(uri string, payload string, token string) *TestResponse {
 	}
 	if r.IsSuccess {
 		// read access token
-		tokenStr := res.Header.Get(utils.HttpHeader_AccessToken)
+		tokenStr := res.Header.Get(utils.HTTPHeader_AccessToken)
 
 		if len(tokenStr) > 0 {
 			r.AccessToken = tokenStr

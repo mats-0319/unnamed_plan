@@ -14,7 +14,7 @@ func Initialize(isTestMode ...bool) {
 	var err error
 	fileIns, err = os.OpenFile("log.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
-		log.Fatalln("create log file failed, error:", err)
+		log.Fatalln("open log file failed, error:", err)
 	}
 
 	multiWriter := io.MultiWriter(fileIns, os.Stdout)
@@ -23,7 +23,7 @@ func Initialize(isTestMode ...bool) {
 	logger := slog.New(handlerIns)
 	slog.SetDefault(logger)
 
-	Info("> Config init.")
+	Info("> Config init.") // 不是这里才初始化的，但是只有这里（日志）初始化之后才能使用自定义结构打印这句话
 	Info("> Log init.")
 }
 

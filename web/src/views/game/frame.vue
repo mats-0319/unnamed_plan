@@ -1,7 +1,7 @@
 <template>
   <div class="game color-bg-0">
     <div class="g-left">
-      <elevated_button class="gl-item" @click="routerLink('gFlip')">Flip</elevated_button>
+      <elevated-button class="gl-item" @click="routerLink('gFlip')">Flip</elevated-button>
     </div>
 
     <el-divider direction="vertical" />
@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import Elevated_button from "@/components/elevated_button.vue"
+import ElevatedButton from "@/components/elevated_button.vue"
 import { routerLink } from "@/ts/util.ts"
 </script>
 

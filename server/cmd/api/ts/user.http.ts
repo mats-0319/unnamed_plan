@@ -5,8 +5,8 @@
 
 import { axiosWrapper } from "./config"
 import { AxiosResponse } from "axios"
-import { RegisterRes, RegisterReq, LoginRes, LoginReq, LoginTotpRes, LoginTotpReq, ListUserRes, ListUserReq, ModifyUserRes, ModifyUserReq } from "./user.go"
 import { Pagination } from "./common.go"
+import { RegisterRes, RegisterReq, LoginRes, LoginReq, LoginMFARes, LoginMFAReq, ListUserRes, ListUserReq, ModifyUserRes, ModifyUserReq } from "./user.go"
 
 class UserAxios {
     public register(user_name: string, password: string): Promise<AxiosResponse<RegisterRes>> {
@@ -27,13 +27,13 @@ class UserAxios {
         return axiosWrapper.post("/login", req)
     }
 
-    public loginTotp(mfa_token: string, totp_code: string): Promise<AxiosResponse<LoginTotpRes>> {
-        let req: LoginTotpReq = {
+    public loginMFA(mfa_token: string, totp_code: string): Promise<AxiosResponse<LoginMFARes>> {
+        let req: LoginMFAReq = {
             mfa_token: mfa_token,
             totp_code: totp_code,
         }
 
-        return axiosWrapper.post("/login-totp", req)
+        return axiosWrapper.post("/login-mfa", req)
     }
 
     public listUser(page: Pagination): Promise<AxiosResponse<ListUserRes>> {
@@ -44,11 +44,11 @@ class UserAxios {
         return axiosWrapper.post("/user/list", req)
     }
 
-    public modifyUser(nickname: string, password: string, enable_2fa: boolean, totp_key: string): Promise<AxiosResponse<ModifyUserRes>> {
+    public modifyUser(nickname: string, password: string, enable_mfa: boolean, totp_key: string): Promise<AxiosResponse<ModifyUserRes>> {
         let req: ModifyUserReq = {
             nickname: nickname,
             password: password,
-            enable_2fa: enable_2fa,
+            enable_mfa: enable_mfa,
             totp_key: totp_key,
         }
 

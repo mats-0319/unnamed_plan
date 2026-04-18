@@ -10,7 +10,7 @@ import (
 )
 
 type Handler struct {
-	handlers map[string]*HandlerItem // uri - handler func
+	handlers map[string]*HandlerItem // uri - handler func and middleware(s)
 }
 
 type HandlerItem struct {
@@ -29,7 +29,9 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	handlerItemIns, ok := h.handlers[request.RequestURI]
 	if !ok {
-		mlog.Error(ErrInvalidUri().Error(), mlog.Field("uri", request.URL.String()))
+		// 实际场景中，会触发这一段代码的，更多的是恶意向服务器批量发送请求的，所以就直接返回了。
+		// 想看访问细节可以去nginx访问日志。
+		// 不想在nginx上配置接口白名单，那样太死板了。找找有什么好办法。
 		return
 	}
 
@@ -39,7 +41,7 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		mlog.Info(fmt.Sprintf("> Process Request: %s , in %d ms", request.URL.String(), time.Since(startTime).Milliseconds()))
 
 		if err := recover(); err != nil {
-			mlog.Error("panic", mlog.Field("", err))
+			mlog.Error("recover panic", mlog.Field("", err))
 		}
 	}()
 
@@ -69,8 +71,8 @@ func (h *Handler) AddHandler(uri string, handlerFunc func(ctx *Context), middlew
 	}
 }
 
-func (h *Handler) displayRegisteredUri() {
+func (h *Handler) displayRegisteredURI() {
 	for k := range h.handlers {
-		mlog.Info("- Http Handler Registered: " + k)
+		mlog.Info("- HTTP Handler Registered: " + k)
 	}
 }

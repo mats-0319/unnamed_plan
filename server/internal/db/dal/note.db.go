@@ -19,6 +19,7 @@ func GetNote(noteID string) (*model.Note, *Error) {
 		} else {
 			e = ErrDBError().WithCause(err)
 		}
+
 		mlog.Error(e.String())
 		return nil, e
 	}
@@ -62,25 +63,26 @@ func DeleteNote(noteID string) *Error {
 	return nil
 }
 
-func ListNote(pageSize int, pageNum int, writer string) (int64, []*model.Note, *Error) {
+func ListNote(pageSize int, pageNum int, writer string) (count int64, records []*model.Note, e *Error) {
 	sql := Note.WithContext(context.TODO())
 	if len(writer) > 0 {
 		sql = sql.Where(Note.Writer.Eq(writer))
 	}
 
-	amount, err := sql.Count()
+	var err error
+	count, err = sql.Count()
 	if err != nil {
-		e := ErrDBError().WithCause(err)
+		e = ErrDBError().WithCause(err)
 		mlog.Error(e.String())
-		return 0, nil, e
+		return
 	}
 
-	notes, err := sql.Order(Note.UpdatedAt.Desc()).Limit(pageSize).Offset((pageNum - 1) * pageSize).Find()
+	records, err = sql.Order(Note.UpdatedAt.Desc()).Limit(pageSize).Offset((pageNum - 1) * pageSize).Find()
 	if err != nil {
-		e := ErrDBError().WithCause(err)
+		e = ErrDBError().WithCause(err)
 		mlog.Error(e.String())
-		return 0, nil, e
+		return
 	}
 
-	return amount, notes, nil
+	return
 }

@@ -16,8 +16,8 @@ func DeleteNote(ctx *mhttp.Context) {
 
 	if len(req.NoteID) < 1 {
 		e := ErrInvalidParams().WithParam("note id", req.NoteID)
-		mlog.Error(e.String())
 		ctx.ResData = e
+		mlog.Error(e.String())
 		return
 	}
 

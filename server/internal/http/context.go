@@ -23,23 +23,25 @@ func NewContext(w http.ResponseWriter, r *http.Request) *Context {
 	return &Context{
 		Writer:      w,
 		Request:     r,
-		AccessToken: r.Header.Get(HttpHeader_AccessToken),
+		AccessToken: r.Header.Get(HTTPHeader_AccessToken),
 	}
 }
 
+// ParseParams 这个函数读取了http req.body，这一结构被限制只能读取一次，
+// 所以包括请求处理函数和中间件在内，如果有多个函数均调用该函数，会出现错误。
 func (ctx *Context) ParseParams(obj any) bool {
 	bodyBytes, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
 		e := ErrServerInternalError().WithCause(err)
-		mlog.Error(e.String())
 		ctx.ResData = e
+		mlog.Error(e.String())
 		return false
 	}
 
 	if err := json.Unmarshal(bodyBytes, obj); err != nil {
-		e := ErrDeserializeHttpReqParam().WithCause(err)
-		mlog.Error(e.String())
+		e := ErrDeserializeHTTPReqParam().WithCause(err)
 		ctx.ResData = e
+		mlog.Error(e.String())
 		return false
 	}
 

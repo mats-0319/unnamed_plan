@@ -9,8 +9,8 @@
     </el-form-item>
 
     <el-form-item label="是否启用双重因素验证">
-      <el-switch v-model="modifyUserReq.enable_2fa" />
-      &emsp;{{ modifyUserReq.enable_2fa ? "启用" : "不启用" }}
+      <el-switch v-model="modifyUserReq.enable_mfa" />
+      &emsp;{{ modifyUserReq.enable_mfa ? "启用" : "不启用" }}
     </el-form-item>
 
     <el-form-item label="TOTP密钥">
@@ -39,14 +39,14 @@ let canModifyFlag = ref<boolean>(false)
 
 onMounted(() => {
     modifyUserReq.value.nickname = userStore.user.nickname
-    modifyUserReq.value.enable_2fa = userStore.user.enable_2fa
+    modifyUserReq.value.enable_mfa = userStore.user.enable_mfa
 })
 
 function modifyUser(): void {
     userStore.modify(
         modifyUserReq.value.nickname,
         modifyUserReq.value.password,
-        modifyUserReq.value.enable_2fa,
+        modifyUserReq.value.enable_mfa,
         modifyUserReq.value.totp_key,
     )
 }
@@ -55,7 +55,7 @@ watch(
     modifyUserReq,
     (newValue, _) => { // 当前的totp key不提供给前端，所以前端也不判断
         canModifyFlag.value =
-            newValue.nickname != userStore.user.nickname || newValue.password.length > 0 || newValue.enable_2fa
+            newValue.nickname != userStore.user.nickname || newValue.password.length > 0 || newValue.enable_mfa
     },
     { deep: true },
 )

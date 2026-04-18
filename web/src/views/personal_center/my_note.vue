@@ -1,6 +1,6 @@
 <template>
   <div class="pnote-tools">
-    <elevated_button class="pt-item" @click="beforeCreate()">写小纸条</elevated_button>
+    <elevated-button class="pt-item" @click="beforeCreate()">写小纸条</elevated-button>
   </div>
 
   <el-table :data="notes" height="60%">
@@ -24,14 +24,14 @@
     <el-table-column label="操作" :min-width="3">
       <template #default="scope">
         <div class="buttons-box">
-          <outlined_button class="button-item" @click="beforeModify(scope.row)">编辑</outlined_button>
-          <outlined_button @click="beforeDelete(scope.row)">删除</outlined_button>
+          <outlined-button class="button-item" @click="beforeModify(scope.row)">编辑</outlined-button>
+          <outlined-button @click="beforeDelete(scope.row)">删除</outlined-button>
         </div>
       </template>
     </el-table-column>
   </el-table>
 
-  <el-pagination layout="prev,pager,next,->,total" :total="amount" background @current-change="listNote" />
+  <el-pagination layout="prev,pager,next,->,total" :total="count" background @current-change="listNote" />
 
   <el-dialog v-model="showCreateDialog" title="写小纸条">
     <el-form v-model="createNoteReq" label-width="20%">
@@ -95,16 +95,16 @@
 </template>
 
 <script lang="ts" setup>
-import Elevated_button from "@/components/elevated_button.vue"
+import ElevatedButton from "@/components/elevated_button.vue"
 import { onMounted, ref, watch } from "vue"
 import { CreateNoteReq, DeleteNoteReq, ModifyNoteReq, Note } from "@/axios/ts/note.go.ts"
 import { deepCopy, displayTimestamp } from "@/ts/util.ts"
 import { useNoteStore } from "@/pinia/note.ts"
-import Outlined_button from "@/components/outlined_button.vue"
+import OutlinedButton from "@/components/outlined_button.vue"
 
 let noteStore = useNoteStore()
 
-let amount = ref<number>(0)
+let count = ref<number>(0)
 let notes = ref<Array<Note>>(new Array<Note>())
 
 let showCreateDialog = ref<boolean>(false)
@@ -162,9 +162,7 @@ function modify(): void {
 
 function beforeDelete(note: Note): void {
     originData.value = deepCopy(note)
-    deleteNoteReq.value = {
-        note_id: note.note_id,
-    }
+    deleteNoteReq.value.note_id = note.note_id
 
     showDeleteDialog.value = true
 }
@@ -178,7 +176,7 @@ function del(): void {
 
 function listNote(pageNum: number = 1): void {
     noteStore.list(true, 10, pageNum, (a: number, n: Array<Note>) => {
-        amount.value = a
+        count.value = a
         notes.value = n
     })
 }

@@ -26,8 +26,7 @@ func Recover[T any](t doBackupRecover[T]) {
 		}
 
 		var fileInfo fs.FileInfo
-		fileInfo, err = entry[i].Info()
-		if err != nil {
+		if fileInfo, err = entry[i].Info(); err != nil {
 			mlog.Error("get file info failed", mlog.Field("error", err))
 			continue
 		}

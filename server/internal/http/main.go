@@ -17,12 +17,12 @@ type config struct {
 
 // StartServer is blocked
 func StartServer(handler *Handler) {
-	configIns, err := getHttpConfig()
+	configIns, err := getHTTPConfig()
 	if err != nil {
 		os.Exit(1)
 	}
 
-	handler.displayRegisteredUri()
+	handler.displayRegisteredURI()
 
 	// 因为允许手机访问需要设置web ip为`192.168.xxx`，即本机内网ipv4地址，
 	// 这里为了支持`127.0.0.1`、内网ip等多种格式，使用`0.0.0.0`
@@ -34,12 +34,12 @@ func StartServer(handler *Handler) {
 	}
 }
 
-func getHttpConfig() (*config, error) {
-	jsonBytes := mconfig.GetConfigItem(utils.ConfigID_Http)
+func getHTTPConfig() (*config, error) {
+	jsonBytes := mconfig.GetConfigItem(utils.ConfigID_HTTP)
 
 	res := &config{}
 	if err := json.Unmarshal(jsonBytes, res); err != nil {
-		mlog.Error("deserialize gateway config failed", mlog.Field("error", err))
+		mlog.Error("deserialize http config failed", mlog.Field("error", err))
 		return nil, err
 	}
 

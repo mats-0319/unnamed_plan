@@ -82,8 +82,8 @@ var presetUser = []*model.User{
 		UserName:  "user 2",
 		Nickname:  "user 2",
 		Password:  "user 2 pwd",
-		Enable2FA: true,
-		TotpKey:   "NVQXE2LP",
+		EnableMFA: true,
+		TOTPKey:   "NVQXE2LP",
 	},
 }
 

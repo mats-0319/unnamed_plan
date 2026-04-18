@@ -24,15 +24,14 @@ type Note struct {
 }
 
 type ListNoteReq struct {
-	// 是否仅查询操作员编写的小纸条，需要该值为true且能从请求头解析出操作员用户名才会执行，否则查询全部
-	OnlyOperator bool `json:"only_operator"`
-	
-	Page Pagination `json:"page"`
+	// 是否仅查询操作员编写的小纸条，需要该值为true且能从接口访问令牌解析出操作员用户名才会执行，否则查询全部
+	OnlyOperator bool       `json:"only_operator"`
+	Page         Pagination `json:"page"`
 }
 
 type ListNoteRes struct {
-	Amount int64   `json:"amount"`
-	Notes  []*Note `json:"notes"`
+	Count int64   `json:"count"`
+	Notes []*Note `json:"notes"`
 }
 
 const URI_ModifyNote = "/note/modify"

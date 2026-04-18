@@ -29,7 +29,7 @@ export class ListNoteReq {
 }
 
 export class ListNoteRes {
-    amount: number = 0
+    count: number = 0
     notes: Array<Note> = new Array<Note>()
 }
 

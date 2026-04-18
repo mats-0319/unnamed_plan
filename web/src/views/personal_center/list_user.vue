@@ -17,7 +17,7 @@
     </el-table-column>
   </el-table>
 
-  <el-pagination layout="prev,pager,next,->,total" :total="amount" background @current-change="listUser" />
+  <el-pagination layout="prev,pager,next,->,total" :total="count" background @current-change="listUser" />
 </template>
 
 <script lang="ts" setup>
@@ -28,7 +28,7 @@ import { displayTimestamp } from "@/ts/util.ts"
 
 let userStore = useUserStore()
 
-let amount = ref<number>(0)
+let count = ref<number>(0)
 let users = ref<Array<User>>(new Array<User>())
 
 onMounted(() => {
@@ -36,8 +36,8 @@ onMounted(() => {
 })
 
 function listUser(pageNum: number = 1): void {
-    userStore.list(10, pageNum, (a: number, u: Array<User>) => {
-        amount.value = a
+    userStore.list(10, pageNum, (c: number, u: Array<User>) => {
+        count.value = c
         users.value = u
     })
 }

@@ -11,25 +11,25 @@ import (
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-type MfaTokenManager struct {
-	Data map[string]*MfaTokenItem // user name - mfa token item
+type MFATokenManager struct {
+	Data map[string]*MFATokenItem // user name - mfa token item
 }
 
-type MfaTokenItem struct {
+type MFATokenItem struct {
 	Token      string // complete token
 	ExpireTime int64
 	TryTimes   int
 }
 
-var mtm = &MfaTokenManager{Data: make(map[string]*MfaTokenItem)}
+var mtm = &MFATokenManager{Data: make(map[string]*MFATokenItem)}
 var clearLock atomic.Bool // 阈值全面清理的锁，保证同时只开一个goroutine执行清理
 
-func NewMfaToken(userName string, token string, expireTime int64) {
-	mtm.Data[userName] = &MfaTokenItem{Token: token, ExpireTime: expireTime}
+func NewMFAToken(userName string, token string, expireTime int64) {
+	mtm.Data[userName] = &MFATokenItem{Token: token, ExpireTime: expireTime}
 }
 
-func VerifyMfaToken(userName string, token string) (e *utils.Error) {
-	clearExpiredMfaToken()
+func VerifyMFAToken(userName string, token string) (e *utils.Error) {
+	clearExpiredMFAToken()
 
 	v, ok := mtm.Data[userName]
 	if !ok || v == nil || v.TryTimes >= 5 {
@@ -37,20 +37,23 @@ func VerifyMfaToken(userName string, token string) (e *utils.Error) {
 			delete(mtm.Data, userName)
 		}
 
-		e = utils.ErrNoMfaToken().WithParam("user name", userName)
+		e = utils.ErrNoMFAToken().WithParam("user name", userName)
+		mlog.Error(e.String())
 		return
 	}
 	mtm.Data[userName].TryTimes++
 
-	if v.Token != token { // 只验证token一致，不展开比较具体属性
-		e = utils.ErrWrongMfaToken().WithParam("token in memory", v).WithParam("token", token)
+	if v.Token != token { // 只验证token是否一致，不展开比较具体属性
+		e = utils.ErrWrongMFAToken().WithParam("token in memory", v).WithParam("token", token)
+		mlog.Error(e.String())
 		return
 	}
 
 	if v.ExpireTime < time.Now().UnixMilli() {
 		delete(mtm.Data, userName) // 访问时删除，参考redis的过期策略
 
-		e = utils.ErrMfaTokenExpired().WithParam("expire time", v.ExpireTime)
+		e = utils.ErrMFATokenExpired().WithParam("expire time", v.ExpireTime)
+		mlog.Error(e.String())
 		return
 	}
 
@@ -59,30 +62,30 @@ func VerifyMfaToken(userName string, token string) (e *utils.Error) {
 	return
 }
 
-func DecodeUserNameFromMfaToken(token string) (userName string, e *utils.Error) {
+func DecodeUserNameFromMFAToken(token string) (userName string, e *utils.Error) {
 	tokenSplit := strings.Split(token, ".")
 	if len(tokenSplit) != 2 {
-		e = utils.ErrInvalidMfaToken().WithParam("token", token)
+		e = utils.ErrInvalidMFAToken().WithParam("token", token)
 		mlog.Error(e.String())
 		return
 	}
 
 	tokenBytes, err := hex.DecodeString(tokenSplit[0])
 	if err != nil {
-		e = utils.ErrDecodeMfaToken().WithCause(err)
+		e = utils.ErrDecodeMFAToken().WithCause(err)
 		mlog.Error(e.String())
 		return
 	}
 
 	tokenIns := &Token{}
 	if err := json.Unmarshal(tokenBytes, tokenIns); err != nil {
-		e = utils.ErrDeserializeMfaToken().WithCause(err)
+		e = utils.ErrDeserializeMFAToken().WithCause(err)
 		mlog.Error(e.String())
 		return
 	}
 
-	if tokenIns.Type != TokenType_MfaToken { // 其实这里不用验证，后面会验证传入token和内存中的值是否一致
-		e = utils.ErrInvalidMfaToken().WithParam("token type", tokenIns.Type)
+	if tokenIns.Type != TokenType_MFAToken { // 其实这里不用验证，后面会验证传入token和内存中的值是否一致
+		e = utils.ErrInvalidMFAToken().WithParam("token type", tokenIns.Type)
 		mlog.Error(e.String())
 		return
 	}
@@ -92,8 +95,8 @@ func DecodeUserNameFromMfaToken(token string) (userName string, e *utils.Error) 
 	return
 }
 
-// clearExpiredMfaToken 积压token达到阈值时，全面检查并清理过期token
-func clearExpiredMfaToken() {
+// clearExpiredMFAToken 积压token达到阈值时，全面检查并清理过期token
+func clearExpiredMFAToken() {
 	if len(mtm.Data) > 1000 && clearLock.CompareAndSwap(false, true) {
 		go func() {
 			defer clearLock.Store(false)

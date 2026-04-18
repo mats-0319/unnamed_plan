@@ -36,8 +36,8 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 	_user.Nickname = field.NewString(tableName, "nickname")
 	_user.Password = field.NewString(tableName, "password")
 	_user.IsAdmin = field.NewBool(tableName, "is_admin")
-	_user.Enable2FA = field.NewBool(tableName, "enable2_fa")
-	_user.TotpKey = field.NewString(tableName, "totp_key")
+	_user.EnableMFA = field.NewBool(tableName, "enable_mfa")
+	_user.TOTPKey = field.NewString(tableName, "totp_key")
 
 	_user.fillFieldMap()
 
@@ -57,8 +57,8 @@ type user struct {
 	Nickname  field.String
 	Password  field.String
 	IsAdmin   field.Bool
-	Enable2FA field.Bool
-	TotpKey   field.String
+	EnableMFA field.Bool
+	TOTPKey   field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -84,8 +84,8 @@ func (u *user) updateTableName(table string) *user {
 	u.Nickname = field.NewString(table, "nickname")
 	u.Password = field.NewString(table, "password")
 	u.IsAdmin = field.NewBool(table, "is_admin")
-	u.Enable2FA = field.NewBool(table, "enable2_fa")
-	u.TotpKey = field.NewString(table, "totp_key")
+	u.EnableMFA = field.NewBool(table, "enable_mfa")
+	u.TOTPKey = field.NewString(table, "totp_key")
 
 	u.fillFieldMap()
 
@@ -120,8 +120,8 @@ func (u *user) fillFieldMap() {
 	u.fieldMap["nickname"] = u.Nickname
 	u.fieldMap["password"] = u.Password
 	u.fieldMap["is_admin"] = u.IsAdmin
-	u.fieldMap["enable2_fa"] = u.Enable2FA
-	u.fieldMap["totp_key"] = u.TotpKey
+	u.fieldMap["enable_mfa"] = u.EnableMFA
+	u.fieldMap["totp_key"] = u.TOTPKey
 }
 
 func (u user) clone(db *gorm.DB) user {
