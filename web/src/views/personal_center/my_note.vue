@@ -194,8 +194,8 @@ watch(
     (newValue, _) => {
         canModifyFlag.value =
             newValue.is_anonymous != originData.value.is_anonymous ||
-			newValue.title != originData.value.title ||
-			newValue.content != originData.value.content
+            newValue.title != originData.value.title ||
+            newValue.content != originData.value.content
     },
     { deep: true },
 )

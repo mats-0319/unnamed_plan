@@ -6,11 +6,11 @@ import (
 )
 
 func ListNote() {
-	testCase("success - visitor", listNoteCase_SuccessVisitor)
-	testCase("success - only operator", listNoteCase_SuccessOnlyOperator)
+	testCase("success - list all", listNoteCase_SuccessListAll)
+	testCase("success - list only operator", listNoteCase_SuccessListOnlyOperator)
 }
 
-func listNoteCase_SuccessVisitor() string {
+func listNoteCase_SuccessListAll() string {
 	res := httpInvoke(api.URI_ListNote, `{"page":{"size":10,"num":1},"only_operator":false}`, accessToken_User)
 	if !res.IsSuccess {
 		return res.Err
@@ -24,7 +24,7 @@ func listNoteCase_SuccessVisitor() string {
 	return ""
 }
 
-func listNoteCase_SuccessOnlyOperator() string {
+func listNoteCase_SuccessListOnlyOperator() string {
 	res := httpInvoke(api.URI_ListNote, `{"page":{"size":10,"num":1},"only_operator":true}`, accessToken_User)
 	if !res.IsSuccess {
 		return res.Err

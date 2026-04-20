@@ -15,6 +15,7 @@ func Login() {
 	testCase("user not exist", loginCase_UserNotExist)
 	testCase("wrong pwd", loginCase_WrongPwd)
 	testCase("success - disable 2fa", loginCase_SuccessDisable2fa)
+	testCase("wrong totp code", loginCase_WrongTOTPCode)
 	testCase("success - enable 2fa", loginCase_SuccessEnable2fa)
 }
 
@@ -45,13 +46,32 @@ func loginCase_SuccessDisable2fa() string {
 	return ""
 }
 
+func loginCase_WrongTOTPCode() string {
+	res := httpInvoke(api.URI_Login, fmt.Sprintf(`{"user_name":"user_with_totp","password":"%s"}`, pwdSHA256), "")
+	if !res.IsSuccess {
+		return res.Err
+	}
+
+	mfaToken := res.Data.MFAToken
+	if len(mfaToken) < 1 {
+		return unknownError
+	}
+
+	res = httpInvoke(api.URI_LoginMFA, fmt.Sprintf(`{"mfa_token":"%s","totp_code":"000000"}`, mfaToken), "")
+	if res.IsSuccess || res.Err != utils.ErrWrongTOTPCode().Error() {
+		return unknownError
+	}
+
+	return ""
+}
+
 func loginCase_SuccessEnable2fa() string {
 	res := httpInvoke(api.URI_Login, fmt.Sprintf(`{"user_name":"user_with_totp","password":"%s"}`, pwdSHA256), "")
 	if !res.IsSuccess {
 		return res.Err
 	}
 
-	mfaToken := res.Data.MfaToken
+	mfaToken := res.Data.MFAToken
 	if len(mfaToken) < 1 {
 		return unknownError
 	}

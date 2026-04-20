@@ -35,11 +35,11 @@ func ListNote(ctx *mhttp.Context) {
 
 	ctx.ResData = &api.ListNoteRes{
 		Count: count,
-		Notes: notesFromDBToHttp(notes),
+		Notes: notesDBToHTTP(notes),
 	}
 }
 
-func notesFromDBToHttp(notes []*model.Note) []*api.Note {
+func notesDBToHTTP(notes []*model.Note) []*api.Note {
 	res := make([]*api.Note, len(notes))
 	for i, v := range notes {
 		res[i] = &api.Note{

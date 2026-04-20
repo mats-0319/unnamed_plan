@@ -14,8 +14,8 @@ func ModifyNote(ctx *mhttp.Context) {
 		return
 	}
 
-	if len(req.NoteID) < 1 {
-		e := ErrInvalidParams().WithParam("note id", req.NoteID)
+	if len(req.NoteID) < 1 || len(req.Content) < 1 {
+		e := ErrInvalidParams().WithParam("note id", req.NoteID).WithParam("content", req.Content)
 		ctx.ResData = e
 		mlog.Error(e.String())
 		return

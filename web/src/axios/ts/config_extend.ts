@@ -14,7 +14,7 @@ export function initInterceptors(invalidLoginHandler: () => void): void {
 
     axiosWrapper.interceptors.response.use(
         (value: AxiosResponse) => {
-            //@ts-ignore
+            // @ts-ignore
             const accessToken: string = value.headers.get(HttpHeader_AccessToken)
             if (accessToken && accessToken.length > 0) {
                 localStorage.setItem(StorageName_AccessToken, accessToken)
@@ -34,8 +34,7 @@ export function initInterceptors(invalidLoginHandler: () => void): void {
 
             const code: number = error.response?.status
 
-            if (code == 401) {
-                // 验证失败，用户id或访问密钥错误
+            if (code == 401) { // 验证失败，用户id或访问密钥错误
                 invalidLoginHandler()
             }
 

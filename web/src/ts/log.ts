@@ -18,8 +18,8 @@ class Log {
             str = "Unauthorized"
         } else if (code == 500) {
             str = "Server Internal Error"
-        } else if (code==400){
-            str="Bad Request"
+        } else if (code == 400) {
+            str = "Bad Request"
         }
 
         console.log("> " + str + ".")

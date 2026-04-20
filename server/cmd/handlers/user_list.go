@@ -43,11 +43,11 @@ func ListUser(ctx *mhttp.Context) {
 
 	ctx.ResData = &api.ListUserRes{
 		Count: count,
-		Users: usersFromDBToHttp(users),
+		Users: usersDBToHTTP(users),
 	}
 }
 
-func usersFromDBToHttp(users []*model.User) []*api.User {
+func usersDBToHTTP(users []*model.User) []*api.User {
 	res := make([]*api.User, len(users))
 	for i, v := range users {
 		res[i] = &api.User{

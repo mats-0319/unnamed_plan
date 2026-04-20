@@ -13,8 +13,10 @@
         </div>
 
         <div class="tc-item center-hv">
-          <outlined-button v-show="!userStore.isLogin()" @click="beforeOpenLoginDialog()">登录
+          <outlined-button v-show="!userStore.isLogin()" @click="beforeOpenLoginDialog()">
+            登录
           </outlined-button>
+
           <div v-show="userStore.isLogin()">
             <el-dropdown placement="bottom-end">
               <template #default>
@@ -39,9 +41,7 @@
 
   <el-dialog v-model="showLoginDialog" title="登录">
     <el-form v-model="loginReq" label-width="20%">
-      <el-form-item label="用户名">
-        <el-input v-model="loginReq.user_name" />
-      </el-form-item>
+      <el-form-item label="用户名"><el-input v-model="loginReq.user_name" /></el-form-item>
 
       <el-form-item label="密码">
         <el-input v-model="loginReq.password" show-password />

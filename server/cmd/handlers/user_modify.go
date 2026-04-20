@@ -31,12 +31,19 @@ func ModifyUser(ctx *mhttp.Context) {
 		mlog.Error(e.String())
 		return
 	}
+	if req.EnableMFA || modifyTOTPKeyFlag { // 准备启用MFA/更换新的totp key时，检查totp key是否有效
+		if e := isValidTOTPKey(req.TOTPKey); e != nil {
+			ctx.ResData = e
+			return
+		}
+	}
 
+	// modify
 	if modifyNicknameFlag {
 		operator.Nickname = req.Nickname
 	}
 	if len(req.Password) > 0 {
-		if e := password.VerifyPassword(req.Password, operator.Password); e == nil { // in modify, same pwd is wrong
+		if password.VerifyPassword(req.Password, operator.Password) == nil { // in modify, same pwd is wrong
 			e := utils.ErrSamePassword()
 			ctx.ResData = e
 			mlog.Error(e.String())
@@ -45,16 +52,11 @@ func ModifyUser(ctx *mhttp.Context) {
 
 		operator.Password = password.GeneratePassword(req.Password)
 	}
-	if modifyTOTPKeyFlag {
-		if e := isValidTOTPKey(req.TOTPKey); e != nil {
-			ctx.ResData = e
-			return
-		}
-
-		operator.TOTPKey = req.TOTPKey
-	}
 	if req.EnableMFA != operator.EnableMFA {
-		operator.EnableMFA = req.EnableMFA // 先判断totp key，到这里就不用重复判断其有效性了
+		operator.EnableMFA = req.EnableMFA
+	}
+	if modifyTOTPKeyFlag {
+		operator.TOTPKey = req.TOTPKey
 	}
 
 	if e := dal.UpdateUser(operator); e != nil {

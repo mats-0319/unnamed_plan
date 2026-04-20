@@ -34,7 +34,7 @@ type TestResponse struct {
 	Err         string `json:"err"`
 	AccessToken string `json:"access_token"`
 	Data        struct {
-		MfaToken string `json:"mfa_token"`
+		MFAToken string `json:"mfa_token"`
 	} `json:"data"`
 }
 

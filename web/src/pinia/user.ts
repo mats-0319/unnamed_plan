@@ -74,7 +74,7 @@ export const useUserStore = defineStore("user", () => {
         localStorage.removeItem("login_data")
     }
 
-    function calcSHA256(password: string):string{ // internal func
+    function calcSHA256(password: string):string { // internal func
         return password.length > 0 ? CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex) : ""
     }
 

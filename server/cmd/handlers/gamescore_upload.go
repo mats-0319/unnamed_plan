@@ -15,10 +15,7 @@ func UploadGameScore(ctx *mhttp.Context) {
 		return
 	}
 
-	gameScore := model.GameScore{
-		Score:  req.Score,
-		Result: req.Result,
-	}
+	gameScore := model.GameScore{Score: req.Score, Result: req.Result}
 
 	// 填写获得该成绩的玩家信息
 	if len(ctx.UserName) > 0 { // 已登录：填写用户名和昵称

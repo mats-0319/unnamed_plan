@@ -17,37 +17,38 @@ func ListGameScore(ctx *mhttp.Context) {
 
 	if req.Page.Size <= 0 || req.Page.Num <= 0 {
 		e := utils.ErrInvalidParams().WithParam("page size", req.Page.Size).WithParam("page num", req.Page.Num)
-		mlog.Error(e.String())
 		ctx.ResData = e
+		mlog.Error(e.String())
 		return
 	}
 
 	var (
-		count   int64
-		records []*model.FlipGameScore
-		e       *utils.Error
+		count         int64
+		gameScoreHTTP []*api.GameScore
+		e             *utils.Error
 	)
 	switch req.GameName {
 	case api.GameName_Flip:
+		records := make([]*model.FlipGameScore, 0)
 		count, records, e = dal.ListFlipGameScore(req.Page.Size, req.Page.Num)
+		if e != nil {
+			ctx.ResData = e
+			return
+		}
+		gameScoreHTTP = flipGameScoreDBToHTTP(records)
 	default:
 		e = utils.ErrInvalidGameName().WithParam("game name", req.GameName)
-		mlog.Error(e.String())
-	}
-	if e != nil {
 		ctx.ResData = e
+		mlog.Error(e.String())
 		return
 	}
 
-	ctx.ResData = &api.ListGameScoreRes{
-		Count:  count,
-		Scores: flipGameScoreDBToHttp(records),
-	}
+	ctx.ResData = &api.ListGameScoreRes{Count: count, Scores: gameScoreHTTP}
 }
 
-func flipGameScoreDBToHttp(dbRecords []*model.FlipGameScore) []*api.GameScore {
-	res := make([]*api.GameScore, len(dbRecords))
-	for i, v := range dbRecords {
+func flipGameScoreDBToHTTP(scores []*model.FlipGameScore) []*api.GameScore {
+	res := make([]*api.GameScore, len(scores))
+	for i, v := range scores {
 		res[i] = &api.GameScore{
 			Score:      v.Score,
 			Result:     v.Result,

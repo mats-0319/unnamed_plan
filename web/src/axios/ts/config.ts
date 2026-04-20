@@ -18,7 +18,7 @@ function getBaseUrl(): string {
     return import.meta.env.DEV ? url.replace("127.0.0.1", localIP) : url
 }
 
-// generate '.env.development' file in root path, 
+// generate '.env.development' file in root path,
 // with content 'Vite_axios_base_url = "http://127.0.0.1:10319/api"'
 //
 // generate '.env.production' file in root path,

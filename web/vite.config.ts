@@ -22,8 +22,8 @@ export default defineConfig({
         vue(),
         vueDevTools(),
 
-        AutoImport({ resolvers: [ElementPlusResolver()] }),
-        Components({ resolvers: [ElementPlusResolver()] }),
+        AutoImport({ resolvers: [ ElementPlusResolver() ] }),
+        Components({ resolvers: [ ElementPlusResolver() ] }),
 
         {
             name: "exclude-wasm-from-dist",
