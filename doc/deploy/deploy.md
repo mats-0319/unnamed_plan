@@ -98,7 +98,7 @@ nginx常用命令：
           PasswordAuthentication no // 禁用密码登录
           ```
         - 测试语法是否正确：`sudo ssh -t`
-        - 重启并检查ssh服务状态：`sudo systemctl restart/status ssh`
+        - 重启/检查ssh服务：`sudo systemctl restart/status ssh`
 
 ### 设置开机自启动
 

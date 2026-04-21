@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
+	mdb "github.com/mats0319/unnamed_plan/server/internal/db"
 	"github.com/mats0319/unnamed_plan/server/internal/db/model"
-	utilsdb "github.com/mats0319/unnamed_plan/server/internal/utils/init_db"
 	"github.com/mats0319/unnamed_plan/server/test/testdata"
 	"gorm.io/gorm"
 )
@@ -23,9 +23,8 @@ func createTable() {
 
 func dropTable() {
 	if db == nil {
-		dbConfig := utilsdb.DefaultConfig()
-		dbConfig.IsTestMode = true
-		db = utilsdb.InitDB(dbConfig)
+		dbConfig := mdb.DefaultConfig(true)
+		db = mdb.InitDB(dbConfig)
 	}
 
 	if err := db.Migrator().DropTable(model.ModelList...); err != nil {

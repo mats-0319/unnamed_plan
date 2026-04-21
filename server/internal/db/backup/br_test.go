@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
+	mdb "github.com/mats0319/unnamed_plan/server/internal/db"
 	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
-	utilsdb "github.com/mats0319/unnamed_plan/server/internal/utils/init_db"
 )
 
 // 测试数据库备份/恢复功能，如果想要更清楚的分辨一条数据库记录是预设的还是恢复的，可以按照如下步骤操作：
@@ -54,9 +54,8 @@ func prepareRecoverData() error {
 }
 
 func initDB() {
-	dbConfig := utilsdb.DefaultConfig()
-	dbConfig.IsTestMode = true
-	db := utilsdb.InitDB(dbConfig)
+	dbConfig := mdb.DefaultConfig(true)
+	db := mdb.InitDB(dbConfig)
 
 	if err := db.Migrator().DropTable(model.ModelList...); err != nil {
 		log.Fatalln("drop db table failed, error: ", err)

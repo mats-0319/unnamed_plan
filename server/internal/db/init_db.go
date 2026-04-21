@@ -1,4 +1,4 @@
-package utilsdb
+package mdb
 
 import (
 	"log"
@@ -26,13 +26,9 @@ func NewConfig(dsn string, isTestMode bool, maxIdleConns int, maxOpenConns int) 
 	}
 }
 
-func DefaultConfig() *DBConfig {
-	return &DBConfig{
-		DSN:          "host=115.190.167.134 user=mario password=123456 dbname=test_cloud port=5432 sslmode=disable",
-		IsTestMode:   false,
-		MaxIdleConns: 10,
-		MaxOpenConns: 100,
-	}
+func DefaultConfig(isTestMode bool) *DBConfig {
+	return NewConfig("host=115.190.167.134 user=mario password=123456 dbname=test_cloud port=5432 sslmode=disable",
+		isTestMode, 10, 100)
 }
 
 func InitDB(config *DBConfig) *gorm.DB {

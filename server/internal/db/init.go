@@ -8,7 +8,6 @@ import (
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
 	"github.com/mats0319/unnamed_plan/server/internal/utils/flag"
-	utilsdb "github.com/mats0319/unnamed_plan/server/internal/utils/init_db"
 )
 
 type config struct {
@@ -23,8 +22,8 @@ func Initialize() {
 		os.Exit(1)
 	}
 
-	dbConfig := utilsdb.NewConfig(configIns.DSN, flag.IsTestMode, configIns.MaxIdleConns, configIns.MaxOpenConns)
-	_ = utilsdb.InitDB(dbConfig)
+	dbConfig := NewConfig(configIns.DSN, flag.IsTestMode, configIns.MaxIdleConns, configIns.MaxOpenConns)
+	_ = InitDB(dbConfig)
 
 	logStr := "> DB init."
 	if flag.IsTestMode {

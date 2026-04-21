@@ -3,26 +3,27 @@ package main
 import (
 	"fmt"
 
+	mdb "github.com/mats0319/unnamed_plan/server/internal/db"
 	"github.com/mats0319/unnamed_plan/server/internal/db/model"
-	utilsdb "github.com/mats0319/unnamed_plan/server/internal/utils/init_db"
 )
 
 func main() {
-	dbConfig := utilsdb.DefaultConfig()
-	db := utilsdb.InitDB(dbConfig)
+	dbConfig := mdb.DefaultConfig(false)
+	db := mdb.InitDB(dbConfig)
 
 	if err := db.Migrator().DropTable(model.ModelList...); err != nil {
-		fmt.Println("-drop table failed, err: ", err) // 不加横杠ide会将其识别为命令
+		fmt.Println("drop db table failed, err: ", err)
 		return
 	}
 
 	if err := db.Migrator().CreateTable(model.ModelList...); err != nil && err.Error() != "insufficient arguments" {
-		fmt.Println("create table failed, err: ", err)
+		fmt.Println("create db table failed, err: ", err)
 		return
 	}
 
 	db.Create(defaultUser)
+
+	db.Create(testUser)
+	db.Create(testNote)
 	db.Create(testFlipGameScore)
-	//db.Create(testUser)
-	//db.Create(testNote)
 }
