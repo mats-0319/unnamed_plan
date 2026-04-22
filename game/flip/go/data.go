@@ -28,6 +28,7 @@ const (
 )
 
 const (
+	// 三个board的偏移量都是相对于body的
 	ScoreBoardOffsetWidth  = scoreMargin
 	ScoreBoardOffsetHeight = scoreMargin
 	ScoreBoardWidth        = scoreWidth

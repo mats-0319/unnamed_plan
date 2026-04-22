@@ -1,6 +1,8 @@
 //go:build js && wasm
 // +build js,wasm
 
+// 编译成wasm使用该文件，包含功能：上传成绩
+
 package flip
 
 import (

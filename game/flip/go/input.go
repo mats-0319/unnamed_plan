@@ -5,14 +5,14 @@ import "github.com/hajimehoshi/ebiten/v2"
 type ClickOn int8
 
 const (
-	ClickOn_None   ClickOn = 0
-	ClickOn_Button         = 1
-	ClickOn_Card           = 2
+	ClickOn_None   ClickOn = 0 // 未点击或点击位置无意义
+	ClickOn_Button         = 1 // 点击按钮
+	ClickOn_Card           = 2 // 点击卡片
 )
 
 type Input struct {
 	clickOn        ClickOn
-	clickCardIndex int
+	clickCardIndex int // 仅点击卡片时生效，表示点击的卡片序号
 }
 
 func (ins *Input) Update(state GameState) {
@@ -37,12 +37,8 @@ func (ins *Input) Update(state GameState) {
 }
 
 func isClickOnButton(clickPosX int, clickPosY int) bool {
-	if (border+buttonMargin < clickPosX && clickPosX < border+buttonMargin+buttonWidth) &&
-		(border+ButtonBoardOffsetHeight < clickPosY && clickPosY < border+ButtonBoardOffsetHeight+buttonHeight) {
-		return true
-	}
-
-	return false
+	return (border+buttonMargin < clickPosX && clickPosX < border+buttonMargin+buttonWidth) &&
+		(border+ButtonBoardOffsetHeight < clickPosY && clickPosY < border+ButtonBoardOffsetHeight+buttonHeight)
 }
 
 func getClickCardIndex(clickPosX int, clickPosY int) int {

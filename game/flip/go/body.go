@@ -10,15 +10,15 @@ import (
 )
 
 type Body struct {
-	score  *ScoreBoard
-	button *ButtonBoard
-	card   *CardBoard
+	Score  *ScoreBoard
+	Button *ButtonBoard
+	Card   *CardBoard
 
-	textFace *text.GoTextFace
+	TextFace *text.GoTextFace
 
-	scoreImage  *ebiten.Image
-	buttonImage *ebiten.Image
-	cardImage   *ebiten.Image
+	ScoreImage  *ebiten.Image
+	ButtonImage *ebiten.Image
+	CardImage   *ebiten.Image
 }
 
 func NewBody() (*Body, error) {
@@ -33,39 +33,48 @@ func NewBody() (*Body, error) {
 	}
 
 	return &Body{
-		score:       NewScoreBoard(),
-		button:      NewButtonBoard(),
-		card:        cardBoard,
-		textFace:    &text.GoTextFace{Source: source, Size: 20},
-		scoreImage:  ebiten.NewImage(ScoreBoardWidth, ScoreBoardHeight),
-		buttonImage: ebiten.NewImage(ButtonBoardWidth, ButtonBoardHeight),
-		cardImage:   ebiten.NewImage(CardBoardWidth, CardBoardHeight),
+		Score:       NewScoreBoard(),
+		Button:      NewButtonBoard(),
+		Card:        cardBoard,
+		TextFace:    &text.GoTextFace{Source: source, Size: 20},
+		ScoreImage:  ebiten.NewImage(ScoreBoardWidth, ScoreBoardHeight),
+		ButtonImage: ebiten.NewImage(ButtonBoardWidth, ButtonBoardHeight),
+		CardImage:   ebiten.NewImage(CardBoardWidth, CardBoardHeight),
 	}, nil
 }
 
-func (b *Body) Update(state GameState, input *Input) int {
-	b.button.Update(state)
-	frontCount, addStep := b.card.Update(input)
-	b.score.Update(state, addStep)
+func (b *Body) reset() {
+	b.Score = NewScoreBoard()
+	b.Button = NewButtonBoard()
+	b.Card.reset()
+}
 
-	return frontCount
+func (b *Body) Update(state GameState, input *Input) int64 {
+	b.Button.Update(state)
+	frontCount, stepOffset := b.Card.Update(input)
+
+	if state == GameState_Playing && frontCount >= 16 {
+		state = GameState_End
+	}
+
+	return b.Score.Update(state, stepOffset)
 }
 
 func (b *Body) Draw(bodyBoard *ebiten.Image, state GameState) {
-	b.score.Draw(b.scoreImage, b.textFace)
+	b.Score.Draw(b.ScoreImage, b.TextFace)
 	options := &ebiten.DrawImageOptions{}
 	options.GeoM.Translate(ScoreBoardOffsetWidth, ScoreBoardOffsetHeight)
-	bodyBoard.DrawImage(b.scoreImage, options)
+	bodyBoard.DrawImage(b.ScoreImage, options)
 
-	b.button.Draw(b.buttonImage, b.textFace)
+	b.Button.Draw(b.ButtonImage, b.TextFace)
 	options = &ebiten.DrawImageOptions{}
 	options.GeoM.Translate(ButtonBoardOffsetWidth, ButtonBoardOffsetHeight)
-	bodyBoard.DrawImage(b.buttonImage, options)
+	bodyBoard.DrawImage(b.ButtonImage, options)
 
-	b.card.Draw(b.cardImage, state)
+	b.Card.Draw(b.CardImage, state)
 	options = &ebiten.DrawImageOptions{}
 	options.GeoM.Translate(CardBoardOffsetWidth, CardBoardOffsetHeight)
-	bodyBoard.DrawImage(b.cardImage, options)
+	bodyBoard.DrawImage(b.CardImage, options)
 }
 
 func drawCenterText(image *ebiten.Image, content string, textFace *text.GoTextFace, cx float64, cy float64, color color.Color) {

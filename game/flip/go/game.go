@@ -4,6 +4,11 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// GameState 状态转换：
+// 1. 初始化游戏，进入 就绪 状态
+// 2. 点击按钮进入 进行中 状态
+// 3. 完成一局游戏，自动进入 结束 状态
+// 4. 点击按钮重新初始化游戏，进入 就绪 状态，完成一个循环
 type GameState int8
 
 const (
@@ -13,12 +18,11 @@ const (
 )
 
 type Game struct {
-	state      GameState
-	frontCount int
+	State GameState
 
-	input     *Input
-	body      *Body
-	bodyBoard *ebiten.Image
+	Input     *Input
+	Body      *Body
+	BodyBoard *ebiten.Image
 }
 
 func NewGame() (*Game, error) {
@@ -28,32 +32,29 @@ func NewGame() (*Game, error) {
 	}
 
 	return &Game{
-		state:     GameState_Prepared,
-		input:     &Input{},
-		body:      body,
-		bodyBoard: ebiten.NewImage(BodyWidth, BodyHeight),
+		State:     GameState_Prepared,
+		Input:     &Input{},
+		Body:      body,
+		BodyBoard: ebiten.NewImage(BodyWidth, BodyHeight),
 	}, nil
 }
 
 func (g *Game) Update() error {
-	g.input.Update(g.state)
-	if g.state == GameState_Prepared && g.input.clickOn == ClickOn_Button {
-		g.state = GameState_Playing
-	} else if g.state == GameState_End && g.input.clickOn == ClickOn_Button {
-		newBody, err := NewBody()
-		if err != nil {
-			return err
-		}
+	g.Input.Update(g.State)
 
-		g.body = newBody // reset game
-		g.state = GameState_Prepared
+	if g.State == GameState_Prepared && g.Input.clickOn == ClickOn_Button {
+		g.State = GameState_Playing
+	} else if g.State == GameState_End && g.Input.clickOn == ClickOn_Button {
+		g.Body.reset()
+		g.State = GameState_Prepared
 	}
 
-	g.frontCount = g.body.Update(g.state, g.input)
-	if g.state == GameState_Playing && g.frontCount >= 16 {
-		g.state = GameState_End
+	gameTime := g.Body.Update(g.State, g.Input)
 
-		sendFlipScoreToWeb(g.body.score.duration.Milliseconds(), g.body.score.steps)
+	if g.State == GameState_Playing && gameTime > 0 {
+		g.State = GameState_End
+
+		sendFlipScoreToWeb(gameTime, g.Body.Score.steps)
 	}
 
 	return nil
@@ -62,11 +63,11 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(backgroundColorDark)
 
-	g.body.Draw(g.bodyBoard, g.state)
+	g.Body.Draw(g.BodyBoard, g.State)
 
 	options := &ebiten.DrawImageOptions{}
 	options.GeoM.Translate(border, border)
-	screen.DrawImage(g.bodyBoard, options)
+	screen.DrawImage(g.BodyBoard, options)
 }
 
 func (g *Game) Layout(_ int, _ int) (screenWidth, screenHeight int) {

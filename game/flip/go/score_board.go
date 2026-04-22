@@ -12,20 +12,17 @@ import (
 
 type ScoreBoard struct {
 	durationStr string
-	duration    time.Duration
-	startTime   time.Time
+	startTime   time.Time // 计算用
 	endTime     time.Time
 
 	steps int
-
-	scopeImage *ebiten.Image
 }
 
 func NewScoreBoard() *ScoreBoard {
-	return &ScoreBoard{scopeImage: ebiten.NewImage(scoreWidth, scoreHeight)}
+	return &ScoreBoard{}
 }
 
-func (s *ScoreBoard) Update(state GameState, addStep bool) {
+func (s *ScoreBoard) Update(state GameState, stepOffset int) (gameTime int64) {
 	switch state {
 	case GameState_Prepared:
 		s.durationStr = "00:00.000"
@@ -34,20 +31,21 @@ func (s *ScoreBoard) Update(state GameState, addStep bool) {
 			s.startTime = time.Now()
 		}
 
-		s.duration = time.Since(s.startTime)
-		s.durationStr = fmt.Sprintf("%02d:%02d.%03d", int(s.duration/time.Minute)%60, int(s.duration/time.Second)%60, s.duration.Milliseconds()%1000)
-	case GameState_End:
-		if s.endTime.IsZero() {
-			s.endTime = time.Now()
-		}
-
-		duration := s.endTime.Sub(s.startTime)
+		duration := time.Since(s.startTime)
 		s.durationStr = fmt.Sprintf("%02d:%02d.%03d", int(duration/time.Minute)%60, int(duration/time.Second)%60, duration.Milliseconds()%1000)
+	case GameState_End:
+		if s.endTime.IsZero() { // 只计算一次
+			s.endTime = time.Now()
+			duration := s.endTime.Sub(s.startTime)
+			s.durationStr = fmt.Sprintf("%02d:%02d.%03d", int(duration/time.Minute)%60, int(duration/time.Second)%60, duration.Milliseconds()%1000)
+
+			gameTime = duration.Milliseconds()
+		}
 	}
 
-	if addStep {
-		s.steps++
-	}
+	s.steps += stepOffset
+
+	return
 }
 
 func (s *ScoreBoard) Draw(scoreBoard *ebiten.Image, textFace *text.GoTextFace) {

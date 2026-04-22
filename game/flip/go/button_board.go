@@ -8,30 +8,28 @@ import (
 )
 
 type ButtonBoard struct {
-	buttonText string
-
-	buttonImage *ebiten.Image
+	ButtonText string
 }
 
 func NewButtonBoard() *ButtonBoard {
-	return &ButtonBoard{buttonImage: ebiten.NewImage(buttonWidth, buttonHeight)}
+	return &ButtonBoard{}
 }
 
 func (b *ButtonBoard) Update(state GameState) {
 	switch state {
 	case GameState_Prepared:
-		b.buttonText = "Start Game"
+		b.ButtonText = "Start Game"
 	case GameState_End:
-		b.buttonText = "Restart Game"
+		b.ButtonText = "Restart Game"
 	default:
-		b.buttonText = ""
+		b.ButtonText = ""
 	}
 }
 
 func (b *ButtonBoard) Draw(buttonBoard *ebiten.Image, textFace *text.GoTextFace) {
 	buttonBoard.Fill(backgroundColorLight)
 
-	if len(b.buttonText) > 0 {
-		drawCenterText(buttonBoard, b.buttonText, textFace, ButtonBoardWidth/2.0, ButtonBoardHeight/2.0, color.Black)
+	if len(b.ButtonText) > 0 {
+		drawCenterText(buttonBoard, b.ButtonText, textFace, ButtonBoardWidth/2.0, ButtonBoardHeight/2.0, color.Black)
 	}
 }
