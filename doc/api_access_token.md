@@ -1,0 +1,31 @@
+# 接口访问令牌/多重因素认证(MFA)
+
+> Api Access Token：登录成功签发该token
+
+服务端签发无状态的`access token`，供客户端后续需要登录的接口使用
+
+- 使用自定义请求头`Unnamed-Plan-Access-Token`传递`token`，客户端和服务端都是
+- `token`结构：`hex({"user_name":[xxx]...}).hex(hash(payload, key))`
+    - hash algorithm：`hmac-sha256`
+    - payload: `hex({"user_name":[xxx]...})`, `.`之前的16进制字符串
+    - key：启动时随机生成（重启服务会失效所有历史令牌）
+    - 程序从`token`中解析`user name`并使用，通常不需要客户端传递
+- (计划中)密钥轮换：将密钥版本号加入payload，同时维护两个版本的密钥，新密钥推出超过令牌有效期后，可以停止维护旧密钥
+
+> MFA Token：如果用户开启了MFA，则登录过程变成两步，两步之间凭借该token确认用户身份
+
+MFA(Multi Factor Authenticate)：多重因素认证，用于登录时，通常指除了用户名和密码，还需要输入一个凭证信息；
+因为该模块属于登录功能的可选模块，所以做成第二个步骤。
+
+- 凭证信息：包括但不限于TOTP Code、手机验证码、邮箱验证码
+- 登录步骤：（MFA以TOTP Code为例）
+    - 用户输入用户名和密码，点击登录，调用接口1
+    - 服务端验证用户名和密码，根据用户是否开启MFA：
+        - 未开启：验证结果即为登录结果
+        - 已开启：
+            - 服务端签发并维护`mfa-token`，前端弹出新的窗口供用户输入`totp code`，与该token一起调用接口2
+            - 服务端验证`mfa-token`和`totp code`，验证结果即为登录结果
+    - 前端完成登录（处理登录结果）
+
+说明：通常情况下，`mfa-token`的维护应使用redis缓存数据库，然而我们这是一个玩具项目，我希望它尽可能少的引入外部系统，
+所以我在程序内存维护`mfa-token`，维护策略参考redis，使用**阈值全面清理+访问时延迟清理**策略
