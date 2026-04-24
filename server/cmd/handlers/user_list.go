@@ -15,8 +15,8 @@ func ListUser(ctx *mhttp.Context) {
 		return
 	}
 
-	if req.Page.Size <= 0 || req.Page.Num <= 0 {
-		e := ErrInvalidParams().WithParam("page size", req.Page.Size).WithParam("page num", req.Page.Num)
+	if len(ctx.UserName) < 1 || req.Page.Size <= 0 || req.Page.Num <= 0 {
+		e := ErrInvalidParams().WithParam("operator", ctx.UserName).WithParam("pagination", req.Page)
 		mlog.Error(e.String())
 		ctx.ResData = e
 		return

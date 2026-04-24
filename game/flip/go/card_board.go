@@ -20,12 +20,19 @@ type CardBoard struct {
 }
 
 type CardItem struct {
-	Number      int
-	IsFrontSide bool
-
-	IsFlipping bool
-	FlipAngle  float64
+	Number    int
+	Status    CardStatus
+	FlipAngle float64 // 仅在 选中状态-执行翻转动画 期间生效
 }
+
+type CardStatus int8
+
+const (
+	CardStatus_Default  CardStatus = 0 // 默认状态，反面向上
+	CardStatus_Flipping            = 1 // 选中状态，执行翻转动画
+	CardStatus_Selected            = 2 // 选中状态，正面向上
+	CardStatus_Matched             = 3 // 配对成功，正面向上
+)
 
 func NewCardBoard() (*CardBoard, error) {
 	res := &CardBoard{}
@@ -50,6 +57,8 @@ func NewCardBoard() (*CardBoard, error) {
 }
 
 func (c *CardBoard) reset() {
+	c.Cards = [16]*CardItem{}
+
 	cardInitFlag := [16]bool{}
 	for i := 0; i < 8; i++ { // i: [0,7]
 		for range 2 { // 每个i用两次
@@ -58,7 +67,7 @@ func (c *CardBoard) reset() {
 				cardIndex = (cardIndex + 1) % 16
 			}
 
-			if c.Cards[cardIndex] == nil {
+			if c.Cards[cardIndex] == nil { // 蹭数据循环来初始化数组的每一项
 				c.Cards[cardIndex] = &CardItem{}
 			}
 			c.Cards[cardIndex].Number = i
@@ -67,54 +76,63 @@ func (c *CardBoard) reset() {
 	}
 }
 
-func (c *CardBoard) Update(input *Input) (frontCount int, stepOffset int) {
+func (c *CardBoard) Update(input *Input) (matchedCount int, stepOffset int) {
 	defer func() {
 		for _, v := range c.Cards {
-			if v.IsFrontSide {
-				frontCount++
+			if v.Status == CardStatus_Matched {
+				matchedCount++
 			}
 		}
 	}()
 
 	// 翻转动画参数计算
 	for _, v := range c.Cards {
-		if v.IsFlipping {
+		if v.Status == CardStatus_Flipping {
 			v.FlipAngle += math.Pi / 12 // 12帧完成翻转
 
 			if v.FlipAngle >= math.Pi {
-				v.IsFlipping = false
+				v.Status = CardStatus_Selected
 				v.FlipAngle = 0
 			}
 		}
 	}
 
-	// 获取点击的卡牌索引，没有点击卡牌或点击已经是正面向上的卡牌时不进行后续处理
+	// 获取点击的卡牌索引，只有满足以下条件之一的，才会进入后续处理：
+	// 1. 选中默认状态的卡牌
+	// 2. 选中已选择状态的卡牌且此前已选择两张不同的卡牌
+	//    - 其实这和上一条相同，只是我们对于两张不同的卡牌，在翻转第三张的时候才将它们重置为反面向上，所以这里多一种情况
 	index := input.clickCardIndex
-	if input.clickOn != ClickOn_Card || c.Cards[index].IsFrontSide { // 未选中卡牌或选中已经是正面向上的卡牌
+	if input.clickOn != ClickOn_Card ||
+		!(c.Cards[index].Status == CardStatus_Default ||
+			(c.Cards[index].Status == CardStatus_Selected && len(c.Selected) == 2)) {
 		return
 	}
 
+	// 处理翻转，包括before flip / after flip
 	{
-		if len(c.Selected) > 1 { // 已翻转过两张卡牌，已经点击了第三张但尚未执行翻转
-			// 它们的序号不同，则在下一次翻转卡牌前（即此刻）将它们重置为反面向上（无动画）；
-			// 序号相同则保持正面向上（无动作）。
-			if c.Cards[c.Selected[0]].Number != c.Cards[c.Selected[1]].Number {
-				c.Cards[c.Selected[0]].IsFrontSide = false
-				c.Cards[c.Selected[1]].IsFrontSide = false
-			}
+		if len(c.Selected) > 1 { // 已翻转过两张卡牌，它们的序号不同（相同的在上一个周期就处理了）
+			// 将选中的卡牌重置为默认状态（此刻已经选择了第三张翻转的卡牌，尚未执行翻转）
+			c.Cards[c.Selected[0]].Status = CardStatus_Default
+			c.Cards[c.Selected[1]].Status = CardStatus_Default
 
 			c.Selected = make([]int, 0, 2) // 移除处理过的卡牌
 		}
 
+		c.Cards[index].Status = CardStatus_Flipping
 		c.Selected = append(c.Selected, index) // 执行翻转
 
 		if len(c.Selected) > 1 { // 此时刚翻转两张卡牌
 			stepOffset = 1 // 步数统计+1
+
+			// 如果两张卡牌序号相同，则将它们标记为配对成功
+			if c.Cards[c.Selected[0]].Number == c.Cards[c.Selected[1]].Number {
+				c.Cards[c.Selected[0]].Status = CardStatus_Matched
+				c.Cards[c.Selected[1]].Status = CardStatus_Matched
+
+				c.Selected = make([]int, 0, 2) // 移除处理过的卡牌
+			}
 		}
 	}
-
-	c.Cards[index].IsFrontSide = true
-	c.Cards[index].IsFlipping = true
 
 	return
 }
@@ -129,11 +147,12 @@ func (c *CardBoard) Draw(cardBoard *ebiten.Image, state GameState) {
 	for i := 0; i < 4; i++ {
 		for j := 0; j < 4; j++ {
 			options := &ebiten.DrawImageOptions{}
-			x := j*cardWidth + (j+1)*cardMargin
-			y := i*cardHeight + (i+1)*cardMargin
+			x := j*cardWidth + (j+1)*cardMargin  // offset x
+			y := i*cardHeight + (i+1)*cardMargin // offset y
 
 			cardItem := c.Cards[i*4+j]
-			if cardItem.IsFlipping { // 如果卡牌正在翻转
+			switch cardItem.Status {
+			case CardStatus_Flipping: // 如果卡牌正在翻转
 				scaleX := math.Cos(cardItem.FlipAngle) // scaleX: 1 -> 0 -> -1
 
 				options.GeoM.Translate(-cardWidth/2, -cardHeight/2) // 将卡牌中心点移动到画布原点(0,0)
@@ -148,14 +167,12 @@ func (c *CardBoard) Draw(cardBoard *ebiten.Image, state GameState) {
 				} else {
 					cardBoard.DrawImage(c.FrontImages[cardItem.Number], options)
 				}
-			} else {
+			case CardStatus_Default:
 				options.GeoM.Translate(float64(x), float64(y))
-
-				if cardItem.IsFrontSide {
-					cardBoard.DrawImage(c.FrontImages[cardItem.Number], options)
-				} else {
-					cardBoard.DrawImage(c.BackImage, options)
-				}
+				cardBoard.DrawImage(c.BackImage, options)
+			case CardStatus_Selected, CardStatus_Matched:
+				options.GeoM.Translate(float64(x), float64(y))
+				cardBoard.DrawImage(c.FrontImages[cardItem.Number], options)
 			}
 		}
 	}

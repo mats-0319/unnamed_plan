@@ -71,7 +71,7 @@ func Backup[T any](t doBackupRecover[T]) {
 			}
 
 			// write file and update db record
-			// 检查：写文件成功但是写数据库失败，下一次会重新尝试备份，而备份函数具有幂等性，所以不必写在一个事务里
+			// 检查：写文件成功但是写数据库失败，下一次会重新尝试备份，而备份函数具有幂等性，所以可以不写在一个事务里
 			fileBytes, err = json.Marshal(fileData)
 			if err != nil {
 				mlog.Error("marshal file failed", mlog.Field("error", err))

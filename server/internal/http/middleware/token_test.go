@@ -2,6 +2,9 @@ package middleware
 
 import (
 	"fmt"
+	"log"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -10,7 +13,7 @@ import (
 )
 
 func TestAccessToken(t *testing.T) {
-	token := GenerateApiAccessToken("test user name")
+	token := GenerateAPIAccessToken("test user name")
 
 	ctx := &mhttp.Context{AccessToken: token}
 	if err := VerifyAccessToken(ctx); err != nil {
@@ -28,7 +31,7 @@ func TestAccessTokenExceptions(t *testing.T) {
 	}
 
 	// tamper hash
-	tokenTamper := GenerateApiAccessToken("test user name")
+	tokenTamper := GenerateAPIAccessToken("test user name")
 	tokenTamper = tokenTamper[:len(tokenTamper)-1] + "g"
 
 	ctx.AccessToken = tokenTamper
@@ -51,7 +54,7 @@ func TestAccessTokenExceptions(t *testing.T) {
 	// token expired
 	tokenExpired := generateToken(&Token{
 		UserName:   "test user name",
-		Type:       TokenType_ApiAccessToken,
+		Type:       TokenType_APIAccessToken,
 		ExpireTime: time.Now().Add(-1 * time.Minute).UnixMilli(),
 	})
 
@@ -61,19 +64,19 @@ func TestAccessTokenExceptions(t *testing.T) {
 	}
 }
 
-func TestMfaToken(t *testing.T) {
+func TestMFAToken(t *testing.T) {
 	// test clear expired token, including basic function test
 	lastMinute := time.Now().Add(-1 * time.Minute).UnixMilli()
 	for i := range 1000 {
-		t := &Token{
+		tokenIns := &Token{
 			UserName:   fmt.Sprintf("test user name %d", i),
 			Type:       TokenType_MFAToken,
 			ExpireTime: lastMinute,
 		}
 
-		token := generateToken(t)
+		token := generateToken(tokenIns)
 
-		NewMFAToken(t.UserName, token, lastMinute)
+		NewMFAToken(tokenIns.UserName, token, lastMinute)
 	}
 
 	// 测试基本功能
@@ -84,16 +87,50 @@ func TestMfaToken(t *testing.T) {
 		t.Error(err.String())
 	}
 
-	tokenCountAfterClear := 0
-	for range 3 {
-		tokenCountAfterClear = len(mtm.Data)
-		t.Logf("time: %v, token count: %d", time.Now(), tokenCountAfterClear)
-
-		time.Sleep(time.Microsecond * 10)
+	tokenCountAfterClear := len(mtm.Data)
+	for i := 0; i < 3; {
+		newLength := len(mtm.Data)
+		if newLength != tokenCountAfterClear {
+			i++
+			tokenCountAfterClear = len(mtm.Data)
+			t.Logf("time: %v, token count: %d", time.Now(), tokenCountAfterClear)
+		} else if newLength == 0 {
+			break
+		}
 	}
 
 	if tokenCountBeforeClear <= 1000 || tokenCountAfterClear >= 1000 {
 		t.Error(fmt.Sprintf("token clear unexpected, token count from %d to %d",
 			tokenCountBeforeClear, tokenCountAfterClear))
 	}
+}
+
+// 测试同时只运行一个实例，如果已经有一个实例在运行，忽略启动新实例的行为
+func TestRunOneInstanceAtOnce(t *testing.T) {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
+
+	var wg sync.WaitGroup
+	var lock atomic.Bool
+
+	f := func() {
+		log.Println("> New Function Call")
+
+		if lock.CompareAndSwap(false, true) {
+			log.Println("| Start New Goroutine")
+
+			wg.Go(func() {
+				defer lock.Store(false)
+
+				time.Sleep(time.Millisecond * 500)
+				log.Println("| Exit New Goroutine")
+			})
+		}
+	}
+
+	for range 10 {
+		f()
+		time.Sleep(time.Millisecond * 100)
+	}
+
+	wg.Wait()
 }

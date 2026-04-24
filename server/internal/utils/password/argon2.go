@@ -11,9 +11,6 @@ import (
 	"golang.org/x/crypto/argon2"
 )
 
-// pwd hash structure: `argon2id.v=19,m=65536,t=3,p=1.[saltHex].[keyHex]`
-// more: doc/design.md 密码存储hash
-
 type AlgorithmParams struct {
 	CalcTimes uint32 // 迭代次数
 	Memory    uint32 // 使用内存

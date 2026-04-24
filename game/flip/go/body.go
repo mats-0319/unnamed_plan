@@ -51,9 +51,9 @@ func (b *Body) reset() {
 
 func (b *Body) Update(state GameState, input *Input) int64 {
 	b.Button.Update(state)
-	frontCount, stepOffset := b.Card.Update(input)
+	matchedCount, stepOffset := b.Card.Update(input)
 
-	if state == GameState_Playing && frontCount >= 16 {
+	if state == GameState_Playing && matchedCount >= 16 {
 		state = GameState_End
 	}
 

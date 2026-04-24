@@ -50,7 +50,7 @@ func VerifyMFAToken(userName string, token string) (e *utils.Error) {
 	}
 
 	if v.ExpireTime < time.Now().UnixMilli() {
-		delete(mtm.Data, userName) // 访问时删除，参考redis的过期策略
+		delete(mtm.Data, userName) // 访问时删除
 
 		e = utils.ErrMFATokenExpired().WithParam("expire time", v.ExpireTime)
 		mlog.Error(e.String())

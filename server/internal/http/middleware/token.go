@@ -12,14 +12,6 @@ import (
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-// token structure: `hex({"user_name":[xxx]...}).hex(hash(payload, key))`
-// more: doc/design.md 接口访问令牌
-
-// 关于接口应如何使用验证中间件的说明：
-// 1. 必须登录后可调用的接口：使用验证中间件，例如写小纸条
-// 2. 是否登录均可调用，对访客/用户的处理逻辑相同的接口：不使用中间件，例如注册、登录
-// 3. 是否登录均可调用，对访客/用户的处理逻辑不同的接口：使用可选验证中间件，例如上传游戏成绩
-
 type Token struct {
 	UserName   string    `json:"user_name"`
 	Type       TokenType `json:"type"`
@@ -29,14 +21,14 @@ type Token struct {
 type TokenType int8
 
 const (
-	TokenType_ApiAccessToken TokenType = 1
+	TokenType_APIAccessToken TokenType = 1
 	TokenType_MFAToken                 = 2
 )
 
-func GenerateApiAccessToken(userName string) string {
+func GenerateAPIAccessToken(userName string) string {
 	return generateToken(&Token{
 		UserName:   userName,
-		Type:       TokenType_ApiAccessToken,
+		Type:       TokenType_APIAccessToken,
 		ExpireTime: time.Now().Add(time.Hour * 12).UnixMilli(), // hard code 'expire time' = 12h
 	})
 }
@@ -108,7 +100,7 @@ func verifyAccessToken(ctx *mhttp.Context) (e *Error) {
 		return
 	}
 
-	if token.Type != TokenType_ApiAccessToken {
+	if token.Type != TokenType_APIAccessToken {
 		e = ErrInvalidAccessToken().WithParam("token type", token.Type)
 		return
 	}

@@ -17,6 +17,13 @@ func ModifyUser(ctx *mhttp.Context) {
 		return
 	}
 
+	if len(ctx.UserName) < 1 {
+		e := utils.ErrInvalidParams().WithParam("operator", ctx.UserName)
+		mlog.Error(e.String())
+		ctx.ResData = e
+		return
+	}
+
 	operator, e := dal.GetUser(ctx.UserName)
 	if e != nil {
 		ctx.ResData = e

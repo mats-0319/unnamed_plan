@@ -15,8 +15,8 @@ func CreateNote(ctx *mhttp.Context) {
 		return
 	}
 
-	if len(req.Content) < 1 {
-		e := utils.ErrInvalidParams().WithParam("content", req.Content)
+	if len(ctx.UserName) < 1 || len(req.Content) < 1 {
+		e := utils.ErrInvalidParams().WithParam("operator", ctx.UserName).WithParam("content", req.Content)
 		mlog.Error(e.String())
 		ctx.ResData = e
 		return
