@@ -67,7 +67,7 @@ func (c *CardBoard) reset() {
 				cardIndex = (cardIndex + 1) % 16
 			}
 
-			if c.Cards[cardIndex] == nil { // 蹭数据循环来初始化数组的每一项
+			if c.Cards[cardIndex] == nil { // 蹭数据循环来初始化数组的每个元素
 				c.Cards[cardIndex] = &CardItem{}
 			}
 			c.Cards[cardIndex].Number = i
@@ -85,33 +85,42 @@ func (c *CardBoard) Update(input *Input) (matchedCount int, stepOffset int) {
 		}
 	}()
 
-	// 翻转动画参数计算
-	for _, v := range c.Cards {
-		if v.Status == CardStatus_Flipping {
-			v.FlipAngle += math.Pi / 12 // 12帧完成翻转
+	// 翻转动画
+	for _, card := range c.Cards {
+		if card.Status == CardStatus_Flipping {
+			card.FlipAngle += math.Pi / 12 // 0.2秒完成翻转
 
-			if v.FlipAngle >= math.Pi {
-				v.Status = CardStatus_Selected
-				v.FlipAngle = 0
+			if card.FlipAngle >= math.Pi {
+				card.Status = CardStatus_Selected
+				card.FlipAngle = 0
 			}
 		}
 	}
 
 	// 获取点击的卡牌索引，只有满足以下条件之一的，才会进入后续处理：
 	// 1. 选中默认状态的卡牌
-	// 2. 选中已选择状态的卡牌且此前已选择两张不同的卡牌
-	//    - 其实这和上一条相同，只是我们对于两张不同的卡牌，在翻转第三张的时候才将它们重置为反面向上，所以这里多一种情况
+	// 2. 选中已选择状态的卡牌、且此前已选择两张卡牌、且卡牌已完成翻转动画
+	// 因为我希望能在点击第三张卡牌时处理前两张（而不是翻转动画结束之后就处理），所以这里要写的复杂一点
 	index := input.clickCardIndex
 	if input.clickOn != ClickOn_Card ||
 		!(c.Cards[index].Status == CardStatus_Default ||
-			(c.Cards[index].Status == CardStatus_Selected && len(c.Selected) == 2)) {
+			(c.Cards[index].Status == CardStatus_Selected &&
+				len(c.Selected) == 2 && c.Cards[c.Selected[1]].Status == CardStatus_Selected)) {
 		return
 	}
 
-	// 处理翻转，包括before flip / after flip
 	{
-		if len(c.Selected) > 1 { // 已翻转过两张卡牌，它们的序号不同（相同的在上一个周期就处理了）
-			// 将选中的卡牌重置为默认状态（此刻已经选择了第三张翻转的卡牌，尚未执行翻转）
+		if len(c.Selected) > 1 { // 已翻转过两张卡牌，正准备翻转第三张卡牌
+			if c.Cards[c.Selected[0]].Number == c.Cards[c.Selected[1]].Number {
+				c.Cards[c.Selected[0]].Status = CardStatus_Matched
+				c.Cards[c.Selected[1]].Status = CardStatus_Matched
+
+				if c.Cards[index].Status == CardStatus_Matched {
+					c.Selected = make([]int, 0, 2)
+					return
+				}
+			}
+
 			c.Cards[c.Selected[0]].Status = CardStatus_Default
 			c.Cards[c.Selected[1]].Status = CardStatus_Default
 
@@ -123,14 +132,6 @@ func (c *CardBoard) Update(input *Input) (matchedCount int, stepOffset int) {
 
 		if len(c.Selected) > 1 { // 此时刚翻转两张卡牌
 			stepOffset = 1 // 步数统计+1
-
-			// 如果两张卡牌序号相同，则将它们标记为配对成功
-			if c.Cards[c.Selected[0]].Number == c.Cards[c.Selected[1]].Number {
-				c.Cards[c.Selected[0]].Status = CardStatus_Matched
-				c.Cards[c.Selected[1]].Status = CardStatus_Matched
-
-				c.Selected = make([]int, 0, 2) // 移除处理过的卡牌
-			}
 		}
 	}
 
