@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand/v2"
+	"slices"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -78,8 +79,8 @@ func (c *CardBoard) reset() {
 
 func (c *CardBoard) Update(input *Input) (matchedCount int, stepOffset int) {
 	defer func() {
-		for _, v := range c.Cards {
-			if v.Status == CardStatus_Matched {
+		for _, card := range c.Cards {
+			if card.Status == CardStatus_Matched {
 				matchedCount++
 			}
 		}
@@ -111,20 +112,21 @@ func (c *CardBoard) Update(input *Input) (matchedCount int, stepOffset int) {
 
 	{
 		if len(c.Selected) > 1 { // 已翻转过两张卡牌，正准备翻转第三张卡牌
-			if c.Cards[c.Selected[0]].Number == c.Cards[c.Selected[1]].Number {
+			if c.Cards[c.Selected[0]].Number == c.Cards[c.Selected[1]].Number { // 两张卡牌相同
 				c.Cards[c.Selected[0]].Status = CardStatus_Matched
 				c.Cards[c.Selected[1]].Status = CardStatus_Matched
 
-				if c.Cards[index].Status == CardStatus_Matched {
-					c.Selected = make([]int, 0, 2)
+				c.Selected = make([]int, 0, 2)
+
+				if slices.Contains(c.Selected, index) { // 选中时是已选择状态，现在已经是配对成功状态了，忽略
 					return
 				}
+			} else {
+				c.Cards[c.Selected[0]].Status = CardStatus_Default
+				c.Cards[c.Selected[1]].Status = CardStatus_Default
+
+				c.Selected = make([]int, 0, 2) // 移除处理过的卡牌
 			}
-
-			c.Cards[c.Selected[0]].Status = CardStatus_Default
-			c.Cards[c.Selected[1]].Status = CardStatus_Default
-
-			c.Selected = make([]int, 0, 2) // 移除处理过的卡牌
 		}
 
 		c.Cards[index].Status = CardStatus_Flipping

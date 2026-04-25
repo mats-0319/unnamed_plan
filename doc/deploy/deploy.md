@@ -6,7 +6,18 @@
 
 ubuntu系统自带一个pg数据库的指定版本快照，如果想要安装其他版本，参考[官方文档](https://www.postgresql.org/download/linux/ubuntu/)
 
-- `apt install postgresql`
+因为我们想要安装pg 18（这个版本原生支持uuidv7），所以记录我的安装过程：
+
+1. 系统自带pg 16
+2. 使apt可以从pg下载：
+    - `sudo apt install -y postgresql-common`
+    - `sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh`
+3. 下载pg 18：
+    - `sudo apt update`
+    - `sudo apt install postgresql-18`
+4. 下载完成之后，终端弹窗说可以直接把16升到18，选择升级，它执行了两个`pg_xxx`工具就好了；
+   数据可以正常访问，对外部使用来说没有影响，如果你的升级没有这一步，参考官方文档继续进行后续步骤：
+   [文档](https://www.postgresql.org/docs/current/index.html)
 
 ### 创建用户/数据库
 

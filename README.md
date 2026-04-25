@@ -12,7 +12,7 @@
 - 如果你想在本地运行该项目，需要以下环境：（版本号为经过测试的推荐版本）
     - go 1.26
     - node 24 (corepack-pnpm)
-    - postgresql 16
+    - postgresql 18：强制要求v18+，因为我们用到了v18的新功能-原生支持uuidv7
 - 修改配置文件`server/cmd/config.json`
 - 执行准备工作：建数据库表
 - 运行服务端程序、运行前端程序
@@ -75,6 +75,6 @@ todo
 - eslint+prettier
 
 - nginx
-- postgresql
+- postgresql 18
 - shell
 - github pages：托管游戏文件
