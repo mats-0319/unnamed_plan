@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math"
 	"math/rand/v2"
-	"slices"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -62,9 +61,9 @@ func (c *CardBoard) reset() {
 
 	cardInitFlag := [16]bool{}
 	for i := 0; i < 8; i++ { // i: [0,7]
-		for range 2 { // 每个i用两次
+		for range 2 {
 			cardIndex := rand.IntN(16)
-			for cardInitFlag[cardIndex] { // 如果随机索引已被占用，则向后找到下一个可用索引
+			for cardInitFlag[cardIndex] {
 				cardIndex = (cardIndex + 1) % 16
 			}
 
@@ -94,14 +93,25 @@ func (c *CardBoard) Update(input *Input) (matchedCount int, stepOffset int) {
 			if card.FlipAngle >= math.Pi {
 				card.Status = CardStatus_Selected
 				card.FlipAngle = 0
+
+				// 如果已经选中两张相同的卡牌，在翻转完成后，将卡牌状态修改为配对成功。
+				// 如果不验证第二张卡牌已完成翻转，在第一张卡牌完成翻转之前点击第二张的场景下，第二张卡牌会提前完成翻转
+				if len(c.Selected) > 1 &&
+					c.Cards[c.Selected[0]].Number == c.Cards[c.Selected[1]].Number &&
+					c.Cards[c.Selected[1]].Status == CardStatus_Selected {
+					c.Cards[c.Selected[0]].Status = CardStatus_Matched
+					c.Cards[c.Selected[1]].Status = CardStatus_Matched
+
+					c.Selected = make([]int, 0, 2)
+				}
 			}
 		}
 	}
 
-	// 获取点击的卡牌索引，只有满足以下条件之一的，才会进入后续处理：
+	// 获取点击的卡牌索引，只有满足以下条件之一的才视为有效卡牌，进入后续处理：
 	// 1. 选中默认状态的卡牌
-	// 2. 选中已选择状态的卡牌、且此前已选择两张卡牌、且卡牌已完成翻转动画
-	// 因为我希望能在点击第三张卡牌时处理前两张（而不是翻转动画结束之后就处理），所以这里要写的复杂一点
+	// 2. 选中已选择状态的卡牌，此前已选中两张不同的卡牌且完成翻转动画
+	// 我希望能在选中第三张卡牌时再将不同的前两张卡牌重置为反面向上（而不是翻转动画结束之后立刻处理），所以这里写的复杂了一点
 	index := input.clickCardIndex
 	if input.clickOn != ClickOn_Card ||
 		!(c.Cards[index].Status == CardStatus_Default ||
@@ -112,25 +122,15 @@ func (c *CardBoard) Update(input *Input) (matchedCount int, stepOffset int) {
 
 	{
 		if len(c.Selected) > 1 { // 已翻转过两张卡牌，正准备翻转第三张卡牌
-			if c.Cards[c.Selected[0]].Number == c.Cards[c.Selected[1]].Number { // 两张卡牌相同
-				c.Cards[c.Selected[0]].Status = CardStatus_Matched
-				c.Cards[c.Selected[1]].Status = CardStatus_Matched
+			// 这里的两张卡牌必然是不同的，因为相同的情况已经在翻转完成时处理了
+			c.Cards[c.Selected[0]].Status = CardStatus_Default
+			c.Cards[c.Selected[1]].Status = CardStatus_Default
 
-				c.Selected = make([]int, 0, 2)
-
-				if slices.Contains(c.Selected, index) { // 选中时是已选择状态，现在已经是配对成功状态了，忽略
-					return
-				}
-			} else {
-				c.Cards[c.Selected[0]].Status = CardStatus_Default
-				c.Cards[c.Selected[1]].Status = CardStatus_Default
-
-				c.Selected = make([]int, 0, 2) // 移除处理过的卡牌
-			}
+			c.Selected = make([]int, 0, 2)
 		}
 
 		c.Cards[index].Status = CardStatus_Flipping
-		c.Selected = append(c.Selected, index) // 执行翻转
+		c.Selected = append(c.Selected, index)
 
 		if len(c.Selected) > 1 { // 此时刚翻转两张卡牌
 			stepOffset = 1 // 步数统计+1
@@ -158,7 +158,7 @@ func (c *CardBoard) Draw(cardBoard *ebiten.Image, state GameState) {
 			case CardStatus_Flipping: // 如果卡牌正在翻转
 				scaleX := math.Cos(cardItem.FlipAngle) // scaleX: 1 -> 0 -> -1
 
-				options.GeoM.Translate(-cardWidth/2, -cardHeight/2) // 将卡牌中心点移动到画布原点(0,0)
+				options.GeoM.Translate(-cardWidth/2, -cardHeight/2) // 将卡牌中心点移动到子画布原点(0,0)
 				options.GeoM.Scale(scaleX, 1)
 				if scaleX < 0 { // 翻转到后半段
 					// 不能和下面的if合并，因为缩放是基于原点的，如果简单合并会导致展示效果未定义

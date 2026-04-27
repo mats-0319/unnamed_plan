@@ -30,7 +30,7 @@ func sendFlipScoreToWeb(duration int64, steps int) {
 	}
 
 	// calc score
-	score := 100_0000 - int(duration) - steps*2_000
+	score := 100_0000 - int(duration) - steps*2000
 	if score < 0 {
 		score = 0
 	}

@@ -14,7 +14,53 @@
 
 <script setup lang="ts">
 import ElevatedButton from "@/components/elevated_button.vue"
-import { routerLink } from "@/ts/util.ts"
+import { randomVisitorName, routerLink } from "@/ts/util.ts"
+import { onMounted, onUnmounted } from "vue"
+import { GameName } from "@/axios/ts/game.go.ts"
+import { useUserStore } from "@/pinia/user.ts"
+import { useGameScoreStore } from "@/pinia/game_score.ts"
+
+let userStore = useUserStore()
+let gameScoreStore = useGameScoreStore()
+
+onMounted(() => {
+    window.addEventListener("message", handleMessage)
+})
+
+onUnmounted(() => {
+    window.removeEventListener("message", handleMessage)
+})
+
+function handleMessage(event: any) {
+    console.log("> Node: test post-message event. ", event)
+
+    const trustedOrigins = Array<string>(getBaseUrl())
+    if (!trustedOrigins.includes(event.origin)) {
+        console.log("> PostMessage - Invalid Event Origin: ", event)
+        return
+    }
+
+    const { game_name, score, result } = event.data
+
+    switch (game_name) {
+        case GameName.Flip:
+            let player = userStore.isLogin() ? "" : randomVisitorName()
+
+            gameScoreStore.uploadGameScore(game_name, score, result, player)
+
+            break
+        default:
+            console.log("> PostMessage - Invalid Game Name: ", game_name)
+            break
+    }
+}
+
+function getBaseUrl(): string {
+    let url = import.meta.env.Vite_axios_base_url
+    let localIP = window.location.hostname
+
+    return import.meta.env.DEV ? url.replace("127.0.0.1", localIP) : url
+}
 </script>
 
 <style lang="less" scoped>

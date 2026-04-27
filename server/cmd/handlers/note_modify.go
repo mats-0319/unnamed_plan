@@ -28,7 +28,6 @@ func ModifyNote(ctx *mhttp.Context) {
 		return
 	}
 
-	// no changes
 	if req.IsAnonymous == note.IsAnonymous && req.Title == note.Title && req.Content == note.Content {
 		e := ErrNoChanges().WithParam("operator", ctx.UserName)
 		ctx.ResData = e

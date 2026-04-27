@@ -47,8 +47,7 @@ func Backup[T any](t doBackupRecover[T]) {
 			fileData := t.EmptySlice()
 			fileBytes, err := os.ReadFile(filePath) // error if file not exist
 			if err == nil {
-				err = json.Unmarshal(fileBytes, &fileData)
-				if err != nil {
+				if err = json.Unmarshal(fileBytes, &fileData); err != nil {
 					mlog.Error("unmarshal file failed", mlog.Field("error", err))
 					return
 				}
