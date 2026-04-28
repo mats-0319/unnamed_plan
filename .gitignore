@@ -5,9 +5,3 @@
 # final build data
 build/
 go.sum
-# testdata created when test backup
-server/internal/db/backup/backup/
-server/internal/db/backup/recover/
-# testdata
-server/cmd/backup/
-server/cmd/recover/

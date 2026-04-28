@@ -13,7 +13,7 @@ import (
 // log structure: "[time] [level] [file:line func] message | attrs(with group)"
 // demo: "[2026-02-14 15:41:37.230] [DEBUG] [log_test.go:24 log.TestLogLevel] debug level log | error=debug error"
 
-type handler struct {
+type Logger struct {
 	writer io.Writer
 
 	level  slog.Level
@@ -23,8 +23,8 @@ type handler struct {
 	mu sync.Mutex
 }
 
-func newHandler(writer io.Writer, level slog.Level) *handler {
-	return &handler{
+func newLogger(writer io.Writer, level slog.Level) *Logger {
+	return &Logger{
 		writer: writer,
 		level:  level,
 		attrs:  []slog.Attr{},
@@ -32,11 +32,11 @@ func newHandler(writer io.Writer, level slog.Level) *handler {
 	}
 }
 
-func (h *handler) Enabled(_ context.Context, level slog.Level) bool {
+func (h *Logger) Enabled(_ context.Context, level slog.Level) bool {
 	return level >= h.level
 }
 
-func (h *handler) Handle(_ context.Context, r slog.Record) error {
+func (h *Logger) Handle(_ context.Context, r slog.Record) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
@@ -51,12 +51,12 @@ func (h *handler) Handle(_ context.Context, r slog.Record) error {
 	return err
 }
 
-func (h *handler) WithAttrs(attrs []slog.Attr) slog.Handler {
+func (h *Logger) WithAttrs(attrs []slog.Attr) slog.Handler {
 	if len(attrs) < 1 {
 		return h
 	}
 
-	newInstance := &handler{
+	newInstance := &Logger{
 		writer: h.writer,
 		level:  h.level,
 		attrs:  make([]slog.Attr, len(h.attrs)+len(attrs)),
@@ -70,12 +70,12 @@ func (h *handler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return newInstance
 }
 
-func (h *handler) WithGroup(name string) slog.Handler {
+func (h *Logger) WithGroup(name string) slog.Handler {
 	if name == "" {
 		return h
 	}
 
-	newInstance := &handler{
+	newInstance := &Logger{
 		writer: h.writer,
 		level:  h.level,
 		attrs:  make([]slog.Attr, len(h.attrs)),
@@ -108,7 +108,7 @@ func codePosition() string {
 	return fmt.Sprintf("%s:%d", fileName, f.Line)
 }
 
-func (h *handler) logAttrs(r slog.Record) string {
+func (h *Logger) logAttrs(r slog.Record) string {
 	length := len(h.attrs) + r.NumAttrs()
 	if length < 1 {
 		return ""

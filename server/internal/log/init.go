@@ -10,18 +10,24 @@ import (
 	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
 )
 
+var logger *Logger
+
+// 当前日志命名为`log.log`，这是为了方便每次启动时找日志文件。正常写日志，写到轮换大小开始轮换：
+//   创建临时日志`temp.log`-向临时日志写入-备份（改名）旧日志-
+//   创建新的当前日志`log.log`-向当前日志写入-将临时日志内容移动到备份日志-删除临时日志
+// 记得关闭旧日志文件句柄
+
 func Initialize(isTestMode ...bool) {
 	var err error
-	fileIns, err = os.OpenFile("log.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	fileIns, err = os.OpenFile("log.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		log.Fatalln("open log file failed, error:", err)
 	}
 
 	multiWriter := io.MultiWriter(fileIns, os.Stdout)
-	handlerIns := newHandler(multiWriter, getLogLevel(isTestMode...))
+	logger = newLogger(multiWriter, getLogLevel(isTestMode...))
 
-	logger := slog.New(handlerIns)
-	slog.SetDefault(logger)
+	slog.SetDefault(slog.New(logger))
 
 	Info("> Config init.") // 不是这里才初始化的，但是只有这里（日志）初始化之后才能使用自定义结构打印这句话
 	Info("> Log init.")
@@ -52,21 +58,21 @@ func Error(msg string, args ...*LogField) {
 }
 
 type LogField struct {
-	Key   string
-	Value any
+	Message string
+	Value   any
 }
 
-func Field(msg string, value any) *LogField {
+func Field(message string, value any) *LogField {
 	return &LogField{
-		Key:   msg,
-		Value: value,
+		Message: message,
+		Value:   value,
 	}
 }
 
 func fieldsToAnySlice(fields []*LogField) []any {
 	fs := make([]any, 0, len(fields)*2)
 	for _, field := range fields {
-		fs = append(fs, field.Key, field.Value)
+		fs = append(fs, field.Message, field.Value)
 	}
 
 	return fs
