@@ -2,6 +2,7 @@ package mhttp
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
 
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
@@ -22,7 +23,7 @@ func (ctx *Context) response() {
 
 	_, err := ctx.Writer.Write(resBytes)
 	if err != nil {
-		mlog.Error("response failed", mlog.Field("error", err))
+		mlog.Error("response failed", slog.Any("error", err))
 		return
 	}
 }
@@ -45,7 +46,7 @@ func serializeRes(obj any) (int, []byte) {
 	jsonBytes, err := json.Marshal(obj)
 	if err != nil {
 		// 因为这里已经给resBytes定型了，返回错误也没啥能做的，就不返回了
-		mlog.Error("serialize res to json failed", mlog.Field("error", err))
+		mlog.Error("serialize res to json failed", slog.Any("error", err))
 		return code, nil
 	}
 

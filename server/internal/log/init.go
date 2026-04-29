@@ -1,81 +1,46 @@
 package mlog
 
 import (
-	"io"
 	"log"
 	"log/slog"
-	"os"
 	"strings"
 
 	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
 )
 
-var logger *Logger
-
-// 当前日志命名为`log.log`，这是为了方便每次启动时找日志文件。正常写日志，写到轮换大小开始轮换：
-//   创建临时日志`temp.log`-向临时日志写入-备份（改名）旧日志-
-//   创建新的当前日志`log.log`-向当前日志写入-将临时日志内容移动到备份日志-删除临时日志
-// 记得关闭旧日志文件句柄
+var handler *Handler
 
 func Initialize(isTestMode ...bool) {
 	var err error
-	fileIns, err = os.OpenFile("log.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	handler, err = newHandler("log.log", 1, getLogLevel(isTestMode...))
 	if err != nil {
 		log.Fatalln("open log file failed, error:", err)
 	}
 
-	multiWriter := io.MultiWriter(fileIns, os.Stdout)
-	logger = newLogger(multiWriter, getLogLevel(isTestMode...))
-
-	slog.SetDefault(slog.New(logger))
+	slog.SetDefault(slog.New(handler))
 
 	Info("> Config init.") // 不是这里才初始化的，但是只有这里（日志）初始化之后才能使用自定义结构打印这句话
 	Info("> Log init.")
 }
 
-var fileIns *os.File
-
 func Close() {
-	if fileIns != nil {
-		_ = fileIns.Close()
-	}
+	handler.close()
 }
 
-func Debug(msg string, args ...*LogField) {
-	slog.Debug(msg, fieldsToAnySlice(args)...)
+func Debug(msg string, args ...any) {
+	slog.Debug(msg, args...)
 }
 
-func Info(msg string, args ...*LogField) {
-	slog.Info(msg, fieldsToAnySlice(args)...)
+func Info(msg string, args ...any) {
+	slog.Info(msg, args...)
 }
 
-func Warn(msg string, args ...*LogField) {
-	slog.Warn(msg, fieldsToAnySlice(args)...)
+func Warn(msg string, args ...any) {
+	slog.Warn(msg, args...)
 }
 
-func Error(msg string, args ...*LogField) {
-	slog.Error(msg, fieldsToAnySlice(args)...)
-}
-
-type LogField struct {
-	Message string
-	Value   any
-}
-
-func Field(message string, value any) *LogField {
-	return &LogField{
-		Message: message,
-		Value:   value,
-	}
-}
-
-func fieldsToAnySlice(fields []*LogField) []any {
-	fs := make([]any, 0, len(fields)*2)
-	for _, field := range fields {
-		fs = append(fs, field.Message, field.Value)
-	}
-
-	return fs
+func Error(msg string, args ...any) {
+	slog.Error(msg, args...)
 }
 
 // Log 适用于需要通过'WithAttrs'/'WithGroup'定制输出内容、生成新的logger实例的场景
@@ -84,18 +49,16 @@ func fieldsToAnySlice(fields []*LogField) []any {
 // 其实可以把slog default logger / slog level复制到这里，在使用过程中就不需要使用slog
 // 用法参考测试代码
 // 已调整为与默认打印函数使用相同的调用层级数（日志中的代码位置一项，使用'mlog.Info()'/'mlog.Log()'均显示为该函数位置）
-func Log(logger *slog.Logger, level slog.Level, msg string, fields ...*LogField) {
-	fs := fieldsToAnySlice(fields)
-
+func Log(logger *slog.Logger, level slog.Level, msg string, fields ...any) {
 	switch level {
 	case slog.LevelDebug:
-		logger.Debug(msg, fs...)
+		logger.Debug(msg, fields...)
 	case slog.LevelInfo:
-		logger.Info(msg, fs...)
+		logger.Info(msg, fields...)
 	case slog.LevelWarn:
-		logger.Warn(msg, fs...)
+		logger.Warn(msg, fields...)
 	case slog.LevelError:
-		logger.Error(msg, fs...)
+		logger.Error(msg, fields...)
 	default:
 		logger.Error("unknown level: " + level.String())
 	}

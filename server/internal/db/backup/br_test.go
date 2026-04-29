@@ -2,6 +2,7 @@ package backup
 
 import (
 	"log"
+	"log/slog"
 	"os"
 	"testing"
 
@@ -41,12 +42,12 @@ func TestBackupRecover(t *testing.T) {
 
 func prepareRecoverData() error {
 	if err := os.RemoveAll("./recover/"); err != nil {
-		mlog.Error("remove dir failed", mlog.Field("error", err))
+		mlog.Error("remove dir failed", slog.Any("error", err))
 		return err
 	}
 
 	if err := os.Rename("./backup/", "./recover/"); err != nil {
-		mlog.Error("rename folder failed", mlog.Field("error", err))
+		mlog.Error("rename folder failed", slog.Any("error", err))
 		return err
 	}
 

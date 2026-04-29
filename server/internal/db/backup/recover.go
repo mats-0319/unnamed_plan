@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"log/slog"
 	"os"
 	"strings"
 
@@ -27,7 +28,7 @@ func Recover[T any](t doBackupRecover[T]) {
 
 		var fileInfo fs.FileInfo
 		if fileInfo, err = entry[i].Info(); err != nil {
-			mlog.Error("get file info failed", mlog.Field("error", err))
+			mlog.Error("get file info failed", slog.Any("error", err))
 			continue
 		}
 
@@ -44,13 +45,13 @@ func Recover[T any](t doBackupRecover[T]) {
 func recoverFile[T any](path string, t doBackupRecover[T]) error {
 	fileBytes, err := os.ReadFile(path)
 	if err != nil {
-		mlog.Error("read file failed", mlog.Field("error", err))
+		mlog.Error("read file failed", slog.Any("error", err))
 		return err
 	}
 
 	fileData := t.EmptySlice()
 	if err := json.Unmarshal(fileBytes, &fileData); err != nil {
-		mlog.Error("unmarshal file failed", mlog.Field("error", err))
+		mlog.Error("unmarshal file failed", slog.Any("error", err))
 		return err
 	}
 
@@ -63,7 +64,7 @@ func recoverFile[T any](path string, t doBackupRecover[T]) error {
 	}
 
 	if err := dal.DB().Model(t.Model()).Clauses(clauseSkipAutoTime).Create(fileData).Error; err != nil {
-		mlog.Error("save file failed", mlog.Field("error", err))
+		mlog.Error("save file failed", slog.Any("error", err))
 		return err
 	}
 

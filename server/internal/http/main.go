@@ -3,6 +3,7 @@ package mhttp
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 
@@ -30,7 +31,7 @@ func StartServer(handler *Handler) {
 	mlog.Info("> Listening at: " + addr)
 
 	if err := http.ListenAndServe(addr, handler); err != nil {
-		mlog.Error("handlers listen and serve failed", mlog.Field("error", err))
+		mlog.Error("handlers listen and serve failed", slog.Any("error", err))
 	}
 }
 
@@ -39,7 +40,7 @@ func getHTTPConfig() (*config, error) {
 
 	res := &config{}
 	if err := json.Unmarshal(jsonBytes, res); err != nil {
-		mlog.Error("deserialize http config failed", mlog.Field("error", err))
+		mlog.Error("deserialize http config failed", slog.Any("error", err))
 		return nil, err
 	}
 

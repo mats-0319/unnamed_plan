@@ -2,6 +2,7 @@ package mdb
 
 import (
 	"encoding/json"
+	"log/slog"
 	"os"
 
 	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
@@ -37,7 +38,7 @@ func getDBConfig() (*config, error) {
 
 	conf := &config{}
 	if err := json.Unmarshal(bytes, conf); err != nil {
-		mlog.Error("deserialize db config failed", mlog.Field("error", err))
+		mlog.Error("deserialize db config failed", slog.Any("error", err))
 		return nil, err
 	}
 

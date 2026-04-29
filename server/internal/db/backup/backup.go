@@ -3,6 +3,7 @@ package backup
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"time"
 
@@ -14,14 +15,14 @@ import (
 func Backup[T any](t doBackupRecover[T]) {
 	dir := "./backup/" + t.Dir()
 	if err := os.MkdirAll(dir, 0644); err != nil {
-		mlog.Error("mkdir failed", mlog.Field("error", err))
+		mlog.Error("mkdir failed", slog.Any("error", err))
 		return
 	}
 
 	// if it has data need backup
 	var count int64
 	if err := dal.DB().Unscoped().Model(t.Model()).Where(t.Condition()).Count(&count).Error; err != nil {
-		mlog.Error("db count failed", mlog.Field("error", err))
+		mlog.Error("db count failed", slog.Any("error", err))
 		return
 	}
 	if count < 1 { // no data need backup
@@ -34,7 +35,7 @@ func Backup[T any](t doBackupRecover[T]) {
 	for range int(count)/pageSize + 1 {
 		dbRecords := t.EmptySlice()
 		if err := dal.DB().Unscoped().Model(t.Model()).Where(t.Condition()).Limit(pageSize).Find(&dbRecords).Error; err != nil {
-			mlog.Error("get data need to backup failed", mlog.Field("error", err))
+			mlog.Error("get data need to backup failed", slog.Any("error", err))
 			return
 		}
 
@@ -48,7 +49,7 @@ func Backup[T any](t doBackupRecover[T]) {
 			fileBytes, err := os.ReadFile(filePath) // error if file not exist
 			if err == nil {
 				if err = json.Unmarshal(fileBytes, &fileData); err != nil {
-					mlog.Error("unmarshal file failed", mlog.Field("error", err))
+					mlog.Error("unmarshal file failed", slog.Any("error", err))
 					return
 				}
 			}
@@ -73,17 +74,17 @@ func Backup[T any](t doBackupRecover[T]) {
 			// 检查：写文件成功但是写数据库失败，下一次会重新尝试备份，而备份函数具有幂等性，所以可以不写在一个事务里
 			fileBytes, err = json.Marshal(fileData)
 			if err != nil {
-				mlog.Error("marshal file failed", mlog.Field("error", err))
+				mlog.Error("marshal file failed", slog.Any("error", err))
 				return
 			}
 
 			if err := os.WriteFile(filePath, fileBytes, 0644); err != nil { // implicit create file at first time
-				mlog.Error("write file failed", mlog.Field("error", err))
+				mlog.Error("write file failed", slog.Any("error", err))
 				return
 			}
 
 			if err := dal.DB().Unscoped().Model(record).UpdateColumns(record).Error; err != nil { // UpdateColumns skip hooks and auto-updateTime
-				mlog.Error("update db data failed", mlog.Field("error", err))
+				mlog.Error("update db data failed", slog.Any("error", err))
 				return
 			}
 		}

@@ -2,6 +2,7 @@ package mhttp
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -41,7 +42,7 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		mlog.Info(fmt.Sprintf("> Process Request: %s , in %d ms", request.URL.String(), time.Since(startTime).Milliseconds()))
 
 		if err := recover(); err != nil {
-			mlog.Error("recover panic", mlog.Field("", err))
+			mlog.Error("recover panic", slog.Any("", err))
 		}
 	}()
 
