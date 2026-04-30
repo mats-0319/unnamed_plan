@@ -29,11 +29,13 @@ func main() {
 
 	var wg sync.WaitGroup
 
-	wg.Go(func() { autoBackup(ctx, brm) })
-	wg.Go(func() { waitSignal(ctx, brm) })
+	{
+		wg.Go(func() { autoBackup(ctx, brm) })
+		wg.Go(func() { waitSignal(ctx, brm) })
 
-	mhttp.StartServer(newHandler()) // blocked
-	cancel()
+		mhttp.StartServer(newHandler()) // blocked
+		cancel()
+	}
 
 	wg.Wait()
 }

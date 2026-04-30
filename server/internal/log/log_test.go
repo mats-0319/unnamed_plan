@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log/slog"
 	"testing"
+	"time"
 )
 
 func TestCustomLog(t *testing.T) {
@@ -35,8 +36,13 @@ func TestLogSplitFile(t *testing.T) {
 	for lastSize <= currentSize { // log split
 		lastSize = currentSize
 
-		Debug("test log message", slog.String("this is a long key", "this is a long value"))
+		slog.SetDefault(slog.New(handler.WithGroup("groupName")))
+		Debug("test log message",
+			slog.String("Key1", "Value1"),
+			slog.String("Key2", "Value2"))
 
 		currentSize = handler.Size
 	}
+
+	time.Sleep(time.Second) // 阻塞，避免异步压缩goroutine因主程序退出而退出
 }
