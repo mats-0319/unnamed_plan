@@ -21,7 +21,7 @@ func Login() {
 
 func loginCase_UserNotExist() string {
 	res := httpInvoke(api.URI_Login, `{"user_name":"not exist","password":"123"}`, "")
-	if res.IsSuccess || res.Err != utils.ErrUserNotFound().Error() {
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrUserNotFound()) {
 		return unknownError
 	}
 
@@ -30,7 +30,7 @@ func loginCase_UserNotExist() string {
 
 func loginCase_WrongPwd() string {
 	res := httpInvoke(api.URI_Login, `{"user_name":"admin","password":"wrong pwd"}`, "")
-	if res.IsSuccess || res.Err != utils.ErrWrongPassword().Error() {
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrWrongPassword()) {
 		return unknownError
 	}
 
@@ -58,7 +58,7 @@ func loginCase_WrongTOTPCode() string {
 	}
 
 	res = httpInvoke(api.URI_LoginMFA, fmt.Sprintf(`{"mfa_token":"%s","totp_code":"000000"}`, mfaToken), "")
-	if res.IsSuccess || res.Err != utils.ErrWrongTOTPCode().Error() {
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrWrongTOTPCode()) {
 		return unknownError
 	}
 

@@ -38,7 +38,7 @@ func createNoteCase_Success() string {
 
 func createNoteCase_Duplicate() string {
 	res := httpInvoke(api.URI_CreateNote, `{"is_anonymous":false,"title":"123","content":"456"}`, accessToken_Admin)
-	if res.IsSuccess || res.Err != utils.ErrNoteExist().Error() {
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrNoteExist()) {
 		return unknownError
 	}
 

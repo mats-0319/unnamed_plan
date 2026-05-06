@@ -15,7 +15,7 @@ func Register() {
 
 func registerCase_Duplicate() string {
 	res := httpInvoke(api.URI_Register, `{"user_name":"admin","password":"123"}`, "")
-	if res.IsSuccess || res.Err != utils.ErrUserExist().Error() {
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrUserExist()) {
 		return unknownError
 	}
 

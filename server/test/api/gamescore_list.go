@@ -12,7 +12,7 @@ func ListGameScore() {
 
 func listGameScoreCase_InvalidGameName() string {
 	res := httpInvoke(api.URI_ListGameScore, `{"game_name":-1,"page":{"size":10,"num":1}}`, "")
-	if res.IsSuccess || res.Err != utils.ErrInvalidGameName().Error() {
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrInvalidGameName()) {
 		return unknownError
 	}
 

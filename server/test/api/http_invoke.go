@@ -83,3 +83,8 @@ func testCase(name string, f func() string) {
 		panic("test failed")
 	}
 }
+
+// errorIs 封装错误检查，避免代码中出现大量错误文本对比，即使这个错误文本也是我写的
+func errorIs(errStr string, e *utils.Error) bool {
+	return errStr == e.Error()
+}

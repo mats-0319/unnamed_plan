@@ -26,8 +26,8 @@ func TestAccessTokenExceptions(t *testing.T) {
 	tokenWithoutPoint := "aStrWithoutPoint"
 	ctx := &mhttp.Context{AccessToken: tokenWithoutPoint}
 
-	if err := verifyAccessToken(ctx); err.Error() != utils.ErrInvalidAccessToken().Error() {
-		t.Error("should fail")
+	if verifyAccessToken(ctx).Code != utils.ErrInvalidAccessToken().Code {
+		t.Error("position 1")
 	}
 
 	// tamper hash
@@ -35,8 +35,8 @@ func TestAccessTokenExceptions(t *testing.T) {
 	tokenTamper = tokenTamper[:len(tokenTamper)-1] + "g"
 
 	ctx.AccessToken = tokenTamper
-	if err := verifyAccessToken(ctx); err.Error() != utils.ErrWrongAccessTokenHash().Error() {
-		t.Error("should fail")
+	if verifyAccessToken(ctx).Code != utils.ErrWrongAccessTokenHash().Code {
+		t.Error("position 2")
 	}
 
 	// wrong token type
@@ -47,8 +47,8 @@ func TestAccessTokenExceptions(t *testing.T) {
 	})
 
 	ctx.AccessToken = tokenWrongType
-	if err := verifyAccessToken(ctx); err.Error() != utils.ErrInvalidAccessToken().Error() {
-		t.Error("should fail")
+	if verifyAccessToken(ctx).Code != utils.ErrInvalidAccessToken().Code {
+		t.Error("position 3")
 	}
 
 	// token expired
@@ -59,8 +59,8 @@ func TestAccessTokenExceptions(t *testing.T) {
 	})
 
 	ctx.AccessToken = tokenExpired
-	if err := verifyAccessToken(ctx); err.Error() != utils.ErrAccessTokenExpired().Error() {
-		t.Error("should fail")
+	if verifyAccessToken(ctx).Code != utils.ErrAccessTokenExpired().Code {
+		t.Error("position 4")
 	}
 }
 
@@ -92,7 +92,7 @@ func TestMFAToken(t *testing.T) {
 		newLength := len(mtm.Data)
 		if newLength != tokenCountAfterClear {
 			i++
-			tokenCountAfterClear = len(mtm.Data)
+			tokenCountAfterClear = newLength
 			t.Logf("time: %v, token count: %d", time.Now(), tokenCountAfterClear)
 		} else if newLength == 0 {
 			break

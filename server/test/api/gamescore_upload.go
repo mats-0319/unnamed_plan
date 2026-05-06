@@ -14,7 +14,7 @@ func UploadGameScore() {
 
 func uploadGameScoreCase_InvalidGameName() string {
 	res := httpInvoke(api.URI_UploadGameScore, `{"game_name":-1,"score":100000,"result":"test game result","player":"Visotor001"}`, "")
-	if res.IsSuccess || res.Err != utils.ErrInvalidGameName().Error() {
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrInvalidGameName()) {
 		return unknownError
 	}
 

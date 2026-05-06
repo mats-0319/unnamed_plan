@@ -16,7 +16,7 @@ func main() {
 		return
 	}
 
-	if err := db.Migrator().CreateTable(model.ModelList...); err != nil && err.Error() != "insufficient arguments" {
+	if err := db.Migrator().CreateTable(model.ModelList...); err != nil {
 		fmt.Println("create db table failed, err: ", err)
 		return
 	}

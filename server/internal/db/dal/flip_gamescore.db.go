@@ -23,9 +23,8 @@ func CreateFlipGameScore(gameScore *model.FlipGameScore) *utils.Error {
 			mlog.Error(e.String())
 			return e
 		}
-		if len(records) > 3 { // 如果一个玩家拥有超过3条成绩
-			_, err := FlipGameScore.WithContext(context.TODO()).Delete(records[3:]...) // 只保留分数最好的3条
-			if err != nil {
+		if len(records) > 3 { // 如果一个玩家拥有超过3条成绩，只保留分数最高的3条
+			if _, err := FlipGameScore.WithContext(context.TODO()).Delete(records[3:]...); err != nil {
 				e := utils.ErrDBError().WithCause(err)
 				mlog.Error(e.String())
 				return e
@@ -39,8 +38,7 @@ func CreateFlipGameScore(gameScore *model.FlipGameScore) *utils.Error {
 func ListFlipGameScore(pageSize int, pageNum int) (count int64, records []*model.FlipGameScore, e *utils.Error) {
 	sql := FlipGameScore.WithContext(context.TODO())
 
-	var err error
-	count, err = sql.Count()
+	count, err := sql.Count()
 	if err != nil {
 		e = utils.ErrDBError().WithCause(err)
 		mlog.Error(e.String())

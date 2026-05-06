@@ -13,7 +13,7 @@ func ListUser() {
 
 func listUserCase_NotAdmin() string {
 	res := httpInvoke(api.URI_ListUser, `{"page":{"size":10,"num":1}}`, accessToken_User)
-	if res.IsSuccess || res.Err != utils.ErrPermissionDenied().Error() {
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrPermissionDenied()) {
 		return unknownError
 	}
 

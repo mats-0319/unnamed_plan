@@ -2,45 +2,44 @@ package dal
 
 import (
 	"context"
-	"strings"
+	"errors"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 	"gorm.io/gorm"
 )
 
-func GetUser(userName string) (*model.User, *Error) {
+func GetUser(userName string) (res *model.User, e *Error) {
 	res, err := User.WithContext(context.TODO()).Where(User.UserName.Eq(userName)).First()
 	if err != nil {
-		var e *Error
-		if err.Error() == gorm.ErrRecordNotFound.Error() {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			e = ErrUserNotFound().WithCause(err)
 		} else {
 			e = ErrDBError().WithCause(err)
 		}
 
 		mlog.Error(e.String())
-		return nil, e
+		return
 	}
 
-	return res, nil
+	return
 }
 
-func CreateUser(user *model.User) *Error {
+func CreateUser(user *model.User) (e *Error) {
 	if err := User.WithContext(context.TODO()).Create(user); err != nil {
-		var e *Error
-		if strings.Contains(err.Error(), "violates unique constraint") {
+		if pge, ok := errors.AsType[*pgconn.PgError](err); ok && pge.Code == "23505" {
 			e = ErrUserExist().WithCause(err)
 		} else {
 			e = ErrDBError().WithCause(err)
 		}
 
 		mlog.Error(e.String())
-		return e
+		return
 	}
 
-	return nil
+	return
 }
 
 func UpdateUser(user *model.User) *Error {
@@ -56,8 +55,7 @@ func UpdateUser(user *model.User) *Error {
 func ListUser(pageSize int, pageNum int) (count int64, records []*model.User, e *Error) {
 	sql := User.WithContext(context.TODO())
 
-	var err error
-	count, err = sql.Count()
+	count, err := sql.Count()
 	if err != nil {
 		e = ErrDBError().WithCause(err)
 		mlog.Error(e.String())

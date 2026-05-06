@@ -2,45 +2,44 @@ package dal
 
 import (
 	"context"
-	"strings"
+	"errors"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	. "github.com/mats0319/unnamed_plan/server/internal/utils"
 	"gorm.io/gorm"
 )
 
-func GetNote(noteID string) (*model.Note, *Error) {
+func GetNote(noteID string) (res *model.Note, e *Error) {
 	res, err := Note.WithContext(context.TODO()).Where(Note.NoteID.Eq(noteID)).First()
 	if err != nil {
-		var e *Error
-		if err.Error() == gorm.ErrRecordNotFound.Error() {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			e = ErrNoteNotFound().WithCause(err)
 		} else {
 			e = ErrDBError().WithCause(err)
 		}
 
 		mlog.Error(e.String())
-		return nil, e
+		return
 	}
 
-	return res, nil
+	return
 }
 
-func CreateNote(note *model.Note) *Error {
+func CreateNote(note *model.Note) (e *Error) {
 	if err := Note.WithContext(context.TODO()).Create(note); err != nil {
-		var e *Error
-		if strings.Contains(err.Error(), "violates unique constraint") {
+		if pge, ok := errors.AsType[*pgconn.PgError](err); ok && pge.Code == "23505" {
 			e = ErrNoteExist().WithCause(err)
 		} else {
 			e = ErrDBError().WithCause(err)
 		}
 
 		mlog.Error(e.String())
-		return e
+		return
 	}
 
-	return nil
+	return
 }
 
 func UpdateNote(note *model.Note) *Error {
@@ -69,8 +68,7 @@ func ListNote(pageSize int, pageNum int, writer string) (count int64, records []
 		sql = sql.Where(Note.Writer.Eq(writer))
 	}
 
-	var err error
-	count, err = sql.Count()
+	count, err := sql.Count()
 	if err != nil {
 		e = ErrDBError().WithCause(err)
 		mlog.Error(e.String())

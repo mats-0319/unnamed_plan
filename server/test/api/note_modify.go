@@ -17,7 +17,7 @@ func ModifyNote() {
 
 func modifyNoteCase_NoteNotExist() string {
 	res := httpInvoke(api.URI_ModifyNote, `{"note_id":"not exist","is_anonymous":false,"title":"","content":"1"}`, accessToken_User)
-	if res.IsSuccess || res.Err != utils.ErrNoteNotFound().Error() {
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrNoteNotFound()) {
 		return unknownError
 	}
 
@@ -26,7 +26,7 @@ func modifyNoteCase_NoteNotExist() string {
 
 func modifyNoteCase_NoChanges() string {
 	res := httpInvoke(api.URI_ModifyNote, fmt.Sprintf(`{"note_id":"%s","is_anonymous":false,"title":"123","content":"456"}`, noteID), accessToken_Admin)
-	if res.IsSuccess || res.Err != utils.ErrNoChanges().Error() {
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrNoChanges()) {
 		return unknownError
 	}
 
@@ -35,7 +35,7 @@ func modifyNoteCase_NoChanges() string {
 
 func modifyNoteCase_NotWriter() string {
 	res := httpInvoke(api.URI_ModifyNote, fmt.Sprintf(`{"note_id":"%s","is_anonymous":false,"title":"","content":"1"}`, noteID), accessToken_User)
-	if res.IsSuccess || res.Err != utils.ErrPermissionDenied().Error() {
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrPermissionDenied()) {
 		return unknownError
 	}
 

@@ -17,7 +17,7 @@ func ModifyUser() {
 
 func modifyUserCase_NoChanges() string {
 	res := httpInvoke(api.URI_ModifyUser, `{"nickname":"","password":"","enable_2fa":false,"totp_key":""}`, accessToken_User)
-	if res.IsSuccess || res.Err != utils.ErrNoChanges().Error() {
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrNoChanges()) {
 		return unknownError
 	}
 
@@ -26,7 +26,7 @@ func modifyUserCase_NoChanges() string {
 
 func modifyUserCase_InvalidTotpKey() string {
 	res := httpInvoke(api.URI_ModifyUser, `{"nickname":"","password":"","enable_2fa":true,"totp_key":"123"}`, accessToken_User)
-	if res.IsSuccess || res.Err != utils.ErrInvalidTOTPKey().Error() {
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrInvalidTOTPKey()) {
 		return unknownError
 	}
 
@@ -35,7 +35,7 @@ func modifyUserCase_InvalidTotpKey() string {
 
 func modifyUserCase_SamePwd() string {
 	res := httpInvoke(api.URI_ModifyUser, fmt.Sprintf(`{"nickname":"","password":"%s","enable_2fa":false,"totp_key":""}`, pwdSHA256), accessToken_User)
-	if res.IsSuccess || res.Err != utils.ErrSamePassword().Error() {
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrSamePassword()) {
 		return unknownError
 	}
 
