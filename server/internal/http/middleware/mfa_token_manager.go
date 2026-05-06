@@ -28,8 +28,13 @@ func NewMFAToken(userName string, token string, expireTime int64) {
 	mtm.Data[userName] = &MFATokenItem{Token: token, ExpireTime: expireTime}
 }
 
-func VerifyMFAToken(userName string, token string) (e *utils.Error) {
+func VerifyMFAToken(token string) (userName string, e *utils.Error) {
 	clearExpiredMFAToken()
+
+	userName, e = decodeUserNameFromMFAToken(token)
+	if e != nil {
+		return
+	}
 
 	v, ok := mtm.Data[userName]
 	if !ok || v == nil || v.TryTimes >= 5 {
@@ -62,7 +67,7 @@ func VerifyMFAToken(userName string, token string) (e *utils.Error) {
 	return
 }
 
-func DecodeUserNameFromMFAToken(token string) (userName string, e *utils.Error) {
+func decodeUserNameFromMFAToken(token string) (userName string, e *utils.Error) {
 	tokenSplit := strings.Split(token, ".")
 	if len(tokenSplit) != 2 {
 		e = utils.ErrInvalidMFAToken().WithParam("token", token)

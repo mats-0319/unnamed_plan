@@ -30,13 +30,8 @@ func LoginMFA(ctx *mhttp.Context) {
 		return
 	}
 
-	userName, e := middleware.DecodeUserNameFromMFAToken(req.MFAToken)
+	userName, e := middleware.VerifyMFAToken(req.MFAToken)
 	if e != nil {
-		ctx.ResData = e
-		return
-	}
-
-	if e := middleware.VerifyMFAToken(userName, req.MFAToken); e != nil {
 		ctx.ResData = e
 		return
 	}

@@ -33,7 +33,7 @@ func TestLogSplitFile(t *testing.T) {
 
 	lastSize := handler.Size
 	currentSize := handler.Size
-	for lastSize <= currentSize { // log split
+	for lastSize <= currentSize { // emit log split
 		lastSize = currentSize
 
 		slog.SetDefault(slog.New(handler.WithGroup("groupName")))
@@ -44,5 +44,5 @@ func TestLogSplitFile(t *testing.T) {
 		currentSize = handler.Size
 	}
 
-	time.Sleep(time.Second) // 阻塞，避免异步压缩goroutine因主程序退出而退出
+	time.Sleep(time.Second) // 阻塞，避免异步压缩goroutine因主程序退出而停止执行
 }

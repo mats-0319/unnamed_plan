@@ -88,6 +88,18 @@ var presetUser = []*model.User{
 }
 
 var presetNote = []*model.Note{
-	model.NewNote("writer 1", "writer 1 name", false, "title 1", "content 1"),
-	model.NewNote("writer 2", "writer 2 name", true, "title 2", "content 2"),
+	{
+		Writer:      "writer 1",
+		WriterName:  "writer 1 name",
+		IsAnonymous: false,
+		Title:       "title 1",
+		Content:     "content 1",
+	},
+	{
+		Writer:      "writer 2",
+		WriterName:  "writer 2 name",
+		IsAnonymous: true,
+		Title:       "title 2",
+		Content:     "content 2",
+	},
 }

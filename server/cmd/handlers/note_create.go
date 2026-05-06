@@ -28,7 +28,14 @@ func CreateNote(ctx *mhttp.Context) {
 		return
 	}
 
-	note := model.NewNote(operator.UserName, operator.Nickname, req.IsAnonymous, req.Title, req.Content)
+	note := &model.Note{
+		Writer:      operator.UserName,
+		WriterName:  operator.Nickname,
+		IsAnonymous: req.IsAnonymous,
+		Title:       req.Title,
+		Content:     req.Content,
+	}
+
 	if e := dal.CreateNote(note); e != nil {
 		ctx.ResData = e
 		return
