@@ -1,10 +1,12 @@
 package utils
 
 // 每个变量代表一个函数，一个预设了不同参数的`NewError`函数，使用时需要添加`()`
-// 错误码为5位十进制数，第一位表示错误类型，2～3位表示功能模块，4～5位表示错误序号
+// 错误码为5位十进制数：
+// - 业务逻辑错误（http状态码为200）：第一位表示错误类型，2～3位表示功能模块，4～5位表示错误序号
+// - 非业务逻辑错误：第1～3位表示http状态码，4～5位表示错误序号
 // 使用invalid表示结构错误，使用wrong表示数值错误
 var (
-	// change http code error (code: start with 'http code')
+	// change http code error
 	ErrInvalidAccessToken     = newError(401, 40101, "Invalid Access Token")
 	ErrWrongAccessTokenHash   = newError(401, 40102, "Wrong Access Token Hash")
 	ErrDecodeAccessToken      = newError(401, 40103, "Decode Access Token Failed")
@@ -21,7 +23,7 @@ var (
 
 	// params error (1)
 	// general (00) / db (01)
-	ErrDeserializeHTTPReqParam = newBusinessError(10001, "Deserialize Http Request Param Failed")
+	ErrDeserializeHTTPReqParam = newBusinessError(10001, "Deserialize HTTP Request Param Failed")
 	ErrInvalidParams           = newBusinessError(10002, "Invalid Params")
 	ErrUserExist               = newBusinessError(10101, "User Already Exist")
 	ErrNoteExist               = newBusinessError(10102, "Note Already Exist")

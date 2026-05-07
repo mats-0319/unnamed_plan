@@ -10,8 +10,8 @@ import (
 )
 
 type Context struct {
-	Writer  http.ResponseWriter
-	Request *http.Request
+	writer  http.ResponseWriter
+	request *http.Request
 
 	AccessToken string // 登录成功后签发，需要身份认证的接口应包含此项
 	UserName    string // parse from 'AccessToken'
@@ -21,8 +21,8 @@ type Context struct {
 
 func NewContext(w http.ResponseWriter, r *http.Request) *Context {
 	return &Context{
-		Writer:      w,
-		Request:     r,
+		writer:      w,
+		request:     r,
 		AccessToken: r.Header.Get(HTTPHeader_AccessToken),
 	}
 }
@@ -30,7 +30,7 @@ func NewContext(w http.ResponseWriter, r *http.Request) *Context {
 // ParseParams 这个函数读取了http req.body，这一结构被限制只能读取一次，
 // 所以包括请求处理函数和中间件在内，如果有多个函数均调用该函数，会出现错误。
 func (ctx *Context) ParseParams(obj any) bool {
-	bodyBytes, err := io.ReadAll(ctx.Request.Body)
+	bodyBytes, err := io.ReadAll(ctx.request.Body)
 	if err != nil {
 		e := ErrServerInternalError().WithCause(err)
 		ctx.ResData = e
@@ -46,4 +46,8 @@ func (ctx *Context) ParseParams(obj any) bool {
 	}
 
 	return true
+}
+
+func (ctx *Context) SetHeader(key string, value string) {
+	ctx.writer.Header().Set(key, value)
 }

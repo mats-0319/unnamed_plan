@@ -19,9 +19,9 @@ type Response struct {
 func (ctx *Context) response() {
 	code, resBytes := serializeRes(ctx.ResData)
 
-	ctx.Writer.WriteHeader(code)
+	ctx.writer.WriteHeader(code)
 
-	_, err := ctx.Writer.Write(resBytes)
+	_, err := ctx.writer.Write(resBytes)
 	if err != nil {
 		mlog.Error("response failed", slog.Any("error", err))
 		return
