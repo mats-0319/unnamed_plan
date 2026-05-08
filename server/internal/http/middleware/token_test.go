@@ -83,7 +83,7 @@ func TestMFAToken(t *testing.T) {
 	validToken := GenerateMFAToken("test user name")
 	tokenCountBeforeClear := len(mtm.Data)
 
-	if err := VerifyMFAToken("test user name", validToken); err != nil {
+	if _, err := VerifyMFAToken(validToken); err != nil {
 		t.Error(err.String())
 	}
 
