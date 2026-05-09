@@ -9,7 +9,7 @@ import (
 
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
-	. "github.com/mats0319/unnamed_plan/server/internal/utils"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 type Token struct {
@@ -50,7 +50,7 @@ func GenerateMFAToken(userName string) string {
 func generateToken(token *Token) string {
 	tokenBytes, err := json.Marshal(token)
 	if err != nil {
-		e := ErrServerInternalError().WithCause(err)
+		e := utils.ErrServerInternalError().WithCause(err)
 		mlog.Error(e.String())
 		return ""
 	}
@@ -61,12 +61,12 @@ func generateToken(token *Token) string {
 }
 
 // OptionalVerifyAccessToken 用于访客和用户均可使用的接口，访问token验证失败视为访客、验证成功可以拿到`ctx.userName`。
-func OptionalVerifyAccessToken(ctx *mhttp.Context) *Error {
+func OptionalVerifyAccessToken(ctx *mhttp.Context) *utils.Error {
 	_ = verifyAccessToken(ctx)
 	return nil
 }
 
-func VerifyAccessToken(ctx *mhttp.Context) *Error {
+func VerifyAccessToken(ctx *mhttp.Context) *utils.Error {
 	if e := verifyAccessToken(ctx); e != nil {
 		mlog.Error(e.String())
 		return e
@@ -76,37 +76,37 @@ func VerifyAccessToken(ctx *mhttp.Context) *Error {
 }
 
 // verifyAccessToken 函数内不打印错误，因为部分场景允许验证错误（例如上方的可选验证函数）
-func verifyAccessToken(ctx *mhttp.Context) (e *Error) {
+func verifyAccessToken(ctx *mhttp.Context) (e *utils.Error) {
 	tokenSplit := strings.Split(ctx.AccessToken, ".")
 	if len(tokenSplit) != 2 {
-		e = ErrInvalidAccessToken().WithParam("token", ctx.AccessToken)
+		e = utils.ErrInvalidAccessToken().WithParam("token", ctx.AccessToken)
 		return
 	}
 
 	if hash := genTokenHash(tokenSplit[0]); hash != tokenSplit[1] {
-		e = ErrWrongAccessTokenHash().WithParam("token", ctx.AccessToken)
+		e = utils.ErrWrongAccessTokenHash().WithParam("token", ctx.AccessToken)
 		return
 	}
 
 	tokenBytes, err := hex.DecodeString(tokenSplit[0])
 	if err != nil {
-		e = ErrDecodeAccessToken().WithCause(err)
+		e = utils.ErrDecodeAccessToken().WithCause(err)
 		return
 	}
 
 	token := &Token{}
 	if err := json.Unmarshal(tokenBytes, token); err != nil {
-		e = ErrDeserializeAccessToken().WithCause(err)
+		e = utils.ErrDeserializeAccessToken().WithCause(err)
 		return
 	}
 
 	if token.Type != TokenType_APIAccessToken {
-		e = ErrInvalidAccessToken().WithParam("token type", token.Type)
+		e = utils.ErrInvalidAccessToken().WithParam("token type", token.Type)
 		return
 	}
 
 	if token.ExpireTime < time.Now().UnixMilli() {
-		e = ErrAccessTokenExpired().WithParam("expire time", token.ExpireTime)
+		e = utils.ErrAccessTokenExpired().WithParam("expire time", token.ExpireTime)
 		return
 	}
 
@@ -115,8 +115,8 @@ func verifyAccessToken(ctx *mhttp.Context) (e *Error) {
 	return
 }
 
-var hmacKey = GenerateRandomBytes[[]byte](10)
+var hmacKey = utils.GenerateRandomBytes[[]byte](10)
 
 func genTokenHash(tokenHex string) string {
-	return HmacSHA256(tokenHex, hmacKey)
+	return utils.HmacSHA256(tokenHex, hmacKey)
 }

@@ -16,7 +16,7 @@ func listNoteCase_SuccessListAll() string {
 		return res.Err
 	}
 
-	count, _, err := dal.ListNote(10, 1, "")
+	count, _, err := dal.ListNotes(10, 1, "")
 	if err != nil || count != 1 {
 		return unknownError
 	}
@@ -30,7 +30,7 @@ func listNoteCase_SuccessListOnlyOperator() string {
 		return res.Err
 	}
 
-	count, _, err := dal.ListNote(10, 1, "not exist")
+	count, _, err := dal.ListNotes(10, 1, "not exist")
 	if err != nil || count != 0 {
 		return unknownError
 	}

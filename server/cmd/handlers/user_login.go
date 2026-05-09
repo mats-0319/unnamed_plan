@@ -35,13 +35,14 @@ func Login(ctx *mhttp.Context) {
 		return
 	}
 
+	// 如果启用MFA：中断登录，进入MFA过程
 	if user.EnableMFA {
 		ctx.ResData = &api.LoginRes{EnableMFA: true, MFAToken: middleware.GenerateMFAToken(user.UserName)}
 
 		return
 	}
 
-	_ = dal.UpdateUser(user) // modify user.UpdatedAt
+	_ = dal.UpdateUser(user) // update user.UpdatedAt
 
 	ctx.SetHeader(utils.HTTPHeader_AccessToken, middleware.GenerateAPIAccessToken(user.UserName))
 

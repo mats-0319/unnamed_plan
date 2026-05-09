@@ -5,7 +5,7 @@ import (
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
-	. "github.com/mats0319/unnamed_plan/server/internal/utils"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 func DeleteNote(ctx *mhttp.Context) {
@@ -15,7 +15,7 @@ func DeleteNote(ctx *mhttp.Context) {
 	}
 
 	if len(ctx.UserName) < 1 || len(req.NoteID) < 1 {
-		e := ErrInvalidParams().WithParam("operator", ctx.UserName).WithParam("note id", req.NoteID)
+		e := utils.ErrInvalidParams().WithParam("operator", ctx.UserName).WithParam("note id", req.NoteID)
 		ctx.ResData = e
 		mlog.Error(e.String())
 		return
@@ -28,7 +28,7 @@ func DeleteNote(ctx *mhttp.Context) {
 	}
 
 	if ctx.UserName != note.Writer {
-		e := ErrPermissionDenied().WithParam("need owner but get", ctx.UserName)
+		e := utils.ErrPermissionDenied().WithParam("need owner but get", ctx.UserName)
 		ctx.ResData = e
 		mlog.Error(e.String())
 		return

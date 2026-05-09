@@ -7,7 +7,7 @@ import (
 	"time"
 
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
-	. "github.com/mats0319/unnamed_plan/server/internal/utils"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 type Handler struct {
@@ -16,7 +16,7 @@ type Handler struct {
 
 type HandlerItem struct {
 	Func        func(ctx *Context)
-	Middlewares []func(ctx *Context) *Error
+	Middlewares []func(ctx *Context) *utils.Error
 }
 
 func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -61,7 +61,7 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	handlerItemIns.Func(ctx)
 }
 
-func (h *Handler) AddHandler(uri string, handlerFunc func(ctx *Context), middlewares ...func(ctx *Context) *Error) {
+func (h *Handler) AddHandler(uri string, handlerFunc func(ctx *Context), middlewares ...func(ctx *Context) *utils.Error) {
 	if h.handlers == nil {
 		h.handlers = make(map[string]*HandlerItem)
 	}

@@ -35,7 +35,7 @@ func CreateFlipGameScore(gameScore *model.FlipGameScore) *utils.Error {
 	return nil
 }
 
-func ListFlipGameScore(pageSize int, pageNum int) (count int64, records []*model.FlipGameScore, e *utils.Error) {
+func ListFlipGameScores(pageSize int, pageNum int) (count int64, records []*model.FlipGameScore, e *utils.Error) {
 	sql := FlipGameScore.WithContext(context.TODO())
 
 	count, err := sql.Count()

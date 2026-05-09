@@ -27,7 +27,7 @@ func uploadGameScoreCase_SuccessVisitor() string {
 		return res.Err
 	}
 
-	count, _, err := dal.ListFlipGameScore(10, 1)
+	count, _, err := dal.ListFlipGameScores(10, 1)
 	if err != nil || count != 1 {
 		return unknownError
 	}
@@ -41,7 +41,7 @@ func uploadGameScoreCase_SuccessUser() string {
 		return res.Err
 	}
 
-	count, _, err := dal.ListFlipGameScore(10, 1)
+	count, _, err := dal.ListFlipGameScores(10, 1)
 	if err != nil || count != 2 {
 		return unknownError
 	}

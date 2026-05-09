@@ -47,7 +47,7 @@ func LoginMFA(ctx *mhttp.Context) {
 		return
 	}
 
-	_ = dal.UpdateUser(user) // modify user.UpdatedAt
+	_ = dal.UpdateUser(user) // update user.UpdatedAt
 
 	ctx.SetHeader(utils.HTTPHeader_AccessToken, middleware.GenerateAPIAccessToken(user.UserName))
 

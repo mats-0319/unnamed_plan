@@ -28,7 +28,7 @@ func registerCase_Success() string {
 		return res.Err
 	}
 
-	count, data, err := dal.ListUser(10, 1)
+	count, data, err := dal.ListUsers(10, 1)
 	if count != 4 || len(data) != 4 || err != nil {
 		return unknownError
 	}

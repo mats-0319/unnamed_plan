@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
-	. "github.com/mats0319/unnamed_plan/server/internal/utils"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 type Context struct {
@@ -23,7 +23,7 @@ func NewContext(w http.ResponseWriter, r *http.Request) *Context {
 	return &Context{
 		writer:      w,
 		request:     r,
-		AccessToken: r.Header.Get(HTTPHeader_AccessToken),
+		AccessToken: r.Header.Get(utils.HTTPHeader_AccessToken),
 	}
 }
 
@@ -32,14 +32,14 @@ func NewContext(w http.ResponseWriter, r *http.Request) *Context {
 func (ctx *Context) ParseParams(obj any) bool {
 	bodyBytes, err := io.ReadAll(ctx.request.Body)
 	if err != nil {
-		e := ErrServerInternalError().WithCause(err)
+		e := utils.ErrServerInternalError().WithCause(err)
 		ctx.ResData = e
 		mlog.Error(e.String())
 		return false
 	}
 
 	if err := json.Unmarshal(bodyBytes, obj); err != nil {
-		e := ErrDeserializeHTTPReqParam().WithCause(err)
+		e := utils.ErrDeserializeHTTPReqParam().WithCause(err)
 		ctx.ResData = e
 		mlog.Error(e.String())
 		return false

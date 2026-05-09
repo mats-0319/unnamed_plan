@@ -27,7 +27,7 @@ func ListNote(ctx *mhttp.Context) {
 		writer = ctx.UserName
 	}
 
-	count, notes, e := dal.ListNote(req.Page.Size, req.Page.Num, writer)
+	count, notes, e := dal.ListNotes(req.Page.Size, req.Page.Num, writer)
 	if e != nil {
 		ctx.ResData = e
 		return

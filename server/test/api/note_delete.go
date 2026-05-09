@@ -38,7 +38,7 @@ func deleteNoteCase_Success() string {
 		return res.Err
 	}
 
-	count, _, err := dal.ListNote(10, 1, "")
+	count, _, err := dal.ListNotes(10, 1, "")
 	if err != nil || count != 0 {
 		return unknownError
 	}
