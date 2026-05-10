@@ -12,10 +12,8 @@ func ListUser() {
 }
 
 func listUserCase_NotAdmin() string {
-	loginCase_Success(false)() // set token
-
-	res := httpInvoke(api.URI_ListUser, `{"page":{"size":10,"num":1}}`)
-	if res.IsSuccess || res.Err != utils.ErrNeedAdmin().Error() {
+	res := httpInvoke(api.URI_ListUser, `{"page":{"size":10,"num":1}}`, accessToken_User)
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrPermissionDenied()) {
 		return unknownError
 	}
 
@@ -23,14 +21,12 @@ func listUserCase_NotAdmin() string {
 }
 
 func listUserCase_Success() string {
-	loginCase_Success(true)()
-
-	res := httpInvoke(api.URI_ListUser, `{"page":{"size":10,"num":1}}`)
+	res := httpInvoke(api.URI_ListUser, `{"page":{"size":10,"num":1}}`, accessToken_Admin)
 	if !res.IsSuccess {
 		return res.Err
 	}
 
-	count, _, err := dal.ListUser(api.Pagination{Size: 10, Num: 1})
+	count, _, err := dal.ListUsers(10, 1)
 	if count != 4 || err != nil {
 		return unknownError
 	}

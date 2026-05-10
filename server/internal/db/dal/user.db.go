@@ -2,41 +2,33 @@ package dal
 
 import (
 	"context"
-	"strings"
+	"errors"
 
-	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
-	"github.com/mats0319/unnamed_plan/server/cmd/model"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
-	. "github.com/mats0319/unnamed_plan/server/internal/utils"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
+	"gorm.io/gorm"
 )
 
-func GetUser(userName string) (*model.User, *Error) {
-	qu := Q.User
-	res, err := qu.WithContext(context.TODO()).Where(qu.UserName.Eq(userName)).First()
-	if err != nil {
-		var e *Error
-		if strings.Contains(err.Error(), "record not found") {
-			e = ErrUserNotFound().WithCause(err)
+func CreateUser(user *model.User) (e *utils.Error) {
+	if err := User.WithContext(context.TODO()).Create(user); err != nil {
+		if pge, ok := errors.AsType[*pgconn.PgError](err); ok && pge.Code == "23505" {
+			e = utils.ErrUserExist().WithCause(err)
 		} else {
-			e = ErrDBError().WithCause(err)
+			e = utils.ErrDBError().WithCause(err)
 		}
+
 		mlog.Error(e.String())
-		return nil, e
+		return
 	}
 
-	return res, nil
+	return
 }
 
-func CreateUser(user *model.User) *Error {
-	err := Q.User.WithContext(context.TODO()).Create(user)
-	if err != nil {
-		var e *Error
-		if strings.Contains(err.Error(), "violates unique constraint") {
-			e = ErrUserExist().WithCause(err)
-		} else {
-			e = ErrDBError().WithCause(err)
-		}
-
+func UpdateUser(user *model.User) *utils.Error {
+	if err := User.WithContext(context.TODO()).Where(User.ID.Eq(user.ID)).Save(user); err != nil {
+		e := utils.ErrDBError().WithCause(err)
 		mlog.Error(e.String())
 		return e
 	}
@@ -44,35 +36,38 @@ func CreateUser(user *model.User) *Error {
 	return nil
 }
 
-func UpdateUser(user *model.User) *Error {
-	qu := Q.User
-	err := qu.WithContext(context.TODO()).Where(qu.ID.Eq(user.ID)).Save(user)
+func GetUser(userName string) (record *model.User, e *utils.Error) {
+	record, err := User.WithContext(context.TODO()).Where(User.UserName.Eq(userName)).First()
 	if err != nil {
-		e := ErrDBError().WithCause(err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			e = utils.ErrUserNotFound().WithCause(err)
+		} else {
+			e = utils.ErrDBError().WithCause(err)
+		}
+
 		mlog.Error(e.String())
-		return e
+		return
 	}
 
-	return nil
+	return
 }
 
-func ListUser(page api.Pagination) (int64, []*model.User, *Error) {
-	qu := Q.User
-	sql := qu.WithContext(context.TODO())
+func ListUsers(pageSize int, pageNum int) (count int64, records []*model.User, e *utils.Error) {
+	sql := User.WithContext(context.TODO())
 
-	amount, err := sql.Count()
+	count, err := sql.Count()
 	if err != nil {
-		e := ErrDBError().WithCause(err)
+		e = utils.ErrDBError().WithCause(err)
 		mlog.Error(e.String())
-		return 0, nil, e
+		return
 	}
 
-	res, err := sql.Order(qu.UpdatedAt.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
+	records, err = sql.Order(User.UpdatedAt.Desc()).Limit(pageSize).Offset((pageNum - 1) * pageSize).Find()
 	if err != nil {
-		e := ErrDBError().WithCause(err)
+		e = utils.ErrDBError().WithCause(err)
 		mlog.Error(e.String())
-		return 0, nil, e
+		return
 	}
 
-	return amount, res, nil
+	return
 }

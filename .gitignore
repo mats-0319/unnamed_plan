@@ -1,5 +1,8 @@
 .idea
-*.log
-*.exe
+**/*.log
+**/*.log.gz
+**/*.exe
 
+# final build data
 build/
+go.sum

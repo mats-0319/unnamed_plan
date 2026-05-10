@@ -2,7 +2,7 @@
 # Use At: Cloud Server
 # Behavior: Stop and Restart Servers
 
-pkill -f unnamed_plan_server_exec
+pkill -f unnamed_plan_server
 
 from_path=$(pwd)
 
@@ -11,8 +11,8 @@ cd "$(dirname "$0")" || exit 1
 
   function start_exec() {
     cd "./server" || exit 1
-    chmod +x "./unnamed_plan_server_exec"
-    (./unnamed_plan_server_exec &) # &: not block. (): still work after cmd exit
+    chmod +x "./unnamed_plan_server"
+    (./unnamed_plan_server &) # &: not block. (): still work after cmd exit
     cd .. || exit 1
   }
 

@@ -6,7 +6,18 @@
 
 ubuntu系统自带一个pg数据库的指定版本快照，如果想要安装其他版本，参考[官方文档](https://www.postgresql.org/download/linux/ubuntu/)
 
-- `apt install postgresql`
+因为我们想要安装pg 18（这个版本原生支持uuidv7），所以记录我的安装过程：
+
+1. 系统自带pg 16
+2. 使apt可以从pg下载：
+    - `sudo apt install -y postgresql-common`
+    - `sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh`
+3. 下载pg 18：
+    - `sudo apt update`
+    - `sudo apt install postgresql-18`
+4. 下载完成之后，终端弹窗说可以直接把16升到18，选择升级，它执行了两个`pg_xxx`工具就好了；
+   数据可以正常访问，对外部使用来说没有影响，如果你的升级没有这一步，参考官方文档继续进行后续步骤：
+   [文档](https://www.postgresql.org/docs/current/index.html)
 
 ### 创建用户/数据库
 
@@ -24,7 +35,7 @@ grant all on database [db name] to [user name];
 \l   // 查看数据库
 ```
 
-### 设置允许外部地址访问
+### 限制访问权限
 
 config file: `/etc/postgresql/16/main/postgresql.conf`(注意版本号)
 add: `listen_address: '*'`
@@ -33,12 +44,13 @@ config file: `/etc/postgresql/16/main/pg_hba.conf`
 add:
 
 ```txt
-host cloud all 127.0.0.1/32 md5     // 允许本机连接cloud数据库
-host cloud all 0.0.0.0/0    reject  // 不允许其他连接访问cloud
-host all   all 0.0.0.0/0    md5     // 允许所有远程连接
+host cloud all 127.0.0.1/32 md5     // 允许本机访问cloud数据库
+host cloud all 0.0.0.0/0    reject  // 不允许其他任何人访问cloud
+host all   all 0.0.0.0/0    md5     // 允许其他所有访问
+// 写在前面的优先级更高，考虑可能是从后往前计算规则，例如本例：允许所有人访问所有数据库-禁止所有人访问cloud-允许本机访问cloud
 ```
 
-数据库可视化工具往往可以通过先登录云服务器再访问的方式，在本地访问远程限制访问的数据库
+数据库可视化工具往往可以通过先登录云服务器再访问的方式，访问远程限制访问的数据库
 
 重启/重载服务：`sudo systemctl restart/reload postgresql`
 
@@ -97,7 +109,7 @@ nginx常用命令：
           PasswordAuthentication no // 禁用密码登录
           ```
         - 测试语法是否正确：`sudo ssh -t`
-        - 重启并检查ssh服务状态：`sudo systemctl restart/status ssh`
+        - 重启/检查ssh服务：`sudo systemctl restart/status ssh`
 
 ### 设置开机自启动
 

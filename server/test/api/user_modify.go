@@ -10,23 +10,14 @@ import (
 
 func ModifyUser() {
 	testCase("no changes", modifyUserCase_NoChanges)
-	testCase("same pwd", modifyUserCase_SamePwd)
 	testCase("invalid totp key", modifyUserCase_InvalidTotpKey)
+	testCase("same pwd", modifyUserCase_SamePwd)
 	testCase("success", modifyUserCase_Success)
 }
 
 func modifyUserCase_NoChanges() string {
-	res := httpInvoke(api.URI_ModifyUser, `{"nickname":"","password":"","enable_2fa":false,"totp_key":""}`)
-	if res.IsSuccess || res.Err != utils.ErrNoChanges().Error() {
-		return unknownError
-	}
-
-	return ""
-}
-
-func modifyUserCase_SamePwd() string {
-	res := httpInvoke(api.URI_ModifyUser, fmt.Sprintf(`{"nickname":"","password":"%s","enable_2fa":false,"totp_key":""}`, pwd))
-	if res.IsSuccess || res.Err != utils.ErrSamePwd().Error() {
+	res := httpInvoke(api.URI_ModifyUser, `{"nickname":"","password":"","enable_2fa":false,"totp_key":""}`, accessToken_User)
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrNoChanges()) {
 		return unknownError
 	}
 
@@ -34,8 +25,17 @@ func modifyUserCase_SamePwd() string {
 }
 
 func modifyUserCase_InvalidTotpKey() string {
-	res := httpInvoke(api.URI_ModifyUser, `{"nickname":"","password":"","enable_2fa":true,"totp_key":"123"}`)
-	if res.IsSuccess || res.Err != utils.ErrInvalidTotpKey().Error() {
+	res := httpInvoke(api.URI_ModifyUser, `{"nickname":"","password":"","enable_2fa":true,"totp_key":"123"}`, accessToken_User)
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrInvalidTOTPKey()) {
+		return unknownError
+	}
+
+	return ""
+}
+
+func modifyUserCase_SamePwd() string {
+	res := httpInvoke(api.URI_ModifyUser, fmt.Sprintf(`{"nickname":"","password":"%s","enable_2fa":false,"totp_key":""}`, pwdSHA256), accessToken_User)
+	if res.IsSuccess || !errorIs(res.Err, utils.ErrSamePassword()) {
 		return unknownError
 	}
 
@@ -43,9 +43,7 @@ func modifyUserCase_InvalidTotpKey() string {
 }
 
 func modifyUserCase_Success() string {
-	loginCase_Success(false)()
-
-	res := httpInvoke(api.URI_ModifyUser, `{"nickname":"123","password":"","enable_2fa":false,"totp_key":""}`)
+	res := httpInvoke(api.URI_ModifyUser, `{"nickname":"123","password":"","enable_2fa":false,"totp_key":""}`, accessToken_User)
 	if !res.IsSuccess {
 		return res.Err
 	}

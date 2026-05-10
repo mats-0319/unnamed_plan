@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
-	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
+	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
+	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 func CreateNote(ctx *mhttp.Context) {
@@ -13,16 +15,29 @@ func CreateNote(ctx *mhttp.Context) {
 		return
 	}
 
-	operator, err := dal.GetUser(ctx.UserName)
-	if err != nil {
-		ctx.ResData = err
+	if len(ctx.UserName) < 1 || len(req.Content) < 1 {
+		e := utils.ErrInvalidParams().WithParam("operator", ctx.UserName).WithParam("content", req.Content)
+		mlog.Error(e.String())
+		ctx.ResData = e
 		return
 	}
 
-	note := model.NewNote(operator.UserName, operator.Nickname, req.IsAnonymous, req.Title, req.Content)
-	err = dal.CreateNote(note)
-	if err != nil {
-		ctx.ResData = err
+	operator, e := dal.GetUser(ctx.UserName)
+	if e != nil {
+		ctx.ResData = e
+		return
+	}
+
+	note := &model.Note{
+		Writer:      operator.UserName,
+		WriterName:  operator.Nickname,
+		IsAnonymous: req.IsAnonymous,
+		Title:       req.Title,
+		Content:     req.Content,
+	}
+
+	if e := dal.CreateNote(note); e != nil {
+		ctx.ResData = e
 		return
 	}
 

@@ -1,60 +1,54 @@
 package utils
 
-type ErrorType string
+// 每个变量代表一个函数，一个预设了不同参数的`NewError`函数，使用时需要添加`()`
+// 错误码为5位十进制数：
+// - 业务逻辑错误（http状态码为200）：第一位表示错误类型，2～3位表示功能模块，4～5位表示错误序号
+// - 非业务逻辑错误：第1～3位表示http状态码，4～5位表示错误序号
+// 使用invalid表示结构错误，使用wrong表示数值错误
+var (
+	// change http code error
+	ErrInvalidAccessToken     = newError(401, 40101, "Invalid Access Token")
+	ErrWrongAccessTokenHash   = newError(401, 40102, "Wrong Access Token Hash")
+	ErrDecodeAccessToken      = newError(401, 40103, "Decode Access Token Failed")
+	ErrDeserializeAccessToken = newError(401, 40104, "Deserialize Access Token Failed")
+	ErrAccessTokenExpired     = newError(401, 40105, "Access Token Expired")
+	ErrInvalidMFAToken        = newError(401, 40106, "Invalid MFA Token")
+	ErrDecodeMFAToken         = newError(401, 40107, "Decode MFA Token Failed")
+	ErrDeserializeMFAToken    = newError(401, 40108, "Deserialize MFA Token Failed")
+	ErrNoMFAToken             = newError(401, 40109, "Input User Name and Password First")
+	ErrWrongMFAToken          = newError(401, 40110, "Wrong MFA Token")
+	ErrMFATokenExpired        = newError(401, 40111, "MFA Token Expired")
+	ErrServerInternalError    = newError(500, 50001, "Sever Internal Error")
+	ErrDBError                = newError(500, 50002, "DB Error")
 
-const (
-	// change http status code
-	ET_BadRequest          ErrorType = "Bad Request"
-	ET_Unauthorized        ErrorType = "Unauthorized"
-	ET_ServerInternalError ErrorType = "Server Internal Error"
+	// params error (1)
+	// general (00) / db (01)
+	ErrDeserializeHTTPReqParam = newBusinessError(10001, "Deserialize HTTP Request Param Failed")
+	ErrInvalidParams           = newBusinessError(10002, "Invalid Params")
+	ErrUserExist               = newBusinessError(10101, "User Already Exist")
+	ErrNoteExist               = newBusinessError(10102, "Note Already Exist")
+	ErrUserNotFound            = newBusinessError(10103, "User Not Found")
+	ErrNoteNotFound            = newBusinessError(10104, "Note Not Found")
 
-	ET_ParamsError   ErrorType = "Params Error"
-	ET_OperatorError ErrorType = "Operator Error"
+	// business error (2)
+	// general (00) / user (01) / note (02) / game score (03)
+	ErrNoChanges        = newBusinessError(20001, "No Changes")
+	ErrPermissionDenied = newBusinessError(20002, "Permission Denied")
+	ErrInvalidPassword  = newBusinessError(20101, "Invalid Password")
+	ErrInvalidPwdSalt   = newBusinessError(20102, "Invalid Password Salt")
+	ErrInvalidPwdKey    = newBusinessError(20103, "Invalid Password Key")
+	ErrWrongPassword    = newBusinessError(20104, "Wrong Password")
+	ErrInvalidTOTPCode  = newBusinessError(20105, "Invalid TOTP Code")
+	ErrInvalidTOTPKey   = newBusinessError(20106, "Invalid TOTP Key")
+	ErrWrongTOTPCode    = newBusinessError(20107, "Wrong TOTP Code")
+	ErrSamePassword     = newBusinessError(20108, "New Password Can't be Identical to the Old One")
+	ErrInvalidGameName  = newBusinessError(20301, "Invalid Game Name")
 )
 
-func newError(typ ErrorType, detail ...string) func() *Error {
-	return func() *Error { return NewError(typ, detail...) }
+func newError(httpCode int, code int, detail string) func() *Error {
+	return func() *Error { return NewError(httpCode, code, detail) }
 }
 
-// 每个变量代表一个函数，一个预设了不同参数的`NewError`函数，使用时需要添加`()`
-//
-// 使用invalid表示结构/格式错误，使用wrong表示数据错误
-var (
-	// bad request
-	ErrUnsupportedUri = newError(ET_BadRequest, "Unsupported URI")
-
-	// unauthorized
-	ErrInvalidAccessToken = newError(ET_Unauthorized, "Invalid Access Token")
-	ErrTokenTamperedWith  = newError(ET_Unauthorized, "Access Token has been Tampered With") // hash unmatch
-	ErrTokenExpired       = newError(ET_Unauthorized, "Access Token Expired")
-
-	// server internal error
-	// 像一个口袋Error，所有不好分类的错误都可以往里装，例如参数全部由服务端代码生成的json marshal error、DB error
-	ErrServerInternalError = newError(ET_ServerInternalError)
-	ErrDBError             = newError(ET_ServerInternalError, "DB Error")
-
-	// params
-	ErrJsonMarshal   = newError(ET_ParamsError, "Json Marshal Failed")
-	ErrJsonUnmarshal = newError(ET_ParamsError, "Json Unmarshal Failed")
-	ErrHexDecode     = newError(ET_ParamsError, "Hex Decode Failed")
-
-	// business-user
-	ErrNeedAdmin       = newError(ET_OperatorError, "Need Admin")
-	ErrNoChanges       = newError(ET_ParamsError, "No Changes")
-	ErrInvalidPwd      = newError(ET_ParamsError, "Invalid Password Structure")
-	ErrPwdParams       = newError(ET_ParamsError, "Wrong Password Params")
-	ErrWrongPwd        = newError(ET_ParamsError, "Wrong UserName or Password")
-	ErrSamePwd         = newError(ET_ParamsError, "New Password Can't be Identical to the Old One")
-	ErrInvalidTotpCode = newError(ET_ParamsError, "Invalid TOTP Code")
-	ErrWrongTotpCode   = newError(ET_ParamsError, "Wrong TOTP Code")
-	ErrInvalidTotpKey  = newError(ET_ParamsError, "Invalid TOTP Key")
-
-	// business-note
-	ErrNeedOwner = newError(ET_OperatorError, "Not Owner of Data")
-
-	// db
-	ErrUserExist    = newError(ET_ParamsError, "User Already Exist")
-	ErrNoteExist    = newError(ET_ParamsError, "Note Already Exist")
-	ErrUserNotFound = newError(ET_ParamsError, "User Not Found")
-	ErrNoteNotFound = newError(ET_ParamsError, "Note Not Found")
-)
+func newBusinessError(code int, detail string) func() *Error {
+	return newError(200, code, detail)
+}

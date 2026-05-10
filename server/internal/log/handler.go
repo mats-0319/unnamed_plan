@@ -1,143 +1,150 @@
 package mlog
 
 import (
+	"bytes"
 	"context"
-	"fmt"
-	"io"
 	"log/slog"
-	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 )
 
-// log structure: "[time] [level] [file:line func] message | attrs(with group)"
-// demo: "[2026-02-14 15:41:37.230] [DEBUG] [log_test.go:24 log.TestLogLevel] debug level log | error=debug error"
+type Handler struct {
+	*HandlerWriter
 
-type handler struct {
-	writer io.Writer
-
-	level  slog.Level
-	attrs  []slog.Attr
-	groups []string
-
-	mu sync.Mutex
+	Level  slog.Level
+	Attrs  []slog.Attr
+	Groups []string
 }
 
-func newHandler(writer io.Writer, level slog.Level) *handler {
-	return &handler{
-		writer: writer,
-		level:  level,
-		attrs:  []slog.Attr{},
-		groups: []string{},
+var _ slog.Handler = (*Handler)(nil)
+
+var bufferPool = sync.Pool{New: func() any { return new(bytes.Buffer) }} // 减少GC抖动
+
+func newHandler(fileName string, maxSize int64, level slog.Level) (*Handler, error) {
+	h := &Handler{
+		HandlerWriter: &HandlerWriter{},
+		Level:         level,
+		Attrs:         []slog.Attr{},
+		Groups:        []string{},
 	}
+
+	maxSize = maxSize << 20 // unit: MB
+	if err := h.HandlerWriter.New(fileName, maxSize); err != nil {
+		return nil, err
+	}
+
+	return h, nil
 }
 
-func (h *handler) Enabled(_ context.Context, level slog.Level) bool {
-	return level >= h.level
+func (h *Handler) Enabled(_ context.Context, level slog.Level) bool {
+	return level >= h.Level
 }
 
-func (h *handler) Handle(_ context.Context, r slog.Record) error {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+func (h *Handler) Handle(_ context.Context, r slog.Record) error {
+	buf := bufferPool.Get().(*bytes.Buffer)
+	buf.Reset()
+	defer bufferPool.Put(buf)
 
-	// time and level
-	timeStr := r.Time.Format("2006-01-02 15:04:05.000")
-	levelStr := r.Level.String()
+	// structure: `[Time] [Level] [a/b.go:10] log message | k1=v1 g.k2=v2`
+	buf.WriteByte('[')
+	buf.WriteString(r.Time.Format("2006-01-02 15:04:05.000"))
+	buf.WriteString("] [")
+	buf.WriteString(r.Level.String())
+	buf.WriteString("] [")
+	codePosition(buf)
+	buf.WriteString("] ")
+	buf.WriteString(r.Message)
+	h.logAttrs(buf, r)
+	buf.WriteByte('\n')
 
-	output := fmt.Sprintf("[%s] [%s] [%s] %s%s\n", timeStr, levelStr, codePosition(), r.Message, h.logAttrs(r))
-
-	_, err := h.writer.Write([]byte(output))
-
-	return err
+	return h.Write(buf.Bytes())
 }
 
-func (h *handler) WithAttrs(attrs []slog.Attr) slog.Handler {
+func (h *Handler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	if len(attrs) < 1 {
 		return h
 	}
 
-	newInstance := &handler{
-		writer: h.writer,
-		level:  h.level,
-		attrs:  make([]slog.Attr, len(h.attrs)+len(attrs)),
-		groups: make([]string, len(h.groups)),
+	newInstance := &Handler{
+		HandlerWriter: h.HandlerWriter,
+		Level:         h.Level,
+		Attrs:         make([]slog.Attr, len(h.Attrs)+len(attrs)),
+		Groups:        make([]string, len(h.Groups)),
 	}
 
-	copy(newInstance.attrs, h.attrs)
-	copy(newInstance.attrs[len(h.attrs):], attrs)
-	copy(newInstance.groups, h.groups)
+	copy(newInstance.Attrs, h.Attrs)
+	copy(newInstance.Attrs[len(h.Attrs):], attrs)
+	copy(newInstance.Groups, h.Groups)
 
 	return newInstance
 }
 
-func (h *handler) WithGroup(name string) slog.Handler {
+func (h *Handler) WithGroup(name string) slog.Handler {
 	if name == "" {
 		return h
 	}
 
-	newInstance := &handler{
-		writer: h.writer,
-		level:  h.level,
-		attrs:  make([]slog.Attr, len(h.attrs)),
-		groups: make([]string, len(h.groups)+1),
+	newInstance := &Handler{
+		HandlerWriter: h.HandlerWriter,
+		Level:         h.Level,
+		Attrs:         make([]slog.Attr, len(h.Attrs)),
+		Groups:        make([]string, len(h.Groups)+1),
 	}
 
-	copy(newInstance.attrs, h.attrs)
-	copy(newInstance.groups, h.groups)
-	newInstance.groups[len(h.groups)] = name
+	copy(newInstance.Attrs, h.Attrs)
+	copy(newInstance.Groups, h.Groups)
+	newInstance.Groups[len(h.Groups)] = name
 
 	return newInstance
 }
 
-func codePosition() string {
+func codePosition(buf *bytes.Buffer) {
 	pc := make([]uintptr, 1)
 	runtime.Callers(6, pc)
 
 	fs := runtime.CallersFrames(pc)
 	f, _ := fs.Next()
 
-	fileName := filepath.Base(f.File)
-	line := f.Line
-	funcName := f.Function
-
-	shortFuncName := filepath.Base(funcName) // without package name
-	if shortFuncName != "" {
-		funcName = shortFuncName
+	fileName := f.File
+	lastIndex := strings.LastIndex(fileName, "/")
+	if lastIndex >= 0 {
+		index := strings.LastIndex(fileName[:lastIndex], "/")
+		if index >= 0 {
+			fileName = fileName[index+1:]
+		}
 	}
 
-	return fmt.Sprintf("%s:%d %s", fileName, line, funcName)
+	buf.WriteString(fileName)
+	buf.WriteByte(':')
+	buf.WriteString(strconv.Itoa(f.Line))
 }
 
-func (h *handler) logAttrs(r slog.Record) string {
-	length := len(h.attrs) + r.NumAttrs()
-	if length < 1 {
-		return ""
+func (h *Handler) logAttrs(buf *bytes.Buffer, r slog.Record) {
+	if len(h.Attrs) == 0 && r.NumAttrs() == 0 {
+		return
 	}
 
-	attrSlice := make([]string, 0, length)
+	buf.WriteString(" |")
 
-	for _, attr := range h.attrs {
-		attrSlice = append(attrSlice, logAttr(attr, ""))
+	for _, attr := range h.Attrs {
+		buf.WriteByte(' ')
+		buf.WriteString(attr.Key)
+		buf.WriteByte('=')
+		buf.WriteString(attr.Value.String())
 	}
 
-	r.Attrs(func(a slog.Attr) bool {
-		attrSlice = append(attrSlice, logAttrWithGroups(a, h.groups))
+	r.Attrs(func(attr slog.Attr) bool {
+		buf.WriteByte(' ')
+		for _, v := range h.Groups {
+			buf.WriteString(v)
+			buf.WriteByte('.')
+		}
+		buf.WriteString(attr.Key)
+		buf.WriteByte('=')
+		buf.WriteString(attr.Value.String())
+
 		return true
 	})
-
-	return " |" + strings.Join(attrSlice, " ")
-}
-
-func logAttrWithGroups(a slog.Attr, groups []string) string {
-	keyPrefix := ""
-	for _, group := range groups {
-		keyPrefix += group + "."
-	}
-
-	return logAttr(a, keyPrefix)
-}
-
-func logAttr(a slog.Attr, keyPrefix string) string {
-	return fmt.Sprintf(" %s=%v", keyPrefix+a.Key, a.Value)
 }

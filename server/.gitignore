@@ -1,0 +1,7 @@
+go.sum
+# testdata created when test backup
+internal/db/backup/backup/
+internal/db/backup/recover/
+# testdata
+cmd/backup/
+cmd/recover/

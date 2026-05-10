@@ -8,13 +8,8 @@ import (
 )
 
 // HmacSHA256 calc hmac-sha256('key', 'content'), return hex(hash)
-func HmacSHA256[T string | []byte](content string, key ...T) string {
-	var k []byte
-	if len(key) > 0 {
-		k = []byte(key[0])
-	}
-
-	hasher := hmac.New(sha256.New, k) // k default nil is ok
+func HmacSHA256[T string | []byte](content string, key T) string {
+	hasher := hmac.New(sha256.New, []byte(key)) // k default nil is ok
 	hasher.Write([]byte(content))
 	bytes := hasher.Sum(nil)
 
@@ -29,7 +24,7 @@ func CalcSHA256(password string) string {
 	return hex.EncodeToString(bytes)
 }
 
-const CharactersLibrary = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const charactersLibrary = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 const useBits = 6 // 6个bit位可以表示全部字符库中的字符
 
 // GenerateRandomBytes generate random readable Bytes
@@ -43,11 +38,11 @@ func GenerateRandomBytes[T string | []byte](length int) T {
 		}
 
 		index := int(randomNum & (1<<useBits - 1)) // 0b0011 1111
-		if index < len(CharactersLibrary) {
+		if index < len(charactersLibrary) {
 			randomNum >>= useBits
 			remainBits -= useBits
 
-			b[i] = CharactersLibrary[index]
+			b[i] = charactersLibrary[index]
 			i++
 		} else {
 			randomNum >>= 1

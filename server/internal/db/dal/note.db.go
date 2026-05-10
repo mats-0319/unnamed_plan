@@ -2,55 +2,33 @@ package dal
 
 import (
 	"context"
-	"strings"
+	"errors"
 
-	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
-	"github.com/mats0319/unnamed_plan/server/cmd/model"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
-	. "github.com/mats0319/unnamed_plan/server/internal/utils"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
+	"gorm.io/gorm"
 )
 
-func GetNote(noteID string) (*model.Note, *Error) {
-	qn := Q.Note
-	sql := qn.WithContext(context.TODO()).Where(qn.NoteID.Eq(noteID))
-
-	res, err := sql.First()
-	if err != nil {
-		var e *Error
-		if strings.Contains(err.Error(), "record not found") {
-			e = ErrNoteNotFound().WithCause(err)
+func CreateNote(note *model.Note) (e *utils.Error) {
+	if err := Note.WithContext(context.TODO()).Create(note); err != nil {
+		if pge, ok := errors.AsType[*pgconn.PgError](err); ok && pge.Code == "23505" {
+			e = utils.ErrNoteExist().WithCause(err)
 		} else {
-			e = ErrDBError().WithCause(err)
-		}
-		mlog.Error(e.String())
-		return nil, e
-	}
-
-	return res, nil
-}
-
-func CreateNote(note *model.Note) *Error {
-	err := Q.Note.WithContext(context.TODO()).Create(note)
-	if err != nil {
-		var e *Error
-		if strings.Contains(err.Error(), "violates unique constraint") {
-			e = ErrNoteExist().WithCause(err)
-		} else {
-			e = ErrDBError().WithCause(err)
+			e = utils.ErrDBError().WithCause(err)
 		}
 
 		mlog.Error(e.String())
-		return e
+		return
 	}
 
-	return nil
+	return
 }
 
-func UpdateNote(note *model.Note) *Error {
-	qn := Q.Note
-	err := qn.WithContext(context.TODO()).Where(qn.ID.Eq(note.ID)).Save(note)
-	if err != nil {
-		e := ErrDBError().WithCause(err)
+func UpdateNote(note *model.Note) *utils.Error {
+	if err := Note.WithContext(context.TODO()).Where(Note.ID.Eq(note.ID)).Save(note); err != nil {
+		e := utils.ErrDBError().WithCause(err)
 		mlog.Error(e.String())
 		return e
 	}
@@ -58,11 +36,9 @@ func UpdateNote(note *model.Note) *Error {
 	return nil
 }
 
-func DeleteNote(noteID string) *Error {
-	qn := Q.Note
-	_, err := qn.WithContext(context.TODO()).Where(qn.NoteID.Eq(noteID)).Delete()
-	if err != nil {
-		e := ErrDBError().WithCause(err)
+func DeleteNote(noteID string) *utils.Error {
+	if _, err := Note.WithContext(context.TODO()).Where(Note.NoteID.Eq(noteID)).Delete(); err != nil {
+		e := utils.ErrDBError().WithCause(err)
 		mlog.Error(e.String())
 		return e
 	}
@@ -70,26 +46,41 @@ func DeleteNote(noteID string) *Error {
 	return nil
 }
 
-func ListNote(page api.Pagination, writer string) (int64, []*model.Note, *Error) {
-	qn := Q.Note
-	sql := qn.WithContext(context.TODO())
+func GetNote(noteID string) (res *model.Note, e *utils.Error) {
+	res, err := Note.WithContext(context.TODO()).Where(Note.NoteID.Eq(noteID)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			e = utils.ErrNoteNotFound().WithCause(err)
+		} else {
+			e = utils.ErrDBError().WithCause(err)
+		}
+
+		mlog.Error(e.String())
+		return
+	}
+
+	return
+}
+
+func ListNotes(pageSize int, pageNum int, writer string) (count int64, records []*model.Note, e *utils.Error) {
+	sql := Note.WithContext(context.TODO())
 	if len(writer) > 0 {
-		sql = sql.Where(qn.Writer.Eq(writer))
+		sql = sql.Where(Note.Writer.Eq(writer))
 	}
 
-	amount, err := sql.Count()
+	count, err := sql.Count()
 	if err != nil {
-		e := ErrDBError().WithCause(err)
+		e = utils.ErrDBError().WithCause(err)
 		mlog.Error(e.String())
-		return 0, nil, e
+		return
 	}
 
-	res, err := sql.Order(qn.UpdatedAt.Desc()).Limit(page.Size).Offset((page.Num - 1) * page.Size).Find()
+	records, err = sql.Order(Note.UpdatedAt.Desc()).Limit(pageSize).Offset((pageNum - 1) * pageSize).Find()
 	if err != nil {
-		e := ErrDBError().WithCause(err)
+		e = utils.ErrDBError().WithCause(err)
 		mlog.Error(e.String())
-		return 0, nil, e
+		return
 	}
 
-	return amount, res, nil
+	return
 }

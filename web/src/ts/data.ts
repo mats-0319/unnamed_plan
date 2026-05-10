@@ -1,4 +1,17 @@
-export const tips_ModifyUser =
-	"密码为空表示不修改<br/>修改TOTP密钥且新值为空，表示关闭TOTP功能<br/><br/>昵称、密码、TOTP均无修改时，不可提交"
+export const tips_ModifyUser = "昵称、密码和TOTP密钥字段为空表示不修改"
 
 export const tips_RegisterUser = "请输入用户名和密码后点击注册"
+
+interface FlipResult {
+    duration: number;
+    steps: number;
+}
+
+export function isFlipResult(obj: any):obj is FlipResult {
+    return (
+        typeof obj === "object" &&
+        obj !== null &&
+        typeof obj.duration === "number" &&
+        typeof obj.steps === "number"
+    )
+}

@@ -27,16 +27,17 @@ mkdir -p "./build/server/"
       local server_name="$1"
 
       cd "./server/${server_name}" || exit 1
-      go build -o "server_exec"
+      go build -o "server"
       cd ../.. || exit 1
 
-      mv "./server/${server_name}/server_exec" "./build/server/unnamed_plan_server_exec"
+      mv "./server/${server_name}/server" "./build/server/unnamed_plan_server"
       cp "./server/${server_name}/config_production.json" "./build/server/config.json"
     }
 
   build_server "cmd"
 
   cp "./scripts/restart_server.sh" "./build/restart_server.sh"
+  cp "./scripts/command.md" "./build/command.md"
 
 # build ui
 

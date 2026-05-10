@@ -6,43 +6,48 @@ import (
 	"net/http"
 
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
-	. "github.com/mats0319/unnamed_plan/server/internal/utils"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 type Context struct {
-	Writer  http.ResponseWriter
-	Request *http.Request
+	writer  http.ResponseWriter
+	request *http.Request
 
-	AccessToken string // 登录成功获得，后续请求均需要在请求头带上该参数
-	UserName    string // user name
+	AccessToken string // 登录成功后签发，需要身份认证的接口应包含此项
+	UserName    string // parse from 'AccessToken'
 
 	ResData any // expect: *utils.Error / *api.resStruct
 }
 
 func NewContext(w http.ResponseWriter, r *http.Request) *Context {
 	return &Context{
-		Writer:      w,
-		Request:     r,
-		AccessToken: r.Header.Get(HttpHeader_AccessToken),
+		writer:      w,
+		request:     r,
+		AccessToken: r.Header.Get(utils.HTTPHeader_AccessToken),
 	}
 }
 
+// ParseParams 这个函数读取了http req.body，这一结构被限制只能读取一次，
+// 所以包括请求处理函数和中间件在内，如果有多个函数均调用该函数，会出现错误。
 func (ctx *Context) ParseParams(obj any) bool {
-	bodyBytes, err := io.ReadAll(ctx.Request.Body)
+	bodyBytes, err := io.ReadAll(ctx.request.Body)
 	if err != nil {
-		e := ErrServerInternalError().WithCause(err)
-		mlog.Error(e.String())
+		e := utils.ErrServerInternalError().WithCause(err)
 		ctx.ResData = e
+		mlog.Error(e.String())
 		return false
 	}
 
-	err = json.Unmarshal(bodyBytes, obj)
-	if err != nil {
-		e := ErrJsonUnmarshal().WithCause(err)
-		mlog.Error(e.String())
+	if err := json.Unmarshal(bodyBytes, obj); err != nil {
+		e := utils.ErrDeserializeHTTPReqParam().WithCause(err)
 		ctx.ResData = e
+		mlog.Error(e.String())
 		return false
 	}
 
 	return true
+}
+
+func (ctx *Context) SetHeader(key string, value string) {
+	ctx.writer.Header().Set(key, value)
 }

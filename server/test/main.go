@@ -8,7 +8,11 @@ import (
 
 // start server with flag '-t' to use test db connection
 func main() {
+	log.Println("> Test Start ...")
+
 	createTable()
+
+	api.GetAccessToken()
 
 	testApi("Register", api.Register)
 	testApi("Login", api.Login)
@@ -20,7 +24,10 @@ func main() {
 	testApi("Modify Note", api.ModifyNote)
 	testApi("Delete Note", api.DeleteNote)
 
-	dropTable()
+	testApi("List Game Score", api.ListGameScore)
+	testApi("Upload Game Score", api.UploadGameScore)
+
+	//dropTable() // do not del testdata during dev
 
 	log.Println("> All Test Passed! ^_^")
 }

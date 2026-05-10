@@ -1,26 +1,26 @@
 <template>
-	<div class="home center-hv color-bg-0">
-		<div class="h-content center-vertical color-bg-1">
-			<div class="hc-item hc-item-1 center-vertical">
-				你不是你以为的你自己，也不是别人眼中的你自己，而是你以为的别人眼中的你自己。<br />
-				<span class="hci-en">
-					You are not who you think you are, nor who others see you as, but rather who you believe others see you as.
-				</span>
-			</div>
+  <div class="home center-hv color-bg-0">
+    <div class="h-content center-vertical color-bg-1">
+      <div class="hc-item hc-item-1 center-vertical">
+        你不是你以为的你自己，也不是别人眼中的你自己，而是你以为的别人眼中的你自己。<br>
+        <span class="hci-en">
+          You are not who you think you are, nor who others see you as, but rather who you believe others see you as.
+        </span>
+      </div>
 
-			<div class="hc-item hc-item-2 center-vertical">
-				不服高人有罪<br />
-				<span class="hci-en">It is a sin not to admire talented people.</span>
-			</div>
+      <div class="hc-item hc-item-2 center-vertical">
+        不服高人有罪<br>
+        <span class="hci-en">It is a sin not to admire talented people.</span>
+      </div>
 
-			<div class="hc-item hc-item-3 center-vertical">
-				让每一行代码都有意义<br />
-				<span class="hci-en">Make every line of code indispensable.</span>
-			</div>
-		</div>
-	</div>
+      <div class="hc-item hc-item-3 center-vertical">
+        让每一行代码都有意义<br>
+        <span class="hci-en">Make every line of code indispensable.</span>
+      </div>
+    </div>
+  </div>
 
-	<bottom />
+  <bottom />
 </template>
 
 <script lang="ts" setup>

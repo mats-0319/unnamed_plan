@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
-	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
+	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
+	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
+	"github.com/mats0319/unnamed_plan/server/internal/utils/password"
 )
 
 func Register(ctx *mhttp.Context) {
@@ -14,15 +16,20 @@ func Register(ctx *mhttp.Context) {
 		return
 	}
 
-	pwd := utils.GeneratePwdHash(req.Password)
+	if len(req.UserName) < 1 || len(req.Password) < 1 {
+		e := utils.ErrInvalidParams().WithParam("user name", req.UserName).WithParam("password", req.Password)
+		mlog.Error(e.String())
+		ctx.ResData = e
+		return
+	}
 
 	user := &model.User{
 		UserName: req.UserName,
 		Nickname: req.UserName,
-		Password: pwd,
+		Password: password.GeneratePassword(req.Password),
 	}
-	err := dal.CreateUser(user)
-	if err != nil {
+
+	if err := dal.CreateUser(user); err != nil {
 		ctx.ResData = err
 		return
 	}

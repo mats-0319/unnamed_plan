@@ -2,21 +2,21 @@ package mhttp
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
-	. "github.com/mats0319/unnamed_plan/server/internal/utils"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 type Handler struct {
-	config   *config
-	handlers map[string]*HandlerItem // uri - handler func
+	handlers map[string]*HandlerItem // uri - handler func and middleware(s)
 }
 
 type HandlerItem struct {
 	Func        func(ctx *Context)
-	Middlewares []func(ctx *Context) *Error
+	Middlewares []func(ctx *Context) *utils.Error
 }
 
 func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -28,32 +28,40 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		return // res body is empty
 	}
 
-	mlog.Info(fmt.Sprintf("| %s | %s |", request.URL.String(), time.Now().String()))
+	handlerItemIns, ok := h.handlers[request.RequestURI]
+	if !ok {
+		// 实际场景中，会触发这一段代码的，更多的是恶意向服务器批量发送请求的，所以就直接返回了。
+		// 想看访问细节可以去nginx访问日志。
+		// 不想在nginx上配置接口白名单，那样太死板了。找找有什么好办法。
+		return
+	}
+
+	mlog.Info(fmt.Sprintf("> Receive Request: %s .", request.URL.String()))
+	startTime := time.Now()
+	defer func() {
+		mlog.Info(fmt.Sprintf("> Process Request: %s , in %d ms", request.URL.String(), time.Since(startTime).Milliseconds()))
+
+		if err := recover(); err != nil {
+			mlog.Error("recover panic", slog.Any("", err))
+		}
+	}()
 
 	ctx := NewContext(writer, request)
 	defer ctx.response()
 
-	handlerItemIns, ok := h.handlers[request.RequestURI]
-	if !ok {
-		e := ErrUnsupportedUri().WithParam("uri", request.RequestURI)
-		mlog.Error(e.String())
-		ctx.ResData = e
-		return
-	}
-
 	// middlewares
 	for i := range handlerItemIns.Middlewares {
-		err := handlerItemIns.Middlewares[i](ctx)
-		if err != nil { // log in middleware
+		if err := handlerItemIns.Middlewares[i](ctx); err != nil { // log in middleware
 			ctx.ResData = err
 			return
 		}
 	}
 
+	// business handler
 	handlerItemIns.Func(ctx)
 }
 
-func (h *Handler) AddHandler(uri string, handlerFunc func(ctx *Context), middlewares ...func(ctx *Context) *Error) {
+func (h *Handler) AddHandler(uri string, handlerFunc func(ctx *Context), middlewares ...func(ctx *Context) *utils.Error) {
 	if h.handlers == nil {
 		h.handlers = make(map[string]*HandlerItem)
 	}
@@ -64,8 +72,8 @@ func (h *Handler) AddHandler(uri string, handlerFunc func(ctx *Context), middlew
 	}
 }
 
-func (h *Handler) supportedUri() {
+func (h *Handler) displayRegisteredURI() {
 	for k := range h.handlers {
-		mlog.Info("- Http Handler Registered: " + k)
+		mlog.Info("- HTTP Handler Registered: " + k)
 	}
 }

@@ -1,3 +1,4 @@
+/* eslint-disable */
 // @ts-nocheck
 // biome-ignore lint: disable
 // oxlint-disable
@@ -12,6 +13,8 @@ declare module 'vue' {
   export interface GlobalComponents {
     Bottom: typeof import('./src/components/bottom.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
+    ElCollapse: typeof import('element-plus/es')['ElCollapse']
+    ElCollapseItem: typeof import('element-plus/es')['ElCollapseItem']
     ElDescriptions: typeof import('element-plus/es')['ElDescriptions']
     ElDescriptionsItem: typeof import('element-plus/es')['ElDescriptionsItem']
     ElDialog: typeof import('element-plus/es')['ElDialog']
@@ -32,6 +35,9 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Stacked_cards: typeof import('./src/components/stacked_cards.vue')['default']
+    Subpage_default: typeof import('./src/components/subpage_default.vue')['default']
+    Subpage_frame: typeof import('./src/components/subpage_frame.vue')['default']
+    SubpageDefault: typeof import('./src/components/subpage_default.vue')['default']
     Top: typeof import('./src/components/top.vue')['default']
   }
 }

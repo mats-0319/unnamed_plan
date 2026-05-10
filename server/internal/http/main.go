@@ -3,11 +3,13 @@ package mhttp
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 
 	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 type config struct {
@@ -16,27 +18,31 @@ type config struct {
 
 // StartServer is blocked
 func StartServer(handler *Handler) {
-	handler.config = getConfig()
+	configIns, err := getHTTPConfig()
+	if err != nil {
+		os.Exit(1)
+	}
 
-	handler.supportedUri()
+	handler.displayRegisteredURI()
 
-	addr := fmt.Sprintf("%s:%s", "0.0.0.0", handler.config.Port)
+	// 因为允许手机访问需要设置web ip为`192.168.xxx`(即本机内网ipv4地址)，
+	// 这里为了支持`127.0.0.1`、内网ip等多种格式，使用`0.0.0.0`
+	addr := fmt.Sprintf("0.0.0.0:%s", configIns.Port)
 	mlog.Info("> Listening at: " + addr)
 
-	err := http.ListenAndServe(addr, handler)
-	if err != nil {
-		log.Fatalln("handlers listen and serve failed", err)
+	if err := http.ListenAndServe(addr, handler); err != nil {
+		mlog.Error("handlers listen and serve failed", slog.Any("error", err))
 	}
 }
 
-func getConfig() *config {
-	jsonBytes := mconfig.GetConfigItem("22c4db2e-06d3-4d6a-b43f-c42aa6f57d15")
+func getHTTPConfig() (*config, error) {
+	jsonBytes := mconfig.GetConfigItem(utils.ConfigID_HTTP)
 
 	res := &config{}
-	err := json.Unmarshal(jsonBytes, res)
-	if err != nil {
-		log.Fatalln("get gateway config failed", err)
+	if err := json.Unmarshal(jsonBytes, res); err != nil {
+		mlog.Error("deserialize http config failed", slog.Any("error", err))
+		return nil, err
 	}
 
-	return res
+	return res, nil
 }

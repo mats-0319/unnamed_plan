@@ -2,11 +2,11 @@ package handlers
 
 import (
 	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
-	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
+	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
-	. "github.com/mats0319/unnamed_plan/server/internal/utils"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 func ListUser(ctx *mhttp.Context) {
@@ -15,32 +15,39 @@ func ListUser(ctx *mhttp.Context) {
 		return
 	}
 
-	operator, err := dal.GetUser(ctx.UserName)
-	if err != nil {
-		ctx.ResData = err
+	if len(ctx.UserName) < 1 || req.Page.Size <= 0 || req.Page.Num <= 0 {
+		e := utils.ErrInvalidParams().WithParam("operator", ctx.UserName).WithParam("pagination", req.Page)
+		mlog.Error(e.String())
+		ctx.ResData = e
+		return
+	}
+
+	operator, e := dal.GetUser(ctx.UserName)
+	if e != nil {
+		ctx.ResData = e
 		return
 	}
 
 	if !operator.IsAdmin {
-		e := ErrNeedAdmin().WithParam("operator", operator.UserName)
+		e := utils.ErrPermissionDenied().WithParam("need admin", operator.UserName)
 		ctx.ResData = e
 		mlog.Error(e.String())
 		return
 	}
 
-	count, users, err := dal.ListUser(req.Page)
-	if err != nil {
-		ctx.ResData = err
+	count, users, e := dal.ListUsers(req.Page.Size, req.Page.Num)
+	if e != nil {
+		ctx.ResData = e
 		return
 	}
 
 	ctx.ResData = &api.ListUserRes{
-		Amount: count,
-		Users:  usersFromDBToHttp(users),
+		Count: count,
+		Users: usersDBToHTTP(users),
 	}
 }
 
-func usersFromDBToHttp(users []*model.User) []*api.User {
+func usersDBToHTTP(users []*model.User) []*api.User {
 	res := make([]*api.User, len(users))
 	for i, v := range users {
 		res[i] = &api.User{
@@ -48,7 +55,7 @@ func usersFromDBToHttp(users []*model.User) []*api.User {
 			Nickname:  v.Nickname,
 			CreatedAt: v.CreatedAt,
 			IsAdmin:   v.IsAdmin,
-			Enable2FA: v.Enable2FA,
+			EnableMFA: v.EnableMFA,
 			LastLogin: v.UpdatedAt,
 		}
 	}

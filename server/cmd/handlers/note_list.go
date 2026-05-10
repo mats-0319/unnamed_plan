@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
-	"github.com/mats0319/unnamed_plan/server/cmd/model"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
+	"github.com/mats0319/unnamed_plan/server/internal/db/model"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
+	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
+	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
 func ListNote(ctx *mhttp.Context) {
@@ -13,19 +15,31 @@ func ListNote(ctx *mhttp.Context) {
 		return
 	}
 
-	count, notes, err := dal.ListNote(req.Page, req.UserName)
-	if err != nil {
-		ctx.ResData = err
+	if req.Page.Size <= 0 || req.Page.Num <= 0 {
+		e := utils.ErrInvalidParams().WithParam("page size", req.Page.Size).WithParam("page num", req.Page.Num)
+		mlog.Error(e.String())
+		ctx.ResData = e
+		return
+	}
+
+	writer := ""
+	if req.OnlyOperator && len(ctx.UserName) > 0 {
+		writer = ctx.UserName
+	}
+
+	count, notes, e := dal.ListNotes(req.Page.Size, req.Page.Num, writer)
+	if e != nil {
+		ctx.ResData = e
 		return
 	}
 
 	ctx.ResData = &api.ListNoteRes{
-		Amount: count,
-		Notes:  notesFromDBToHttp(notes),
+		Count: count,
+		Notes: notesDBToHTTP(notes),
 	}
 }
 
-func notesFromDBToHttp(notes []*model.Note) []*api.Note {
+func notesDBToHTTP(notes []*model.Note) []*api.Note {
 	res := make([]*api.Note, len(notes))
 	for i, v := range notes {
 		res[i] = &api.Note{
