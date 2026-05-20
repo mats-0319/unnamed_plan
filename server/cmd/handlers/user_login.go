@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"github.com/mats0319/unnamed_plan/server/cmd/api/go"
+	"github.com/mats0319/unnamed_plan/server/cmd/config"
+	"github.com/mats0319/unnamed_plan/server/cmd/handlers/mfa"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
 	"github.com/mats0319/unnamed_plan/server/internal/http/middleware"
@@ -30,26 +32,32 @@ func Login(ctx *mhttp.Context) {
 	}
 
 	if e := password.VerifyPassword(req.Password, user.Password); e != nil {
-		ctx.ResData = e
 		mlog.Error(e.String())
+		ctx.ResData = e
 		return
 	}
 
+	sc := config.GetServerConfig()
+
 	// 如果启用MFA：中断登录，进入MFA过程
 	if user.EnableMFA {
-		ctx.ResData = &api.LoginRes{EnableMFA: true, MFAToken: middleware.GenerateMFAToken(user.UserName)}
+		ctx.ResData = &api.LoginRes{
+			EnableMFA: true,
+			MFAToken:  mfa.GenerateMFAToken(user.UserName, sc.MFATokenExpireMinute),
+		}
 
 		return
 	}
 
 	_ = dal.UpdateUser(user) // update user.UpdatedAt
 
-	ctx.SetHeader(utils.HTTPHeader_AccessToken, middleware.GenerateAPIAccessToken(user.UserName))
+	ctx.SetHeader(utils.HTTPHeader_AccessToken, middleware.GenerateAPIAccessToken(user.UserName, sc.AccessTokenExpireHour))
 
 	ctx.ResData = &api.LoginRes{
-		UserName:  user.UserName,
-		Nickname:  user.Nickname,
-		IsAdmin:   user.IsAdmin,
-		EnableMFA: false,
+		EnableMFA:  false,
+		UserName:   user.UserName,
+		Nickname:   user.Nickname,
+		IsAdmin:    user.IsAdmin,
+		HasTOTPKey: len(user.TOTPKey) > 0,
 	}
 }

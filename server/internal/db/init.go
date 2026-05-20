@@ -1,30 +1,20 @@
 package mdb
 
 import (
-	"encoding/json"
-	"log/slog"
-	"os"
+	"log"
 
 	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
+	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
-	"github.com/mats0319/unnamed_plan/server/internal/utils"
 	"github.com/mats0319/unnamed_plan/server/internal/utils/flag"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 )
 
-type config struct {
-	DSN          string `json:"dsn"`
-	MaxIdleConns int    `json:"max_idle_conns"`
-	MaxOpenConns int    `json:"max_open_conns"`
-}
-
 func Initialize() {
-	configIns, err := getDBConfig()
-	if err != nil {
-		os.Exit(1)
-	}
-
-	dbConfig := NewConfig(configIns.DSN, flag.IsTestMode, configIns.MaxIdleConns, configIns.MaxOpenConns)
-	_ = InitDB(dbConfig)
+	_ = InitDB(mconfig.GetDBConfig().DSN, 10, 100)
 
 	logStr := "> DB init."
 	if flag.IsTestMode {
@@ -33,14 +23,41 @@ func Initialize() {
 	mlog.Info(logStr)
 }
 
-func getDBConfig() (*config, error) {
-	bytes := mconfig.GetConfigItem(utils.ConfigID_DB)
+var defaultDSN = "host=115.190.167.134 user=mario password=123456 dbname=test_cloud port=5432 sslmode=disable"
 
-	conf := &config{}
-	if err := json.Unmarshal(bytes, conf); err != nil {
-		mlog.Error("deserialize db config failed", slog.Any("error", err))
-		return nil, err
+// InitTestDB 使用场景：不启动服务端程序，又需要数据库功能。例如备份/恢复功能的单元测试、集成测试
+func InitTestDB() *gorm.DB {
+	flag.IsTestMode = true
+
+	return InitDB(defaultDSN, 10, 100)
+}
+
+func InitDB(dsn string, maxIdleConns int, maxOpenConns int) *gorm.DB {
+	gormConfig := &gorm.Config{
+		Logger:                 logger.Default.LogMode(logger.Error),
+		SkipDefaultTransaction: true,
+	}
+	if flag.IsTestMode {
+		gormConfig.NamingStrategy = schema.NamingStrategy{TablePrefix: "t_"}
 	}
 
-	return conf, nil
+	db, err := gorm.Open(postgres.Open(dsn), gormConfig)
+	if err != nil {
+		log.Fatalln("open db failed, error: ", err)
+	}
+
+	// set conns
+	{
+		sqlDB, err := db.DB()
+		if err != nil {
+			log.Fatalln("get sql db failed, error: ", err)
+		}
+
+		sqlDB.SetMaxIdleConns(maxIdleConns)
+		sqlDB.SetMaxOpenConns(maxOpenConns)
+	}
+
+	dal.SetDefault(db)
+
+	return db
 }

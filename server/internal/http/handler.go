@@ -11,7 +11,7 @@ import (
 )
 
 type Handler struct {
-	handlers map[string]*HandlerItem // uri - handler func and middleware(s)
+	Handlers map[string]*HandlerItem // uri - handler func and middleware(s)
 }
 
 type HandlerItem struct {
@@ -28,7 +28,7 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		return // res body is empty
 	}
 
-	handlerItemIns, ok := h.handlers[request.RequestURI]
+	handlerItemIns, ok := h.Handlers[request.RequestURI]
 	if !ok {
 		// 实际场景中，会触发这一段代码的，更多的是恶意向服务器批量发送请求的，所以就直接返回了。
 		// 想看访问细节可以去nginx访问日志。
@@ -62,18 +62,18 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 }
 
 func (h *Handler) AddHandler(uri string, handlerFunc func(ctx *Context), middlewares ...func(ctx *Context) *utils.Error) {
-	if h.handlers == nil {
-		h.handlers = make(map[string]*HandlerItem)
+	if h.Handlers == nil {
+		h.Handlers = make(map[string]*HandlerItem)
 	}
 
-	h.handlers[uri] = &HandlerItem{
+	h.Handlers[uri] = &HandlerItem{
 		Func:        handlerFunc,
 		Middlewares: middlewares,
 	}
 }
 
-func (h *Handler) displayRegisteredURI() {
-	for k := range h.handlers {
+func (h *Handler) DisplayRegisteredURI() {
+	for k := range h.Handlers {
 		mlog.Info("- HTTP Handler Registered: " + k)
 	}
 }

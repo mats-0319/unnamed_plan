@@ -8,8 +8,7 @@ import (
 )
 
 func main() {
-	dbConfig := mdb.DefaultConfig(false)
-	db := mdb.InitDB(dbConfig)
+	db := mdb.InitDB(mdb.DefaultDSN, 10, 100, false)
 
 	if err := db.Migrator().DropTable(model.ModelList...); err != nil {
 		fmt.Println("drop db table failed, err: ", err)

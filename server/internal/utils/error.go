@@ -7,7 +7,7 @@ import (
 )
 
 type Error struct {
-	HttpCode int
+	HTTPCode int
 	Code     int
 	Detail   string
 
@@ -23,7 +23,7 @@ func NewError(httpCode int, code int, detail string) *Error {
 	n := runtime.Callers(2, stack[:]) // skip 'runtime.caller' and 'NewError'
 
 	return &Error{
-		HttpCode: httpCode,
+		HTTPCode: httpCode,
 		Code:     code,
 		Detail:   detail,
 		Params:   make(map[string]any),

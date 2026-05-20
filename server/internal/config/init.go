@@ -7,8 +7,9 @@ import (
 )
 
 type Config struct {
-	Level string        `json:"level"`
-	Items []*ConfigItem `json:"items"`
+	Level    string        `json:"level"`
+	Internal *Internal     `json:"internal"`
+	Items    []*ConfigItem `json:"items"`
 }
 
 type ConfigItem struct {
@@ -19,7 +20,7 @@ type ConfigItem struct {
 
 var conf = &Config{}
 
-func Initialize() {
+func Initialize(configInitFunc ...func()) {
 	confBytes, err := os.ReadFile("./config.json")
 	if err != nil {
 		log.Fatalln("> Read config file failed, path: 'config.json', error: ", err)
@@ -27,6 +28,10 @@ func Initialize() {
 
 	if err := json.Unmarshal(confBytes, conf); err != nil {
 		log.Fatalln("> Json unmarshal failed, error: ", err)
+	}
+
+	for _, f := range configInitFunc {
+		f()
 	}
 }
 

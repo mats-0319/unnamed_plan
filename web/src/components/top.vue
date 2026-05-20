@@ -100,13 +100,9 @@ function beforeOpenLoginDialog(): void {
 }
 
 function login(): void {
-    userStore.login(loginReq.value.user_name, loginReq.value.password, (mfaToken: string) => {
-        if (mfaToken.length < 1) {
-            showLoginDialog.value = false
-            return
-        }
-
-        beforeOpenLoginMFADialog(mfaToken)
+    userStore.login(loginReq.value.user_name, loginReq.value.password, (enableMFA: boolean, mfaToken: string) => {
+        // 开启了MFA就继续执行MFA，否则登录完成
+        enableMFA ? beforeOpenLoginMFADialog(mfaToken) : showLoginDialog.value = false
     })
 }
 

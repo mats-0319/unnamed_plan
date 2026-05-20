@@ -7,8 +7,8 @@ import (
 	"math/rand/v2"
 )
 
-// HmacSHA256 calc hmac-sha256('key', 'content'), return hex(hash)
-func HmacSHA256[T string | []byte](content string, key T) string {
+// HMACSHA256 calc hmac-sha256('key', 'content'), return hex(hash)
+func HMACSHA256[T string | []byte](content string, key T) string {
 	hasher := hmac.New(sha256.New, []byte(key)) // k default nil is ok
 	hasher.Write([]byte(content))
 	bytes := hasher.Sum(nil)

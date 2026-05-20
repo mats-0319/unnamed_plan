@@ -33,15 +33,15 @@ func (ctx *Context) ParseParams(obj any) bool {
 	bodyBytes, err := io.ReadAll(ctx.request.Body)
 	if err != nil {
 		e := utils.ErrServerInternalError().WithCause(err)
-		ctx.ResData = e
 		mlog.Error(e.String())
+		ctx.ResData = e
 		return false
 	}
 
 	if err := json.Unmarshal(bodyBytes, obj); err != nil {
-		e := utils.ErrDeserializeHTTPReqParam().WithCause(err)
-		ctx.ResData = e
+		e := utils.ErrDeserializeReqParam().WithCause(err)
 		mlog.Error(e.String())
+		ctx.ResData = e
 		return false
 	}
 

@@ -23,8 +23,7 @@ func createTable() {
 
 func dropTable() {
 	if db == nil {
-		dbConfig := mdb.DefaultConfig(true)
-		db = mdb.InitDB(dbConfig)
+		db = mdb.InitTestDB()
 	}
 
 	if err := db.Migrator().DropTable(model.ModelList...); err != nil {

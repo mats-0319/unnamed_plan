@@ -17,8 +17,8 @@ func ModifyNote(ctx *mhttp.Context) {
 	if len(ctx.UserName) < 1 || len(req.NoteID) < 1 || len(req.Content) < 1 {
 		e := utils.ErrInvalidParams().WithParam("operator", ctx.UserName).
 			WithParam("note id", req.NoteID).WithParam("content", req.Content)
-		ctx.ResData = e
 		mlog.Error(e.String())
+		ctx.ResData = e
 		return
 	}
 
@@ -30,15 +30,15 @@ func ModifyNote(ctx *mhttp.Context) {
 
 	if req.IsAnonymous == note.IsAnonymous && req.Title == note.Title && req.Content == note.Content {
 		e := utils.ErrNoChanges().WithParam("operator", ctx.UserName)
-		ctx.ResData = e
 		mlog.Error(e.String())
+		ctx.ResData = e
 		return
 	}
 
 	if ctx.UserName != note.Writer {
 		e := utils.ErrPermissionDenied().WithParam("need writer but get", ctx.UserName)
-		ctx.ResData = e
 		mlog.Error(e.String())
+		ctx.ResData = e
 		return
 	}
 

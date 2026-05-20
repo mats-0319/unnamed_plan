@@ -33,7 +33,7 @@ func serializeRes(obj any) (httpCode int, jsonBytes []byte) {
 	case *utils.Error:
 		obj = &Response{Err: v.Error()}
 
-		httpCode = v.HttpCode
+		httpCode = v.HTTPCode
 	default: // *api.resStruct(s)
 		obj = &Response{IsSuccess: true, Data: v}
 
