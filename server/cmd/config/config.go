@@ -24,6 +24,6 @@ func Init() {
 	}
 }
 
-func GetServerConfig() *Config {
+func GetConfig() *Config {
 	return conf
 }

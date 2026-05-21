@@ -70,9 +70,10 @@ export class NewTOTPKeyRes {
     totp_key: string = ""
 }
 
-export class VerifyTOTPCodeReq {
+export class SetMFAStatusReq {
     enable_mfa: boolean = false
+    apply_new_key_flag: boolean = false // 是否申请了新的totp key
     totp_code: string = ""
 }
 
-export class VerifyTOTPCodeRes {}
+export class SetMFAStatusRes {}

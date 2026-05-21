@@ -21,10 +21,9 @@ import (
 )
 
 func main() {
-	mconfig.Initialize(config.Init)
+	mconfig.Initialize(mdb.Initialize, config.Init)
 	mlog.Initialize()
 	defer mlog.Close()
-	mdb.Initialize()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	brm := backup.NewBRManager(&backup.UserBR{}, &backup.NoteBR{}, &backup.FlipGameScore{})
@@ -47,7 +46,7 @@ func newHandler() *mhttp.Handler {
 
 	uriPrefix := "/api" // even use domain name like 'api.xxx.com/login', nginx will forward req
 
-	token.InitTokenManager(config.GetServerConfig().HMACKey)
+	token.InitTokenManager(config.GetConfig().HMACKey)
 
 	// user
 	h.AddHandler(uriPrefix+api.URI_Register, handlers.Register)
@@ -55,6 +54,8 @@ func newHandler() *mhttp.Handler {
 	h.AddHandler(uriPrefix+api.URI_LoginMFA, handlers.LoginMFA)
 	h.AddHandler(uriPrefix+api.URI_ListUser, handlers.ListUser, middleware.VerifyAPIAccessToken)
 	h.AddHandler(uriPrefix+api.URI_ModifyUser, handlers.ModifyUser, middleware.VerifyAPIAccessToken)
+	h.AddHandler(uriPrefix+api.URI_NewTOTPKey, handlers.NewTOTPKey, middleware.VerifyAPIAccessToken)
+	h.AddHandler(uriPrefix+api.URI_SetMFAStatus, handlers.SetMFAStatus, middleware.VerifyAPIAccessToken)
 
 	// note
 	h.AddHandler(uriPrefix+api.URI_CreateNote, handlers.CreateNote, middleware.VerifyAPIAccessToken)

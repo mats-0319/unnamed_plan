@@ -43,7 +43,7 @@ func LoginMFA(ctx *mhttp.Context) {
 
 	_ = dal.UpdateUser(user) // update user.UpdatedAt
 
-	sc := config.GetServerConfig()
+	sc := config.GetConfig()
 	ctx.SetHeader(utils.HTTPHeader_AccessToken, middleware.GenerateAPIAccessToken(user.UserName, sc.AccessTokenExpireHour))
 
 	ctx.ResData = &api.LoginMFARes{

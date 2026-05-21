@@ -12,6 +12,7 @@ import (
 
 type Handler struct {
 	Handlers map[string]*HandlerItem // uri - handler func and middleware(s)
+	uri      []string                // 按照添加顺序保存uri，用于启动时展示
 }
 
 type HandlerItem struct {
@@ -70,10 +71,14 @@ func (h *Handler) AddHandler(uri string, handlerFunc func(ctx *Context), middlew
 		Func:        handlerFunc,
 		Middlewares: middlewares,
 	}
+
+	h.uri = append(h.uri, uri)
 }
 
 func (h *Handler) DisplayRegisteredURI() {
-	for k := range h.Handlers {
-		mlog.Info("- HTTP Handler Registered: " + k)
+	mlog.Info(fmt.Sprintf("> HTTP Handler Count: %d.", len(h.Handlers)))
+
+	for _, v := range h.uri {
+		mlog.Info("- HTTP Handler Registered: " + v)
 	}
 }

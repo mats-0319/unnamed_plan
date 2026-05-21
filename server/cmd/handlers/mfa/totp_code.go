@@ -13,8 +13,7 @@ import (
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
 
-// VerifyTOTPCode totpKey should be base32 encoded
-func VerifyTOTPCode(code string, totpKey string) *utils.Error {
+func VerifyTOTPCode(code string, keyBase32 string) *utils.Error {
 	if len(code) != 6 {
 		e := utils.ErrInvalidTOTPCode().WithParam("code", code)
 		mlog.Error(e.String())
@@ -22,7 +21,7 @@ func VerifyTOTPCode(code string, totpKey string) *utils.Error {
 	}
 
 	key := make([]byte, 10)
-	n, err := base32.StdEncoding.Decode(key, []byte(totpKey))
+	n, err := base32.StdEncoding.Decode(key, []byte(keyBase32))
 	if err != nil {
 		e := utils.ErrInvalidTOTPKey().WithCause(err)
 		mlog.Error(e.String())

@@ -5,7 +5,7 @@
 
 import { axiosWrapper } from "./config"
 import { AxiosResponse } from "axios"
-import { RegisterRes, RegisterReq, LoginRes, LoginReq, LoginMFARes, LoginMFAReq, ListUserRes, ListUserReq, ModifyUserRes, ModifyUserReq, NewTOTPKeyRes, VerifyTOTPCodeRes, VerifyTOTPCodeReq } from "./user.go"
+import { RegisterRes, RegisterReq, LoginRes, LoginReq, LoginMFARes, LoginMFAReq, ListUserRes, ListUserReq, ModifyUserRes, ModifyUserReq, NewTOTPKeyRes, SetMFAStatusRes, SetMFAStatusReq } from "./user.go"
 import { Pagination } from "./common.go"
 
 class UserAxios {
@@ -57,13 +57,14 @@ class UserAxios {
         return axiosWrapper.post("/totp-key/new")
     }
 
-    public verifyTOTPCode(enable_mfa: boolean, totp_code: string): Promise<AxiosResponse<VerifyTOTPCodeRes>> {
-        let req: VerifyTOTPCodeReq = {
+    public setMFAStatus(enable_mfa: boolean, apply_new_key_flag: boolean, totp_code: string): Promise<AxiosResponse<SetMFAStatusRes>> {
+        let req: SetMFAStatusReq = {
             enable_mfa: enable_mfa,
+            apply_new_key_flag: apply_new_key_flag,
             totp_code: totp_code,
         }
 
-        return axiosWrapper.post("/totp-code/verify", req)
+        return axiosWrapper.post("/mfa/set-status", req)
     }
 }
 

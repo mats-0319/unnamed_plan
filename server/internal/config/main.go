@@ -7,9 +7,14 @@ import (
 )
 
 type Config struct {
-	Level    string        `json:"level"`
-	Internal *Internal     `json:"internal"`
-	Items    []*ConfigItem `json:"items"`
+	Level    string          `json:"level"`
+	Internal *InternalConfig `json:"internal"`
+	Items    []*ConfigItem   `json:"items"`
+}
+
+type InternalConfig struct {
+	HTTPServerPort int    `json:"http_server_port"`
+	DBDSN          string `json:"db_dsn"` // data resource name
 }
 
 type ConfigItem struct {
@@ -37,6 +42,10 @@ func Initialize(configInitFunc ...func()) {
 
 func GetLevel() string {
 	return conf.Level
+}
+
+func GetInternalConfig() *InternalConfig {
+	return conf.Internal
 }
 
 func GetConfigItem(id string) json.RawMessage {

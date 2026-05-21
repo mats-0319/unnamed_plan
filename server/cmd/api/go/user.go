@@ -80,12 +80,13 @@ type NewTOTPKeyRes struct {
 	TOTPKey string `json:"totp_key"`
 }
 
-const URI_VerifyTOTPCode = "/totp-code/verify"
+const URI_SetMFAStatus = "/mfa/set-status"
 
-type VerifyTOTPCodeReq struct {
-	EnableMFA bool   `json:"enable_mfa"`
-	TOTPCode  string `json:"totp_code"`
+type SetMFAStatusReq struct {
+	EnableMFA       bool   `json:"enable_mfa"`
+	ApplyNewKeyFlag bool   `json:"apply_new_key_flag"` // 是否申请了新的totp key
+	TOTPCode        string `json:"totp_code"`
 }
 
-type VerifyTOTPCodeRes struct {
+type SetMFAStatusRes struct {
 }

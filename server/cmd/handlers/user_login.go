@@ -37,7 +37,7 @@ func Login(ctx *mhttp.Context) {
 		return
 	}
 
-	sc := config.GetServerConfig()
+	sc := config.GetConfig()
 
 	// 如果启用MFA：中断登录，进入MFA过程
 	if user.EnableMFA {
