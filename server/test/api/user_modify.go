@@ -14,8 +14,12 @@ func ModifyUser() {
 	testCase("success", modifyUserCase_Success)
 }
 
+func modifyUserParams(nickname string, password string) string {
+	return fmt.Sprintf(`{"nickname":"%s","password":"%s"}`, nickname, password)
+}
+
 func modifyUserCase_NoChanges() string {
-	res := httpInvoke(api.URI_ModifyUser, `{"nickname":"","password":""}`, accessToken_User)
+	res := httpInvoke(api.URI_ModifyUser, modifyUserParams("", ""), accessToken_User)
 	if res.IsSuccess || !errorIs(res.Err, utils.ErrNoChanges()) {
 		return unknownError
 	}
@@ -24,7 +28,7 @@ func modifyUserCase_NoChanges() string {
 }
 
 func modifyUserCase_SamePwd() string {
-	res := httpInvoke(api.URI_ModifyUser, fmt.Sprintf(`{"nickname":"","password":"%s"}`, pwdSHA256), accessToken_User)
+	res := httpInvoke(api.URI_ModifyUser, modifyUserParams("", pwdSHA256), accessToken_User)
 	if res.IsSuccess || !errorIs(res.Err, utils.ErrSamePassword()) {
 		return unknownError
 	}
@@ -33,13 +37,13 @@ func modifyUserCase_SamePwd() string {
 }
 
 func modifyUserCase_Success() string {
-	res := httpInvoke(api.URI_ModifyUser, `{"nickname":"123","password":""}`, accessToken_User)
+	res := httpInvoke(api.URI_ModifyUser, modifyUserParams("new nickname", ""), accessToken_User)
 	if !res.IsSuccess {
 		return res.Err
 	}
 
 	user, err := dal.GetUser("user")
-	if (user != nil && user.Nickname != "123") || err != nil {
+	if (user != nil && user.Nickname != "new nickname") || err != nil {
 		return unknownError
 	}
 

@@ -35,6 +35,7 @@ type TestResponse struct {
 	AccessToken string `json:"access_token"`
 	Data        struct {
 		MFAToken string `json:"mfa_token"`
+		TOTPKey  string `json:"totp_key"`
 	} `json:"data"`
 }
 

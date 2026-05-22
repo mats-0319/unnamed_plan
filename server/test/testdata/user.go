@@ -11,19 +11,15 @@ func PresetUser() []*model.User {
 
 	return []*model.User{
 		{
-			UserName:  "admin",
-			Nickname:  "admin",
-			Password:  password.GeneratePassword(pwdSHA256),
-			IsAdmin:   true,
-			EnableMFA: false,
-			TOTPKey:   "",
+			UserName: "admin",
+			Nickname: "admin",
+			Password: password.GeneratePassword(pwdSHA256),
+			IsAdmin:  true,
 		},
 		{
-			UserName:  "user",
-			Nickname:  "user",
-			Password:  password.GeneratePassword(pwdSHA256),
-			EnableMFA: false,
-			TOTPKey:   "",
+			UserName: "user",
+			Nickname: "user",
+			Password: password.GeneratePassword(pwdSHA256),
 		},
 		{
 			UserName:  "user_with_totp",
