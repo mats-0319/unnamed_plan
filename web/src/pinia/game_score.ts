@@ -17,8 +17,7 @@ export const useGameScoreStore = defineStore("game_score", () => {
     }
 
     function listGameScore(game_name: GameName, pageSize: number, pageNum: number): void {
-        gameAxios.
-            listGameScore(game_name, { size: pageSize, num: pageNum }).
+        gameAxios.listGameScore(game_name, { size: pageSize, num: pageNum }).
             then(({ data }: { data: ListGameScoreRes }) => {
                 count.value = data.count
                 scores.value = data.scores

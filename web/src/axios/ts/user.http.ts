@@ -5,7 +5,21 @@
 
 import { axiosWrapper } from "./config"
 import { AxiosResponse } from "axios"
-import { RegisterRes, RegisterReq, LoginRes, LoginReq, LoginMFARes, LoginMFAReq, ListUserRes, ListUserReq, ModifyUserRes, ModifyUserReq, NewTOTPKeyRes, VerifyTOTPCodeRes, VerifyTOTPCodeReq } from "./user.go"
+import {
+    RegisterRes,
+    RegisterReq,
+    LoginRes,
+    LoginReq,
+    LoginMFARes,
+    LoginMFAReq,
+    ListUserRes,
+    ListUserReq,
+    ModifyUserRes,
+    ModifyUserReq,
+    NewTOTPKeyRes,
+    VerifyTOTPCodeRes,
+    VerifyTOTPCodeReq
+} from "./user.go"
 import { Pagination } from "./common.go"
 
 class UserAxios {

@@ -9,7 +9,12 @@ import { UploadGameScoreRes, UploadGameScoreReq, GameName, ListGameScoreRes, Lis
 import { Pagination } from "./common.go"
 
 class GameAxios {
-    public uploadGameScore(game_name: GameName, score: number, result: string, player: string): Promise<AxiosResponse<UploadGameScoreRes>> {
+    public uploadGameScore(
+        game_name: GameName,
+        score: number,
+        result: string,
+        player: string
+    ): Promise<AxiosResponse<UploadGameScoreRes>> {
         let req: UploadGameScoreReq = {
             game_name: game_name,
             score: score,

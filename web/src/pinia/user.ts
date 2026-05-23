@@ -14,8 +14,7 @@ export const useUserStore = defineStore("user", () => {
 
             log.success("register")
 
-            login(userName, password, () => {
-            })
+            login(userName, password, () => {})
         })
     }
 
@@ -23,8 +22,15 @@ export const useUserStore = defineStore("user", () => {
         userAxios.login(userName, calcSHA256(password)).then(({ data }: { data: LoginRes }) => {
             cb(data.enable_mfa, data.mfa_token)
 
-            if (!data.enable_mfa) { // login done
-                user.value = loginResToUser(data, false, data.has_totp_key)
+            if (!data.enable_mfa) { // disable MFA, login done
+                Object.assign(user.value, {
+                    user_name: data.user_name,
+                    nickname: data.nickname,
+                    is_admin: data.is_admin,
+                    enable_mfa: false,
+                    has_totp_key: data.has_totp_key,
+                })
+
                 log.success("login")
             }
         })
@@ -32,7 +38,13 @@ export const useUserStore = defineStore("user", () => {
 
     function loginMFA(mfaToken: string, totpCode: string, cb: () => void): void {
         userAxios.loginMFA(mfaToken, totpCode).then(({ data }: { data: LoginMFARes }) => {
-            user.value = loginResToUser(data, true, true)
+            Object.assign(user.value, {
+                user_name: data.user_name,
+                nickname: data.nickname,
+                is_admin: data.is_admin,
+                enable_mfa: true,
+                has_totp_key: true,
+            })
 
             cb()
 
@@ -54,20 +66,7 @@ export const useUserStore = defineStore("user", () => {
         })
     }
 
-    function loginResToUser(res: LoginRes | LoginMFARes, enableMFA: boolean, hasTOTPKey: boolean): User {
-        const userIns = new User()
-        userIns.user_name = res.user_name
-        userIns.nickname = res.nickname
-        userIns.is_admin = res.is_admin
-        userIns.enable_mfa = enableMFA
-        userIns.has_totp_key = hasTOTPKey
-
-        return userIns
-    }
-
-    function isLogin(): boolean {
-        return user.value.user_name.length > 0
-    }
+    function isLogin(): boolean { return user.value.user_name.length > 0 }
 
     function exitLogin(): void {
         user.value = new User()
@@ -75,9 +74,9 @@ export const useUserStore = defineStore("user", () => {
         localStorage.removeItem("login_data")
     }
 
-    function calcSHA256(password: string):string { // internal func
-        return password.length > 0 ? CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex) : ""
-    }
-
     return { user, register, login, loginMFA, modify, list, isLogin, exitLogin }
 })
+
+function calcSHA256(password: string): string { // internal func
+    return password.length > 0 ? CryptoJs.SHA256(password).toString(CryptoJs.enc.Hex) : ""
+}

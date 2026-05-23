@@ -76,8 +76,8 @@ export const router = createRouter({
 router.beforeEach((to, _from, next) => {
     const userStore = useUserStore()
 
-    if (!(to.meta && to.meta.requireLogin) || userStore.isLogin()) {
     // 页面不需要登录，或者已经登录
+    if (!(to.meta && to.meta.requireLogin) || userStore.isLogin()) {
         next()
         return
     }

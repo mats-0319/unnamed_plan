@@ -31,8 +31,8 @@ export default tsEslint.config(
             "@stylistic/dot-location": "warn", // 链式调用，点和前面的部分在一行，例如`res.err`，如果需要换行应写成`res.\nerr`
             "@stylistic/eol-last": "warn", // 文件末尾应有换行符
             "@stylistic/function-call-spacing": "warn", // 函数调用，函数名和括号中间不应有空格
-            "@stylistic/indent": "warn", // 缩进，4个空格
-            "@stylistic/indent-binary-ops": "warn", // 多行二元运算符缩进，4个空格（推荐与上一条一起使用?）
+            "@stylistic/indent": [ "warn", 4 ], // 缩进，4个空格
+            "@stylistic/indent-binary-ops": [ "warn", 4 ], // 多行二元运算符缩进，4个空格（推荐与上一条一起使用?）
             "vue/html-indent": [ "warn", 2 ], // vue html部分缩进，2个空格
             "@stylistic/key-spacing": "warn", // 冒号后应有空格
             "@stylistic/keyword-spacing": "warn", // 关键字前后应有空格
@@ -45,6 +45,7 @@ export default tsEslint.config(
             "@stylistic/no-multi-spaces": "warn", // 禁止连续空格
             "@stylistic/no-multiple-empty-lines": "warn", // 禁止多空行
             "@stylistic/no-trailing-spaces": "warn", // 禁止行末空格
+            "@stylistic/object-curly-spacing": [ "warn", "always" ], // 大括号内部应有空格
             "@stylistic/semi": [ "warn", "never" ], // 分号
             "@stylistic/space-before-blocks": "warn", // 块前空格
             "@stylistic/space-before-function-paren": [ "warn", "never" ], // 函数定义，函数名和括号中间不应有空格

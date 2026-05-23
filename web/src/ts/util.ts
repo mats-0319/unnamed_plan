@@ -16,11 +16,7 @@ export function routerLink(name: string): void {
 }
 
 export function displayTimestamp(timestamp: number): string {
-    if (timestamp == 0) {
-        return "无"
-    }
-
-    return new Date(timestamp).toLocaleString()
+    return timestamp != 0 ? new Date(timestamp).toLocaleString() : "无"
 }
 
 export function randomVisitorName(): string {
