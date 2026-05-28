@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import Bottom from "@/components/bottom.vue"
+import Bottom from "@/views/components/bottom.vue"
 </script>
 
 <style scoped lang="less">

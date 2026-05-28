@@ -1,5 +1,5 @@
 <template>
-  <top />
+  <top v-if="!$route.meta.hideTop" />
   <router-view />
 </template>
 
@@ -8,13 +8,13 @@ import { useFlagStore } from "@/pinia/flag.ts"
 import { onMounted } from "vue"
 import { useUserStore } from "@/pinia/user.ts"
 import { deepCopy } from "@/ts/util.ts"
-import Top from "@/components/top.vue"
+import Top from "@/views/components/top.vue"
 
-let flags = useFlagStore()
-let userStore = useUserStore()
+const flags = useFlagStore()
+const userStore = useUserStore()
 
 onMounted(() => {
-    console.log("version: " + import.meta.env.Vite_package_version)
+    console.log("version: " + __PackageVersion__)
 
     // on re-size screen width
     flags.onScreenWidthChanged(screen.width)
@@ -28,7 +28,7 @@ onMounted(() => {
         localStorage.setItem("login_data", JSON.stringify(userStore.user))
     })
 
-    let loginData = localStorage.getItem("login_data")
+    const loginData = localStorage.getItem("login_data")
     if (loginData) {
         userStore.user = deepCopy(JSON.parse(loginData))
     }

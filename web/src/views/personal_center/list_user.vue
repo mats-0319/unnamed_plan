@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="users" height="80%">
+  <el-table :data="userStore.users" height="80%">
     <el-table-column label="用户名" prop="user_name" />
 
     <el-table-column label="昵称" prop="nickname" />
@@ -17,29 +17,27 @@
     </el-table-column>
   </el-table>
 
-  <el-pagination layout="prev,pager,next,->,total" :total="count" background @current-change="listUser" />
+  <el-pagination
+    layout="prev,pager,next,->,total"
+    :total="userStore.count"
+    background
+    @current-change="listUser"
+  />
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue"
-import { User } from "@/axios/ts/user.go.ts"
+import { onMounted } from "vue"
 import { useUserStore } from "@/pinia/user.ts"
 import { displayTimestamp } from "@/ts/util.ts"
 
-let userStore = useUserStore()
-
-let count = ref<number>(0)
-let users = ref<Array<User>>(new Array<User>())
+const userStore = useUserStore()
 
 onMounted(() => {
     listUser()
 })
 
 function listUser(pageNum: number = 1): void {
-    userStore.list(10, pageNum, (c: number, u: Array<User>) => {
-        count.value = c
-        users.value = u
-    })
+    userStore.list(10, pageNum)
 }
 </script>
 

@@ -24,7 +24,7 @@ import { Pagination } from "./common.go"
 
 class UserAxios {
     public register(user_name: string, password: string): Promise<AxiosResponse<RegisterRes>> {
-        let req: RegisterReq = {
+        const req: RegisterReq = {
             user_name: user_name,
             password: password,
         }
@@ -33,7 +33,7 @@ class UserAxios {
     }
 
     public login(user_name: string, password: string): Promise<AxiosResponse<LoginRes>> {
-        let req: LoginReq = {
+        const req: LoginReq = {
             user_name: user_name,
             password: password,
         }
@@ -42,7 +42,7 @@ class UserAxios {
     }
 
     public loginMFA(mfa_token: string, totp_code: string): Promise<AxiosResponse<LoginMFARes>> {
-        let req: LoginMFAReq = {
+        const req: LoginMFAReq = {
             mfa_token: mfa_token,
             totp_code: totp_code,
         }
@@ -51,7 +51,7 @@ class UserAxios {
     }
 
     public listUser(page: Pagination): Promise<AxiosResponse<ListUserRes>> {
-        let req: ListUserReq = {
+        const req: ListUserReq = {
             page: page,
         }
 
@@ -59,7 +59,7 @@ class UserAxios {
     }
 
     public modifyUser(nickname: string, password: string): Promise<AxiosResponse<ModifyUserRes>> {
-        let req: ModifyUserReq = {
+        const req: ModifyUserReq = {
             nickname: nickname,
             password: password,
         }
@@ -72,7 +72,7 @@ class UserAxios {
     }
 
     public verifyTOTPCode(enable_mfa: boolean, totp_code: string): Promise<AxiosResponse<VerifyTOTPCodeRes>> {
-        let req: VerifyTOTPCodeReq = {
+        const req: VerifyTOTPCodeReq = {
             enable_mfa: enable_mfa,
             totp_code: totp_code,
         }

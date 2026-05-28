@@ -22,7 +22,7 @@ export default tsEslint.config(
             },
         },
         rules: {
-            // stylistic不推荐直接启用所有规则并应用其默认值，所以我们一个一个过
+            // style, stylistic不推荐直接启用所有规则并应用其默认值，所以我们一个一个过
             "@stylistic/array-bracket-spacing": [ "warn", "always", { objectsInArrays: false, arraysInArrays: false }], // 数组括号间距
             "@stylistic/arrow-spacing": "warn", // 箭头符号左右应有空格
             "@stylistic/block-spacing": "warn", // 块间距
@@ -52,6 +52,11 @@ export default tsEslint.config(
             "@stylistic/space-in-parens": "warn", // 括号里侧不应有空格
             "@stylistic/space-infix-ops": [ "warn", { ignoreTypes: true }], // 中缀运算符前后应有空格，例如`+`/`=`
             "@stylistic/spaced-comment": "warn", // 注释符号和正文中间应有空格
+
+            // eslint
+            "no-duplicate-imports": [ "warn", { includeExports: true }], // 一个文件一行导入
+            "no-var": "warn", // 使用let/const代替var
+            "prefer-const": [ "warn", { destructuring: "all" }], // 优先定义常量
         },
     },
 )

@@ -5,6 +5,7 @@ import (
 
 	mdb "github.com/mats0319/unnamed_plan/server/internal/db"
 	"github.com/mats0319/unnamed_plan/server/internal/db/model"
+	"github.com/mats0319/unnamed_plan/server/internal/db/tool_create_table/testdata"
 )
 
 func main() {
@@ -20,9 +21,13 @@ func main() {
 		return
 	}
 
-	db.Create(defaultUser)
+	db.Create(defaultUsers)
 
-	db.Create(testUser)
-	db.Create(testNote)
-	db.Create(testFlipGameScore)
+	db.Create(testdata.TestUsers)
+	db.Create(testdata.TestNotes())
+	db.Create(testdata.TestFlipGameScores)
+}
+
+var defaultUsers = []*model.User{
+	testdata.NewUser("mats0319", "Mario", true, false, ""),
 }

@@ -73,6 +73,21 @@ export const router = createRouter({
     routes: routes,
 })
 
+
+if (__IsDev__) {
+    router.addRoute({
+        path: "/test",
+        name: "test",
+        meta: { hideTop: true },
+        component: () => import("@/views/components/test_page.vue"),
+        children: [{
+            path: "lock-button",
+            name: "TLockButton",
+            component: () => import("@/components/lock_button_test.vue")
+        }]
+    })
+}
+
 router.beforeEach((to, _from, next) => {
     const userStore = useUserStore()
 

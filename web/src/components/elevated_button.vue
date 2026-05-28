@@ -1,31 +1,56 @@
 <template>
-  <div class="elevated-button color-bg-1 center-hv" :class="{ 'eb-loading': props.loading }">
-    <span v-show="!loading"><slot /></span>
-    <span v-show="loading">loading...</span>
+  <div class="elevated-button" :style="{ width: props.w + 'rem', height: props.h + 'rem' }">
+    <lock-button
+      :style="{ 'background-color': props.bg }"
+      :disabled="props.disabled"
+      :on-click="props.onClick"
+    >
+      <slot />
+    </lock-button>
   </div>
 </template>
 
 <script lang="ts" setup>
-let props = defineProps({
-    loading: {
+import LockButton from "@/components/lock_button.vue"
+
+const props = defineProps({
+    w: {
+        type: String,
+        default: "fit-content",
+    },
+    h: {
+        type: String,
+        default: "fit-content",
+    },
+    bg: {
+        type: String,
+        default: "rgb(240, 239, 226)",
+    },
+    disabled: {
         type: Boolean,
         default: false,
+    },
+    onClick: {
+        type: Function,
+        required: true,
     },
 })
 </script>
 
 <style lang="less" scoped>
-.elevated-button {
-	border-radius: 1rem;
-	padding: 0.5rem 0;
-}
-.elevated-button:hover {
-	cursor: pointer;
-	text-decoration-line: underline;
-}
+.elevated-button{
+  border-radius: 1rem;
 
-.eb-loading {
-	pointer-events: none;
-	opacity: 0.6;
+  button {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 1rem;
+  }
+  button:hover,
+  button.loading {
+    border: 1px solid darkgray;
+    opacity: 0.8;
+  }
 }
 </style>
