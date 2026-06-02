@@ -33,14 +33,14 @@ export const useNoteStore = defineStore("note", () => {
 
         if (currentIndex >= notes.value.length - 1) { // 已经是当前数组的最后一个了
             if (currentNum.value >= count.value) { // 没有更多了，从头开始
-                await list(false)
                 currentNum.value = 0
+                await list(false)
             } else { // 下一页
                 await list(false, nextPage.value)
             }
         } else { // 正常获取数组的下一个元素，同时可以兼容当前小纸条不存在的情况(`currentIndex=-1`)
             currentNum.value++
-            currentNote.value = notes.value.length > 0 ? notes.value[0] : new Note()
+            currentNote.value = notes.value.length > 0 ? notes.value[currentIndex + 1] : new Note()
         }
     }
 
@@ -52,7 +52,7 @@ export const useNoteStore = defineStore("note", () => {
         count.value = data.count
         notes.value = data.notes
 
-        currentNum.value++
+        currentNum.value = pageNum * pageSize + 1
         currentNote.value = notes.value.length > 0 ? notes.value[0] : new Note()
         nextPage.value = pageNum + 1
 
@@ -64,7 +64,7 @@ export const useNoteStore = defineStore("note", () => {
 
         log.success("Create Note")
 
-        list(true) // 默认写小纸条后查询自己的小纸条
+        await list(true) // 默认写小纸条后查询自己的小纸条
     }
 
     async function modify(noteID: string, isAnonymous: boolean, title: string, content: string): Promise<void> {
@@ -72,7 +72,7 @@ export const useNoteStore = defineStore("note", () => {
 
         log.success("Modify Note")
 
-        list(true) // 默认修改小纸条后查询自己的小纸条
+        await list(true) // 默认修改小纸条后查询自己的小纸条
     }
 
     // delete是关键字，所以这里命名为del
@@ -81,7 +81,7 @@ export const useNoteStore = defineStore("note", () => {
 
         log.success("Delete Note")
 
-        list(true) // 默认删除小纸条后查询自己的小纸条
+        await list(true) // 默认删除小纸条后查询自己的小纸条
     }
 
     return { noteType, count, notes, currentNum, currentNote, next, list, create, modify, del }

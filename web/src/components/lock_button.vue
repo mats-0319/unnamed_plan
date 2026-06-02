@@ -1,7 +1,6 @@
 <template>
   <button
     class="lock-button center-hv"
-    :class="{ loading }"
     :disabled="loading || props.disabled"
     @click="handleClick"
   >
@@ -54,7 +53,6 @@ async function handleClick(): Promise<void> {
   cursor: pointer;
 	text-decoration-line: underline;
 }
-.lock-button.loading,
 .lock-button:disabled {
   pointer-events: none;
 }

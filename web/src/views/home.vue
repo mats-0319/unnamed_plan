@@ -25,6 +25,18 @@
 
 <script lang="ts" setup>
 import Bottom from "@/views/components/bottom.vue"
+import { onMounted } from "vue"
+import { useUserStore } from "@/pinia/user.ts"
+import { useRoute } from "vue-router"
+
+const route = useRoute()
+const userStore = useUserStore()
+
+onMounted(() => {
+    if (route.params.v != "") {
+        userStore.exitLogin() // 配合http拦截器，如果是401错误，则退出登录
+    }
+})
 </script>
 
 <style scoped lang="less">

@@ -17,11 +17,11 @@
   <el-divider />
   测试样式：修改按钮组件的颜色和边框<br/><br/>
   <div class="wrapper">
-    <outlined-button w="16" h="4" :on-click="clickButton">测试样式-带边框的文字按钮</outlined-button>
+    <outlined-button class="fat-button" :on-click="clickButton">测试样式-带边框的文字按钮</outlined-button>
 
     <div :style="{ width: '6rem' }"></div>
 
-    <elevated-button w="16" h="4" bg="rgb(240, 239, 226)" :on-click="clickButton">测试样式-增强按钮</elevated-button>
+    <elevated-button class="fat-button" bg="rgb(240, 239, 226)" :on-click="clickButton">测试样式-增强按钮</elevated-button>
   </div>
 </template>
 
@@ -34,7 +34,7 @@ import { ref } from "vue"
 const count = ref<number>(0)
 
 async function clickButton(): Promise<void> {
-    await sleep(1_000)
+    await sleep(1_500)
     count.value++
 }
 
@@ -76,5 +76,10 @@ async function sleep(time: number): Promise<void> {
 
 .wrapper{
   display: flex;
+
+  .fat-button {
+    width: 16rem;
+    height: 4rem;
+  }
 }
 </style>

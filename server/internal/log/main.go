@@ -10,9 +10,21 @@ import (
 
 var handler *Handler
 
-func Initialize(isTestMode ...bool) {
+// InitializeTest 正式的初始化函数需要先从配置文件读取配置，而在一些不需要配置的场景中就需要一个测试用初始化函数了
+// 例如测试备份/恢复功能、测试日志结构、分文件等
+func InitializeTest() {
 	var err error
-	handler, err = newHandler("log.log", 1, getLogLevel(isTestMode...))
+	handler, err = newHandler("log.log", 1, slog.LevelDebug)
+	if err != nil {
+		log.Fatalln("open log file failed, error:", err)
+	}
+
+	slog.SetDefault(slog.New(handler))
+}
+
+func Initialize() {
+	var err error
+	handler, err = newHandler("log.log", 1, getLogLevel())
 	if err != nil {
 		log.Fatalln("open log file failed, error:", err)
 	}
@@ -64,11 +76,7 @@ func Log(logger *slog.Logger, level slog.Level, msg string, fields ...any) {
 	}
 }
 
-func getLogLevel(isTestMode ...bool) slog.Level {
-	if len(isTestMode) > 0 && isTestMode[0] {
-		return slog.LevelDebug
-	}
-
+func getLogLevel() slog.Level {
 	levelStr := mconfig.GetLevel()
 
 	var level slog.Level

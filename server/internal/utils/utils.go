@@ -5,6 +5,9 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"math/rand/v2"
+	"strings"
+
+	"github.com/google/uuid"
 )
 
 // HMACSHA256 calc hmac-sha256('key', 'content'), return hex(hash)
@@ -22,6 +25,10 @@ func CalcSHA256(password string) string {
 	bytes := hasher.Sum(nil)
 
 	return hex.EncodeToString(bytes)
+}
+
+func UUIDv5[T string | []byte](data T) string {
+	return strings.ToUpper(uuid.NewSHA1(uuid.NameSpaceDNS, []byte(data)).String())
 }
 
 const charactersLibrary = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"

@@ -55,19 +55,19 @@
     <el-dialog v-model="showLoginMFADialog" title="MFA" append-to-body>
       <el-form v-model="loginMFAReq" labelWidth="20%">
         <el-form-item label="TOTP Code">
-          <el-input v-model="loginMFAReq.totp_code" />
+          <el-input-otp v-model="loginMFAReq.totp_code" type="filled" />
         </el-form-item>
       </el-form>
 
       <template #footer>
         <elevated-button bg="white" :onClick="()=>{showLoginMFADialog=false}">取消</elevated-button>
-        <elevated-button :disabled="!canLoginMFAFlag" :onClick="loginMFA">确认</elevated-button>
+        <elevated-button bg="lightgray" :disabled="!canLoginMFAFlag" :onClick="loginMFA">确认</elevated-button>
       </template>
     </el-dialog>
 
     <template #footer>
       <elevated-button bg="white" :onClick="()=>{showLoginDialog=false}">取消</elevated-button>
-      <elevated-button :disabled="!canLoginFlag" :onClick="login">登录</elevated-button>
+      <elevated-button bg="lightgray" :disabled="!canLoginFlag" :onClick="login">登录</elevated-button>
     </template>
   </el-dialog>
 </template>
@@ -129,17 +129,13 @@ function exitLogin(): void {
     routerLink("home")
 }
 
-watch(loginReq, (newValue, _) => {
+watch(loginReq, (newValue) => {
     canLoginFlag.value = newValue.user_name.length > 0 && newValue.password.length > 0
-},
-{ deep: true }
-)
+}, { deep: true })
 
-watch(loginMFAReq, (newValue, _) => {
+watch(loginMFAReq, (newValue) => {
     canLoginMFAFlag.value = newValue.mfa_token.length > 0 && newValue.totp_code.length > 0
-},
-{ deep: true }
-)
+}, { deep: true })
 </script>
 
 <style lang="less" scoped>

@@ -55,6 +55,7 @@ func (ctx *Context) SetHeader(key string, value string) {
 
 type Response struct {
 	IsSuccess bool   `json:"is_success"`
+	Code      int    `json:"code"`
 	Err       string `json:"err"`
 	Data      any    `json:"data"`
 }
@@ -66,16 +67,16 @@ func (ctx *Context) response() {
 	var obj any
 	switch v := ctx.ResData.(type) {
 	case *utils.Error:
-		obj = &Response{Err: v.Error()}
+		obj = &Response{Code: v.Code, Err: v.Error()}
 
 		httpCode = v.HTTPCode
 	default: // *api.resStruct(s)
 		obj = &Response{IsSuccess: true, Data: v}
 	}
+
 	resBytes, err := json.Marshal(obj)
 	if err != nil {
 		mlog.Error("serialize res to json failed", slog.Any("error", err))
-		return
 	}
 
 	// write res

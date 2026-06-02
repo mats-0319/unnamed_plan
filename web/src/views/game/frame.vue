@@ -1,7 +1,7 @@
 <template>
   <div class="game color-bg-0">
     <div class="g-left">
-      <elevated-button class="gl-item" w="10" h="4" :onClick="routerToFlip">Flip</elevated-button>
+      <elevated-button class="gl-item" :onClick="routerToFlip">Flip</elevated-button>
     </div>
 
     <el-divider direction="vertical" />
@@ -73,11 +73,15 @@ function routerToFlip(): void { routerLink('gFlip') }
 	.g-left {
 		width: calc(20vw - 1px);
 		margin: 6rem 2vw;
-		font-size: 1.4rem;
 
 		.gl-item {
 			margin: 2rem auto;
+      width: 80%;
+      height: 4rem;
 		}
+    .gl-item:deep(button) {
+      font-size: 1.4rem;
+    }
 	}
 
 	.g-right {

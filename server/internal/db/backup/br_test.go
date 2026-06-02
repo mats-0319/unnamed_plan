@@ -17,7 +17,7 @@ import (
 // 这样再执行本程序，就可以区分一条数据是预设的还是恢复的了。
 // 我们做了什么：恢复功能执行到写数据库之前，我们调用了修改方法修改数据（具体修改内容见接口方法的实现）
 func TestBackupRecover(t *testing.T) {
-	mlog.Initialize(true)
+	mlog.InitializeTest()
 	defer mlog.Close()
 
 	initDB()

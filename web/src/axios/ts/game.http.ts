@@ -5,16 +5,11 @@
 
 import { axiosWrapper } from "./config"
 import { AxiosResponse } from "axios"
-import { UploadGameScoreRes, UploadGameScoreReq, GameName, ListGameScoreRes, ListGameScoreReq } from "./game.go"
 import { Pagination } from "./common.go"
+import { UploadGameScoreRes, UploadGameScoreReq, GameName, ListGameScoreRes, ListGameScoreReq } from "./game.go"
 
 class GameAxios {
-    public uploadGameScore(
-        game_name: GameName,
-        score: number,
-        result: string,
-        player: string
-    ): Promise<AxiosResponse<UploadGameScoreRes>> {
+    public uploadGameScore(game_name: GameName, score: number, result: string, player: string): Promise<AxiosResponse<UploadGameScoreRes>> {
         const req: UploadGameScoreReq = {
             game_name: game_name,
             score: score,

@@ -5,17 +5,8 @@
 
 import { axiosWrapper } from "./config"
 import { AxiosResponse } from "axios"
-import {
-    CreateNoteRes,
-    CreateNoteReq,
-    ListNoteRes,
-    ListNoteReq,
-    ModifyNoteRes,
-    ModifyNoteReq,
-    DeleteNoteRes,
-    DeleteNoteReq
-} from "./note.go"
 import { Pagination } from "./common.go"
+import { CreateNoteRes, CreateNoteReq, ListNoteRes, ListNoteReq, ModifyNoteRes, ModifyNoteReq, DeleteNoteRes, DeleteNoteReq } from "./note.go"
 
 class NoteAxios {
     public createNote(is_anonymous: boolean, title: string, content: string): Promise<AxiosResponse<CreateNoteRes>> {
@@ -37,12 +28,7 @@ class NoteAxios {
         return axiosWrapper.post("/note/list", req)
     }
 
-    public modifyNote(
-        note_id: string,
-        is_anonymous: boolean,
-        title: string,
-        content: string
-    ): Promise<AxiosResponse<ModifyNoteRes>> {
+    public modifyNote(note_id: string, is_anonymous: boolean, title: string, content: string): Promise<AxiosResponse<ModifyNoteRes>> {
         const req: ModifyNoteReq = {
             note_id: note_id,
             is_anonymous: is_anonymous,

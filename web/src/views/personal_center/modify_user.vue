@@ -1,5 +1,5 @@
 <template>
-  <el-form v-model="modifyUserReq" class="modify-user" label-width="20%">
+  <el-form v-model="modifyUserReq" class="modify-user" label-width="20%" size="large">
     <el-form-item label="用户名">{{ userStore.user.user_name }}</el-form-item>
 
     <el-form-item label="昵称"><el-input v-model="modifyUserReq.nickname" /></el-form-item>
@@ -33,11 +33,9 @@ function modifyUser(): void {
     userStore.modify(modifyUserReq.value.nickname, modifyUserReq.value.password)
 }
 
-watch(modifyUserReq, (newValue, _) => {
+watch(modifyUserReq, (newValue) => {
     canModifyFlag.value = newValue.nickname != userStore.user.nickname || newValue.password.length > 0
-},
-{ deep: true },
-)
+}, { deep: true })
 </script>
 
 <style lang="less">

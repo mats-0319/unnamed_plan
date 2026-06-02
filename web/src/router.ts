@@ -34,6 +34,11 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import("@/views/personal_center/modify_user.vue"),
             },
             {
+                path: "set-mfa-status",
+                name: "pSetMFAStatus",
+                component: () => import("@/views/personal_center/set_mfa_status.vue"),
+            },
+            {
                 path: "note",
                 name: "pNote",
                 component: () => import("@/views/personal_center/my_note.vue"),

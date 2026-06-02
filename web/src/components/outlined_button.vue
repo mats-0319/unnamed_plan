@@ -1,5 +1,5 @@
 <template>
-  <div class="outlined-button" :style="{ width: props.w + 'rem', height: props.h + 'rem' }">
+  <div class="outlined-button">
     <lock-button :disabled="props.disabled" :on-click="props.onClick"><slot /></lock-button>
   </div>
 </template>
@@ -8,14 +8,6 @@
 import LockButton from "@/components/lock_button.vue"
 
 const props = defineProps({
-    w: {
-        type: String,
-        default: "fit-content",
-    },
-    h: {
-        type: String,
-        default: "fit-content",
-    },
     disabled: {
         type: Boolean,
         default: false,
@@ -27,13 +19,16 @@ const props = defineProps({
 })
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .outlined-button {
+  width: fit-content;
+  height: fit-content;
+
   button {
     width: 100%;
     height: 100%;
     background-color: transparent;
-    border: 1px solid black
+    border: 1px solid black;
   }
   button:hover {
     opacity: 0.8;

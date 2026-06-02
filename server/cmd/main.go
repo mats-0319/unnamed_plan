@@ -21,8 +21,7 @@ import (
 )
 
 func main() {
-	mconfig.Initialize(mdb.Initialize, config.Init)
-	mlog.Initialize()
+	mconfig.Initialize(mlog.Initialize, mdb.Initialize, config.Init)
 	defer mlog.Close()
 
 	ctx, cancel := context.WithCancel(context.Background())

@@ -1,13 +1,14 @@
 import { defineStore } from "pinia"
-import { ListUserRes, LoginRes, LoginMFARes, User } from "@/axios/ts/user.go.ts"
+import { ListUserRes, LoginRes, LoginMFARes, User, NewTOTPKeyRes } from "@/axios/ts/user.go.ts"
 import { ref } from "vue"
 import CryptoJs from "crypto-js"
 import { userAxios } from "@/axios/ts/user.http.ts"
 import { log } from "@/ts/log.ts"
 
 export const useUserStore = defineStore("user", () => {
-    const user = ref<User>(new User())
-    const count = ref<number>(0)
+    const user = ref<User>(new User()) // current user
+
+    const count = ref<number>(0) // list users
     const users = ref<Array<User>>(new Array<User>())
 
     async function register(userName: string, password: string): Promise<void> {
@@ -70,6 +71,23 @@ export const useUserStore = defineStore("user", () => {
         log.success("List User")
     }
 
+    async function applyTOTPKey(): Promise<NewTOTPKeyRes> {
+        const { data }:{ data: NewTOTPKeyRes } = await userAxios.newTOTPKey()
+
+        log.success("Apply New TOTP Key")
+
+        return data
+    }
+
+    async function setMFAStatus(enableMFA: boolean, applyNewKeyFlag: boolean, totpCode: string): Promise<void> {
+        await userAxios.setMFAStatus(enableMFA, applyNewKeyFlag, totpCode)
+
+        log.success("Set MFA Status")
+
+        user.value.enable_mfa = true
+        user.value.has_totp_key = true
+    }
+
     function isLogin(): boolean { return user.value.user_name.length > 0 }
 
     function exitLogin(): void {
@@ -78,7 +96,8 @@ export const useUserStore = defineStore("user", () => {
         localStorage.removeItem("login_data")
     }
 
-    return { user, count, users, register, login, loginMFA, modify, list, isLogin, exitLogin }
+    return { user, count, users, isLogin, exitLogin,
+        register, login, loginMFA, modify, list, applyTOTPKey, setMFAStatus }
 })
 
 function calcSHA256(password: string): string { // internal func

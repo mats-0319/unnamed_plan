@@ -25,7 +25,7 @@
       <template #default="scope">
         <div class="buttons-box">
           <outlined-button class="button-item" :onClick="()=>{beforeModify(scope.row)}">编辑</outlined-button>
-          <outlined-button :onClick="()=>{beforeDelete(scope.row)}">删除</outlined-button>
+          <outlined-button class="button-item" :onClick="()=>{beforeDelete(scope.row)}">删除</outlined-button>
         </div>
       </template>
     </el-table-column>
@@ -50,8 +50,8 @@
     </el-form>
 
     <template #footer>
-      <el-button @click="showCreateDialog = false">取消</el-button>
-      <el-button type="primary" :disabled="!canCreateFlag" @click="create()">提交</el-button>
+      <elevated-button bg="white" :onClick="()=>{showCreateDialog=false}">取消</elevated-button>
+      <elevated-button bg="lightgray" :disabled="!canCreateFlag" :onClick="create">提交</elevated-button>
     </template>
   </el-dialog>
 
@@ -69,13 +69,13 @@
 
       <el-form-item label="是否匿名发布">
         <el-switch v-model="modifyNoteReq.is_anonymous" />
-        &emsp;{{ createNoteReq.is_anonymous ? "匿名" : "不匿名" }}
+        &emsp;{{ modifyNoteReq.is_anonymous ? "匿名" : "不匿名" }}
       </el-form-item>
     </el-form>
 
     <template #footer>
       <elevated-button bg="white" :onClick="()=>{showModifyDialog=false}">取消</elevated-button>
-      <elevated-button :disabled="!canModifyFlag" :onClick="modify">提交</elevated-button>
+      <elevated-button bg="lightgray" :disabled="!canModifyFlag" :onClick="modify">提交</elevated-button>
     </template>
   </el-dialog>
 
@@ -89,7 +89,7 @@
 
     <template #footer>
       <elevated-button bg="white" :onClick="()=>{showDeleteDialog=false}">取消</elevated-button>
-      <elevated-button :onClick="del">删除</elevated-button>
+      <elevated-button bg="lightgray" :onClick="del">删除</elevated-button>
     </template>
   </el-dialog>
 </template>
@@ -169,23 +169,19 @@ async function del(): Promise<void> {
 }
 
 function listNote(pageNum: number = 1): void {
-    noteStore.list(true, 10, pageNum)
+    noteStore.list(true, pageNum)
 }
 
-watch(createNoteReq, (newValue, _) => {
+watch(createNoteReq, (newValue) => {
     canCreateFlag.value = newValue.content.length > 0
-},
-{ deep: true },
-)
+}, { deep: true })
 
-watch(modifyNoteReq, (newValue, _) => {
+watch(modifyNoteReq, (newValue) => {
     canModifyFlag.value =
         newValue.is_anonymous != originData.value.is_anonymous ||
         newValue.title != originData.value.title ||
         newValue.content != originData.value.content
-},
-{ deep: true },
-)
+}, { deep: true })
 </script>
 
 <style lang="less" scoped>
@@ -211,6 +207,7 @@ watch(modifyNoteReq, (newValue, _) => {
 
 	.button-item {
 		margin-right: 0.5rem;
+    height: 2rem;
 	}
 }
 </style>

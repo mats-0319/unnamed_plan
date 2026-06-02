@@ -8,7 +8,7 @@ import (
 )
 
 func TestCustomLog(t *testing.T) {
-	Initialize(true)
+	InitializeTest()
 	defer Close()
 
 	logger := slog.Default().WithGroup("group1").WithGroup("group2")
@@ -18,7 +18,7 @@ func TestCustomLog(t *testing.T) {
 }
 
 func TestLogLevel(t *testing.T) {
-	Initialize(true)
+	InitializeTest()
 	defer Close()
 
 	Debug("debug level log", slog.Any("error", errors.New("debug error")))
@@ -28,7 +28,7 @@ func TestLogLevel(t *testing.T) {
 }
 
 func TestLogSplitFile(t *testing.T) {
-	Initialize(true)
+	InitializeTest()
 	defer Close()
 
 	lastSize := handler.Size

@@ -1,5 +1,5 @@
 <template>
-  <div class="elevated-button" :style="{ width: props.w + 'rem', height: props.h + 'rem' }">
+  <div class="elevated-button">
     <lock-button
       :style="{ 'background-color': props.bg }"
       :disabled="props.disabled"
@@ -14,14 +14,6 @@
 import LockButton from "@/components/lock_button.vue"
 
 const props = defineProps({
-    w: {
-        type: String,
-        default: "fit-content",
-    },
-    h: {
-        type: String,
-        default: "fit-content",
-    },
     bg: {
         type: String,
         default: "rgb(240, 239, 226)",
@@ -39,17 +31,17 @@ const props = defineProps({
 
 <style lang="less" scoped>
 .elevated-button{
-  border-radius: 1rem;
+  width: fit-content;
+  height: fit-content;
 
   button {
     width: 100%;
     height: 100%;
-    border: none;
-    border-radius: 1rem;
+    border: 1px solid transparent; // 为了不让hover/loading时出现的border造成布局抖动，这里不使用border:none
   }
   button:hover,
   button.loading {
-    border: 1px solid darkgray;
+    border-color: darkgray;
     opacity: 0.8;
   }
 }
