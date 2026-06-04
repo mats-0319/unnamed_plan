@@ -41,12 +41,12 @@ todo
 - build：生成的部署用内容
 - doc：文档
     - deploy：部署文档，介绍把程序发布到公网的主要步骤（含nginx反向代理配置）
-    - design/dev：设计，记录一些系统模块的设计思路与要点
+    - doc/dev：设计，记录一些系统模块的设计思路与要点
 - game：小游戏，使用ebiten引擎
 - scripts：脚本
     - build.sh：在本地使用，生成可以部署到云服务器的内容（包括服务端程序、UI和其他资源）
-    - restart_server.sh：在云服务器使用，（重新）启动所有服务端程序
-    - update_game.sh：重新编译小游戏并将`.wasm/.html/wasm_exec.js`文件移动到指定位置
+    - restart_server.sh：在云服务器使用，（重新）启动服务端程序
+    - compile_game.sh：在本地使用，重新编译小游戏并将`.wasm/.html/wasm_exec.js`文件移动到指定位置
 - server：服务端代码
     - .run：一些执行配置，例如服务端、服务端测试模式、建表工具、集成测试等
     - cmd：服务端程序启动入口，一些非通用的服务端代码也放在这里了
@@ -72,7 +72,7 @@ todo
 - vue-router
 - pinia
 - element-plus
-- eslint+prettier
+- eslint
 
 - nginx
 - postgresql 18
