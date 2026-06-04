@@ -23,7 +23,7 @@ type ConfigItem struct {
 	Json json.RawMessage `json:"json"`
 }
 
-var conf = &Config{}
+var config = &Config{}
 
 func Initialize(configInitFunc ...func()) {
 	confBytes, err := os.ReadFile("./config.json")
@@ -31,7 +31,7 @@ func Initialize(configInitFunc ...func()) {
 		log.Fatalln("> Read config file failed, path: 'config.json', error: ", err)
 	}
 
-	if err := json.Unmarshal(confBytes, conf); err != nil {
+	if err := json.Unmarshal(confBytes, config); err != nil {
 		log.Fatalln("> Json unmarshal failed, error: ", err)
 	}
 
@@ -41,16 +41,16 @@ func Initialize(configInitFunc ...func()) {
 }
 
 func GetLevel() string {
-	return conf.Level
+	return config.Level
 }
 
 func GetInternalConfig() *InternalConfig {
-	return conf.Internal
+	return config.Internal
 }
 
 func GetConfigItem(id string) json.RawMessage {
 	var res json.RawMessage
-	for _, v := range conf.Items {
+	for _, v := range config.Items {
 		if v.ID == id {
 			res = v.Json
 			break

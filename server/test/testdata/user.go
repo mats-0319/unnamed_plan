@@ -8,6 +8,7 @@ import (
 
 func PresetUser() []*model.User {
 	pwdSHA256 := utils.CalcSHA256("123456")
+	totpKey, _ := utils.Encrypt("NVQXE2LP", "cBsnYH1yDvFfW4q84wAz7FhrzWHiUjQk")
 
 	return []*model.User{
 		{
@@ -26,7 +27,7 @@ func PresetUser() []*model.User {
 			Nickname:  "user_with_totp",
 			Password:  password.GeneratePassword(pwdSHA256),
 			EnableMFA: true,
-			TOTPKey:   "NVQXE2LP", // base32 of 'mario'
+			TOTPKey:   totpKey, // base32 of 'mario'
 		},
 	}
 }

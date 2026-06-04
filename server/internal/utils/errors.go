@@ -15,6 +15,8 @@ var (
 	// general (00) / db (01) / middleware (02)
 	ErrDeserializeReqParam = newBusinessError(10001, "Deserialize HTTP Request Params Failed")
 	ErrInvalidParams       = newBusinessError(10002, "Invalid Params")
+	ErrEncrypt             = newBusinessError(10003, "Encrypt Failed")
+	ErrDecrypt             = newBusinessError(10004, "Decrypt Failed")
 	ErrUserExist           = newBusinessError(10101, "User Already Exist")
 	ErrNoteExist           = newBusinessError(10102, "Note Already Exist")
 	ErrUserNotFound        = newBusinessError(10103, "User Not Found")
@@ -38,6 +40,9 @@ var (
 	ErrInvalidTOTPKey   = newBusinessError(20106, "Invalid TOTP Key")
 	ErrWrongTOTPCode    = newBusinessError(20107, "Wrong TOTP Code")
 	ErrSamePassword     = newBusinessError(20108, "New Password Can't be Identical to the Old One")
+	ErrTOTPKeyNotFound  = newBusinessError(20109, "TOTP Key not Found")
+	ErrTryTooManyTimes  = newBusinessError(20110, "Try Too Many Times")
+	ErrTOTPKeyExpired   = newBusinessError(20111, "TOTP Key Expired")
 	ErrInvalidGameName  = newBusinessError(20301, "Invalid Game Name")
 )
 

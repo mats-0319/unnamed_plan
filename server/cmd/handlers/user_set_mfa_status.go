@@ -2,6 +2,7 @@ package handlers
 
 import (
 	api "github.com/mats0319/unnamed_plan/server/cmd/api/go"
+	"github.com/mats0319/unnamed_plan/server/cmd/config"
 	"github.com/mats0319/unnamed_plan/server/cmd/handlers/mfa"
 	"github.com/mats0319/unnamed_plan/server/internal/db/dal"
 	mhttp "github.com/mats0319/unnamed_plan/server/internal/http"
@@ -28,7 +29,9 @@ func SetMFAStatus(ctx *mhttp.Context) {
 		return
 	}
 
-	if !req.EnableMFA { // 禁用MFA
+	/* 禁用MFA */
+
+	if !req.EnableMFA {
 		if operator.EnableMFA { // 仅在启用状态下更新数据库，如已是禁用状态，直接返回
 			operator.EnableMFA = false
 			if e := dal.UpdateUser(operator); e != nil {
@@ -45,14 +48,20 @@ func SetMFAStatus(ctx *mhttp.Context) {
 	/* 启用MFA */
 
 	if req.ApplyNewKeyFlag { // 申请了新的totp key
-		totpKey, e := mfa.VerifyTOTPKey(ctx.UserName, req.TOTPCode)
+		encryptedKeyBytes, e := mfa.VerifyTOTPKey(ctx.UserName, req.TOTPCode, config.GetConfig().EncryptKey)
 		if e != nil {
 			ctx.ResData = e
 			return
 		}
-		operator.TOTPKey = totpKey
+		operator.TOTPKey = encryptedKeyBytes
 	} else { // 使用历史totp key
-		if e := mfa.VerifyTOTPCode(req.TOTPCode, operator.TOTPKey); e != nil {
+		decryptedKey, e := utils.Decrypt(operator.TOTPKey, config.GetConfig().EncryptKey)
+		if e != nil {
+			ctx.ResData = e
+			return
+		}
+
+		if e := mfa.VerifyTOTPCode(req.TOTPCode, decryptedKey); e != nil {
 			ctx.ResData = e
 			return
 		}

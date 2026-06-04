@@ -8,7 +8,7 @@ import (
 
 func TestGenerateRandomStr(t *testing.T) {
 	for range 5 {
-		t.Log(GenerateRandomBytes[string](20))
+		t.Log(GenerateRandomBytes[string](32))
 	}
 }
 

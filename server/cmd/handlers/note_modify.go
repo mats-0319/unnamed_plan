@@ -28,15 +28,15 @@ func ModifyNote(ctx *mhttp.Context) {
 		return
 	}
 
-	if req.IsAnonymous == note.IsAnonymous && req.Title == note.Title && req.Content == note.Content {
-		e := utils.ErrNoChanges().WithParam("operator", ctx.UserName)
+	if ctx.UserName != note.Writer {
+		e := utils.ErrPermissionDenied().WithParam("need writer but get", ctx.UserName)
 		mlog.Error(e.String())
 		ctx.ResData = e
 		return
 	}
 
-	if ctx.UserName != note.Writer {
-		e := utils.ErrPermissionDenied().WithParam("need writer but get", ctx.UserName)
+	if req.IsAnonymous == note.IsAnonymous && req.Title == note.Title && req.Content == note.Content {
+		e := utils.ErrNoChanges().WithParam("operator", ctx.UserName)
 		mlog.Error(e.String())
 		ctx.ResData = e
 		return

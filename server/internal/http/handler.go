@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	mconfig "github.com/mats0319/unnamed_plan/server/internal/config"
 	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
 )
@@ -18,6 +19,20 @@ type Handler struct {
 type HandlerItem struct {
 	Func        func(ctx *Context)
 	Middlewares []func(ctx *Context) *utils.Error
+}
+
+// StartServer is blocked
+func (h *Handler) StartServer() {
+	h.displayRegisteredURI()
+
+	// 因为允许手机访问需要设置web ip为`192.168.xxx`(即本机内网ipv4地址)，
+	// 这里为了支持`127.0.0.1`、内网ip等多种格式，使用`0.0.0.0`
+	addr := fmt.Sprintf("0.0.0.0:%d", mconfig.GetInternalConfig().HTTPServerPort)
+	mlog.Info("> Listening at: " + addr)
+
+	if err := http.ListenAndServe(addr, h); err != nil {
+		mlog.Error("handlers listen and serve failed", slog.Any("error", err))
+	}
 }
 
 func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -37,15 +52,18 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	mlog.Info(fmt.Sprintf("> Receive Request: %s .", request.URL.String()))
-	startTime := time.Now()
-	defer func() {
-		mlog.Info(fmt.Sprintf("> Process Request: %s , in %d ms", request.URL.String(), time.Since(startTime).Milliseconds()))
+	// log req
+	{
+		mlog.Info(fmt.Sprintf("> Receive Request: %s .", request.URL.String()))
+		startTime := time.Now()
+		defer func() {
+			mlog.Info(fmt.Sprintf("> Process Request: %s , in %d ms", request.URL.String(), time.Since(startTime).Milliseconds()))
 
-		if err := recover(); err != nil {
-			mlog.Error("recover panic", slog.Any("", err))
-		}
-	}()
+			if err := recover(); err != nil {
+				mlog.Error("recover panic", slog.Any("", err))
+			}
+		}()
+	}
 
 	ctx := NewContext(writer, request)
 	defer ctx.response()
@@ -75,7 +93,7 @@ func (h *Handler) AddHandler(uri string, handlerFunc func(ctx *Context), middlew
 	h.uri = append(h.uri, uri)
 }
 
-func (h *Handler) DisplayRegisteredURI() {
+func (h *Handler) displayRegisteredURI() {
 	mlog.Info(fmt.Sprintf("> HTTP Handler Count: %d.", len(h.Handlers)))
 
 	for _, v := range h.uri {

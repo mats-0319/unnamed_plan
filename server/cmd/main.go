@@ -27,22 +27,23 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	brm := backup.NewBRManager(&backup.UserBR{}, &backup.NoteBR{}, &backup.FlipGameScore{})
 
+	handler := &mhttp.Handler{}
+	registerHandlers(handler)
+
 	var wg sync.WaitGroup
 
 	{
 		wg.Go(func() { autoBackup(ctx, brm) })
 		wg.Go(func() { waitSignal(ctx, brm) })
 
-		mhttp.StartServer(newHandler()) // blocked
+		handler.StartServer() // blocked
 	}
 
 	cancel()
 	wg.Wait()
 }
 
-func newHandler() *mhttp.Handler {
-	h := &mhttp.Handler{}
-
+func registerHandlers(h *mhttp.Handler) {
 	uriPrefix := "/api" // even use domain name like 'api.xxx.com/login', nginx will forward req
 
 	token.InitTokenManager(config.GetConfig().HMACKey)
@@ -65,8 +66,6 @@ func newHandler() *mhttp.Handler {
 	// game score
 	h.AddHandler(uriPrefix+api.URI_ListGameScore, handlers.ListGameScore)
 	h.AddHandler(uriPrefix+api.URI_UploadGameScore, handlers.UploadGameScore, middleware.OptionalVerifyAPIAccessToken)
-
-	return h
 }
 
 func autoBackup(ctx context.Context, brm *backup.BRManager) {

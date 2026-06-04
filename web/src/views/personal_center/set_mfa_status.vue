@@ -35,8 +35,8 @@ import ElevatedButton from "@/components/elevated_button.vue"
 
 const userStore = useUserStore()
 
-const setMFAStatusReq = ref<SetMFAStatusReq>(new SetMFAStatusReq())
 const totpKey = ref<string>("")
+const setMFAStatusReq = ref<SetMFAStatusReq>(new SetMFAStatusReq())
 
 onMounted(() => {
     setMFAStatusReq.value = new SetMFAStatusReq()
@@ -54,7 +54,8 @@ async function setMFAStatus() {
     await userStore.setMFAStatus(
         setMFAStatusReq.value.enable_mfa,
         setMFAStatusReq.value.apply_new_key_flag,
-        setMFAStatusReq.value.totp_code)
+        setMFAStatusReq.value.totp_code,
+    )
 }
 </script>
 

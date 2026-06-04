@@ -36,15 +36,21 @@ func LoginMFA(ctx *mhttp.Context) {
 		return
 	}
 
-	if e := mfa.VerifyTOTPCode(req.TOTPCode, user.TOTPKey); e != nil {
+	decryptedKey, e := utils.Decrypt(user.TOTPKey, config.GetConfig().EncryptKey)
+	if e != nil {
+		ctx.ResData = e
+		return
+	}
+
+	if e := mfa.VerifyTOTPCode(req.TOTPCode, decryptedKey); e != nil {
 		ctx.ResData = e
 		return
 	}
 
 	_ = dal.UpdateUser(user) // update user.UpdatedAt
 
-	sc := config.GetConfig()
-	ctx.SetHeader(utils.HTTPHeader_AccessToken, middleware.GenerateAPIAccessToken(user.UserName, sc.AccessTokenExpireHour))
+	token := middleware.GenerateAPIAccessToken(user.UserName, config.GetConfig().AccessTokenExpireHour)
+	ctx.SetHeader(utils.HTTPHeader_AccessToken, token)
 
 	ctx.ResData = &api.LoginMFARes{
 		UserName: user.UserName,

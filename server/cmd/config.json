@@ -12,7 +12,8 @@
         "hmac_key": "LQUlVE8aN8ecfiVevJuP",
         "access_token_expire_hour": 12,
         "mfa_token_expire_minute": 5,
-        "totp_key_expire_minute": 5
+        "totp_key_expire_minute": 5,
+        "encrypt_key": "cBsnYH1yDvFfW4q84wAz7FhrzWHiUjQk"
       }
     }
   ]

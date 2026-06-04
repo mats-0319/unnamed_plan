@@ -17,7 +17,15 @@ func NewTOTPKey(ctx *mhttp.Context) {
 		return
 	}
 
-	totpKey := mfa.GenerateTOTPKey(ctx.UserName, config.GetConfig().TOTPKeyExpireMinute)
+	totpKey, e := mfa.GenerateTOTPKey(
+		ctx.UserName,
+		config.GetConfig().TOTPKeyExpireMinute,
+		config.GetConfig().EncryptKey,
+	)
+	if e != nil {
+		ctx.ResData = e
+		return
+	}
 
 	ctx.ResData = &api.NewTOTPKeyRes{TOTPKey: totpKey}
 }

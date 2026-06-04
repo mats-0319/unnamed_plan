@@ -37,13 +37,11 @@ func Login(ctx *mhttp.Context) {
 		return
 	}
 
-	sc := config.GetConfig()
-
 	// 如果启用MFA：中断登录，进入MFA过程
 	if user.EnableMFA {
 		ctx.ResData = &api.LoginRes{
 			EnableMFA: true,
-			MFAToken:  mfa.GenerateMFAToken(user.UserName, sc.MFATokenExpireMinute),
+			MFAToken:  mfa.GenerateMFAToken(user.UserName, config.GetConfig().MFATokenExpireMinute),
 		}
 
 		return
@@ -51,7 +49,8 @@ func Login(ctx *mhttp.Context) {
 
 	_ = dal.UpdateUser(user) // update user.UpdatedAt
 
-	ctx.SetHeader(utils.HTTPHeader_AccessToken, middleware.GenerateAPIAccessToken(user.UserName, sc.AccessTokenExpireHour))
+	token := middleware.GenerateAPIAccessToken(user.UserName, config.GetConfig().AccessTokenExpireHour)
+	ctx.SetHeader(utils.HTTPHeader_AccessToken, token)
 
 	ctx.ResData = &api.LoginRes{
 		EnableMFA:  false,

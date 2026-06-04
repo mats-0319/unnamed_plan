@@ -49,6 +49,7 @@ func DeserializeToken(token string, typ TokenType) (t *Token, e *utils.Error) {
 		return
 	}
 
+	// decode & deserialize
 	tokenBytes, err := hex.DecodeString(tokenSplit[0])
 	if err != nil {
 		e = utils.ErrDecodeToken().WithCause(err).WithParam("payload", tokenSplit[0])

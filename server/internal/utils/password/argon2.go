@@ -42,7 +42,7 @@ func GeneratePassword(pwdSHA256 string) (pwdArgon2 string) {
 
 // VerifyPassword decode 'key' from 'pwdArgon2', calc 'new key' with 'pwdSHA256', compare two keys
 func VerifyPassword(pwdSHA256 string, pwdArgon2 string) *utils.Error {
-	params, oldKey, e := decodeHash(pwdArgon2)
+	params, oldKey, e := decodePwdDB(pwdArgon2)
 	if e != nil {
 		return e
 	}
@@ -58,7 +58,7 @@ func VerifyPassword(pwdSHA256 string, pwdArgon2 string) *utils.Error {
 	return nil
 }
 
-func decodeHash(pwdArgon2 string) (params *AlgorithmParams, oldKey []byte, e *utils.Error) {
+func decodePwdDB(pwdArgon2 string) (params *AlgorithmParams, oldKey []byte, e *utils.Error) {
 	pwdSplit := strings.Split(pwdArgon2, ".")
 	if len(pwdSplit) != 4 || pwdSplit[0] != "argon2id" {
 		e = utils.ErrInvalidPassword().WithParam("encoded pwd", pwdArgon2)
