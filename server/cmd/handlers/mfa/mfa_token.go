@@ -3,6 +3,7 @@ package mfa
 import (
 	"time"
 
+	mlog "github.com/mats0319/unnamed_plan/server/internal/log"
 	"github.com/mats0319/unnamed_plan/server/internal/utils"
 	"github.com/mats0319/unnamed_plan/server/internal/utils/token"
 )
@@ -16,5 +17,11 @@ func GenerateMFAToken(userName string, expireMinute int) string {
 }
 
 func VerifyMFAToken(tokenStr string) (t *token.Token, e *utils.Error) {
-	return token.DeserializeToken(tokenStr, token.TokenType_MFAToken)
+	t, e = token.DeserializeToken(tokenStr, token.TokenType_MFAToken)
+	if e != nil {
+		mlog.Error(e.String())
+		return
+	}
+	
+	return
 }

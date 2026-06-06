@@ -37,7 +37,7 @@ func Login(ctx *mhttp.Context) {
 		return
 	}
 
-	// 如果启用MFA：中断登录，进入MFA过程
+	// 如果启用MFA：暂停登录，进入MFA过程
 	if user.EnableMFA {
 		ctx.ResData = &api.LoginRes{
 			EnableMFA: true,
