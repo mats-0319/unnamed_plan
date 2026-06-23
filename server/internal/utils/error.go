@@ -37,7 +37,7 @@ func (e *Error) Error() string {
 		return ""
 	}
 
-	return fmt.Sprintf("error code: %d, message: %s", e.Code, e.Message)
+	return fmt.Sprintf("error code: %d", e.Code)
 }
 
 // String print all details, use in server log
