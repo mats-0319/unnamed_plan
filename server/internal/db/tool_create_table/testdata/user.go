@@ -13,18 +13,19 @@ var TestUsers = []*model.User{
 
 func NewUser(userName string, nickname string, isAdmin bool, enable2FA bool, totpKey string) *model.User {
 	pwdSHA256 := utils.CalcSHA256("123456")
-	pwdArgon2 := password.GeneratePassword(pwdSHA256)
 
 	if len(nickname) < 1 {
 		nickname = userName
 	}
 
+	keyEncrypted, _ := utils.Encrypt(totpKey, "cBsnYH1yDvFfW4q84wAz7FhrzWHiUjQk")
+
 	return &model.User{
 		UserName:  userName,
 		Nickname:  nickname,
-		Password:  pwdArgon2,
+		Password:  password.GeneratePassword(pwdSHA256),
 		IsAdmin:   isAdmin,
 		EnableMFA: enable2FA,
-		TOTPKey:   totpKey,
+		TOTPKey:   keyEncrypted,
 	}
 }
