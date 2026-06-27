@@ -68,22 +68,24 @@ func registerHandlers(h *mhttp.Handler) {
 	h.AddHandler(uriPrefix+api.URI_UploadGameScore, handlers.UploadGameScore, middleware.OptionalVerifyAPIAccessToken)
 }
 
+const dayMilliSeconds = 24 * 60 * 60 * 1000
+
 func autoBackup(ctx context.Context, brm *backup.BRManager) {
 	time.Sleep(500 * time.Millisecond)
 
 	mlog.Info("> Goroutine: Auto Backup Start.")
 
 	for {
-		// timestamp, unit: second
-		now := time.Now().Unix()
-		tomorrowZero := (now/86400 + 1) * 86400 // 0时区，次日0点，即北京时间每天早上8点
+		// timestamp, unit: millisecond
+		now := time.Now().UnixMilli()
+		tomorrowZero := (now/dayMilliSeconds + 1) * dayMilliSeconds // 0时区，次日0点，即北京时间每天早上8点
 		remain := tomorrowZero - now
 
 		select {
 		case <-ctx.Done():
 			mlog.Info("> Goroutine: Auto Backup Exit.")
 			return
-		case <-time.After(time.Duration(remain) * time.Second):
+		case <-time.After(time.Duration(remain) * time.Millisecond):
 			mlog.Info("> Auto Backup Start ...")
 			brm.Backup()
 			mlog.Info("> Auto Backup Done.")
