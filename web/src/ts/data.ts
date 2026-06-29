@@ -1,3 +1,5 @@
+export const pageSize = 20
+
 interface FlipResult {
     duration: number;
     steps: number;

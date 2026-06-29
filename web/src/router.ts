@@ -89,6 +89,10 @@ if (__IsDev__) {
             path: "lock-button",
             name: "TLockButton",
             component: () => import("@/components/lock_button_test.vue")
+        }, {
+            path: "lock-screen",
+            name: "TLockScreen",
+            component: () => import("@/components/lock_screen_test.vue")
         }]
     })
 }

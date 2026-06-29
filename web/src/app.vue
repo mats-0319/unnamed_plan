@@ -1,4 +1,5 @@
 <template>
+  <lock-screen />
   <top v-if="!$route.meta.hideTop" />
   <router-view />
 </template>
@@ -9,6 +10,7 @@ import { onMounted } from "vue"
 import { useUserStore } from "@/pinia/user.ts"
 import { deepCopy } from "@/ts/util.ts"
 import Top from "@/views/components/top.vue"
+import LockScreen from "@/components/lock_screen.vue"
 
 const flags = useFlagStore()
 const userStore = useUserStore()

@@ -3,6 +3,7 @@
     <div class="tp-left">
       <p class="tpl-item" @click="testHome">> Home</p>
       <p class="tpl-item center-hv" @click="testLockButton">测试锁定按钮</p>
+      <p class="tpl-item center-hv" @click="testLockScreen">测试全局锁定</p>
     </div>
 
     <el-divider direction="vertical" />
@@ -22,6 +23,10 @@ function testHome() {
 
 function testLockButton() {
     routerLink("TLockButton")
+}
+
+function testLockScreen() {
+    routerLink("TLockScreen")
 }
 </script>
 

@@ -5,6 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
+		"preview": "vite preview",
 		"build": "vue-tsc --noEmit && vite build",
 		"format": "eslint --fix --format html --output-file ./format_result.html"
 	},

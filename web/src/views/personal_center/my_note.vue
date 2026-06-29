@@ -1,9 +1,13 @@
 <template>
   <div class="pnote-tools">
-    <elevated-button class="pt-item" :onClick="beforeCreate">写小纸条</elevated-button>
+    <elevated-button class="pt-item" :disabled="loading" :onClick="beforeCreate">写小纸条</elevated-button>
   </div>
 
-  <el-table :data="noteStore.noteType == NoteType.MyNotes ? noteStore.notes : new Array<Note>()" height="60%">
+  <el-table
+    v-loading="loading"
+    :data="noteStore.noteType == NoteType.MyNotes ? noteStore.notes : new Array<Note>()"
+    height="60%"
+  >
     <el-table-column type="expand">
       <template #default="scope">
         <el-descriptions class="pnote-table-description" title="小纸条详情" border column="1" label-width="15%">
@@ -31,7 +35,14 @@
     </el-table-column>
   </el-table>
 
-  <el-pagination layout="prev,pager,next,->,total" :total="noteStore.count" background @current-change="listNote" />
+  <el-pagination
+    layout="prev,pager,next,->,total"
+    :total="noteStore.count"
+    :page-size="pageSize"
+    :disabled="loading"
+    background
+    @current-change="listMyNote"
+  />
 
   <el-dialog v-model="showCreateDialog" title="写小纸条">
     <el-form v-model="createNoteReq" label-width="20%">
@@ -101,8 +112,10 @@ import { deepCopy, displayTimestamp } from "@/ts/util.ts"
 import { NoteType, useNoteStore } from "@/pinia/note.ts"
 import OutlinedButton from "@/components/outlined_button.vue"
 import ElevatedButton from "@/components/elevated_button.vue"
+import { pageSize } from "@/ts/data.ts"
 
 const noteStore = useNoteStore()
+const loading = ref<boolean>(false)
 
 const showCreateDialog = ref<boolean>(false)
 const canCreateFlag = ref<boolean>(false)
@@ -117,7 +130,7 @@ const showDeleteDialog = ref<boolean>(false)
 const deleteNoteReq = ref<DeleteNoteReq>(new DeleteNoteReq())
 
 onMounted(() => {
-    listNote()
+    listMyNote()
 })
 
 function beforeCreate(): void {
@@ -127,9 +140,11 @@ function beforeCreate(): void {
 }
 
 async function create(): Promise<void> {
+    loading.value = true
     await noteStore.create(createNoteReq.value.is_anonymous, createNoteReq.value.title, createNoteReq.value.content)
 
     showCreateDialog.value = false
+    loading.value = false
 }
 
 function beforeModify(note: Note): void {
@@ -145,6 +160,7 @@ function beforeModify(note: Note): void {
 }
 
 async function modify(): Promise<void> {
+    loading.value = true
     await noteStore.modify(
         modifyNoteReq.value.note_id,
         modifyNoteReq.value.is_anonymous,
@@ -153,6 +169,7 @@ async function modify(): Promise<void> {
     )
 
     showModifyDialog.value = false
+    loading.value = false
 }
 
 function beforeDelete(note: Note): void {
@@ -163,12 +180,14 @@ function beforeDelete(note: Note): void {
 }
 
 async function del(): Promise<void> {
+    loading.value = true
     await noteStore.del(deleteNoteReq.value.note_id)
 
     showDeleteDialog.value = false
+    loading.value = false
 }
 
-function listNote(pageNum: number = 1): void {
+function listMyNote(pageNum: number = 1): void {
     noteStore.list(true, pageNum)
 }
 

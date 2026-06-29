@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="userStore.users" height="80%">
+  <el-table v-loading="loading" :data="userStore.users" height="80%">
     <el-table-column label="用户名" prop="user_name" />
 
     <el-table-column label="昵称" prop="nickname" />
@@ -20,24 +20,31 @@
   <el-pagination
     layout="prev,pager,next,->,total"
     :total="userStore.count"
+    :page-size="pageSize"
+    :disabled="loading"
     background
     @current-change="listUser"
   />
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from "vue"
+import { onMounted, ref } from "vue"
 import { useUserStore } from "@/pinia/user.ts"
 import { displayTimestamp } from "@/ts/util.ts"
+import { pageSize } from "@/ts/data.ts"
 
 const userStore = useUserStore()
+
+const loading = ref<boolean>(false)
 
 onMounted(() => {
     listUser()
 })
 
-function listUser(pageNum: number = 1): void {
-    userStore.list(10, pageNum)
+async function listUser(pageNum: number = 1): Promise<void> {
+    loading.value = true
+    await userStore.list(10, pageNum)
+    loading.value = false
 }
 </script>
 

@@ -31,9 +31,14 @@ declare module 'vue' {
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     Lock_button: typeof import('./src/components/lock_button.vue')['default']
     Lock_button_test: typeof import('./src/components/lock_button_test.vue')['default']
+    Lock_screen: typeof import('./src/components/lock_screen.vue')['default']
+    Lock_screen_test: typeof import('./src/components/lock_screen_test.vue')['default']
     Outlined_button: typeof import('./src/components/outlined_button.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Stacked_cards: typeof import('./src/components/stacked_cards.vue')['default']
+  }
+  export interface GlobalDirectives {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

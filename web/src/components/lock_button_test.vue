@@ -1,8 +1,9 @@
 <template>
-  测试结论：对Promise不熟悉的，可以考虑使用async/await编写处理函数
+  <p>测试结论：对Promise不熟悉的，可以考虑使用async/await编写处理函数</p>
 
   <el-divider />
-  测试组件：锁定按钮；在一次点击之后、直到功能执行完成并允许下一次点击之前，禁止点击行为、不响应点击事件<br/><br/>
+
+  <p>测试组件：锁定按钮；在一次点击之后、直到功能执行完成并允许下一次点击之前，禁止点击行为、不响应点击事件</p>
   <div class="wrapper">
     <lock-button :onClick="clickButton">测试功能</lock-button>
     <div :style="{ width: '4rem'}"></div>
@@ -12,10 +13,11 @@
     <div :style="{ width: '4rem'}"></div>
     <elevated-button :disabled="true" :on-click="clickButton">禁用的elevated button</elevated-button>
   </div><br/>
-  {{ count }}
+  <p>count:&emsp;{{ count }}</p>
 
   <el-divider />
-  测试样式：修改按钮组件的颜色和边框<br/><br/>
+
+  <p>测试样式：修改按钮组件的颜色和边框</p>
   <div class="wrapper">
     <outlined-button class="fat-button" :on-click="clickButton">测试样式-带边框的文字按钮</outlined-button>
 
