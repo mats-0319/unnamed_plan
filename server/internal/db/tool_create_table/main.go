@@ -11,12 +11,14 @@ import (
 func main() {
 	db := mdb.InitDB(mdb.DefaultDSN, 10, 100)
 
-	if err := db.Migrator().DropTable(model.ModelList...); err != nil {
+	err := db.Migrator().DropTable(model.ModelList...)
+	if err != nil {
 		fmt.Println("drop db table failed, err: ", err)
 		return
 	}
 
-	if err := db.Migrator().CreateTable(model.ModelList...); err != nil {
+	err = db.Migrator().CreateTable(model.ModelList...)
+	if err != nil {
 		fmt.Println("create db table failed, err: ", err)
 		return
 	}

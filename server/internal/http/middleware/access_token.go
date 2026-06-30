@@ -24,7 +24,8 @@ func OptionalVerifyAPIAccessToken(ctx *mhttp.Context) *utils.Error {
 }
 
 func VerifyAPIAccessToken(ctx *mhttp.Context) *utils.Error {
-	if e := verifyAPIAccessToken(ctx); e != nil {
+	e := verifyAPIAccessToken(ctx)
+	if e != nil {
 		mlog.Error(e.String())
 		return utils.ErrInvalidAccessToken()
 	}

@@ -42,7 +42,8 @@ func LoginMFA(ctx *mhttp.Context) {
 		return
 	}
 
-	if e := mfa.VerifyTOTPCode(req.TOTPCode, decryptedKey); e != nil {
+	e = mfa.VerifyTOTPCode(req.TOTPCode, decryptedKey)
+	if e != nil {
 		ctx.ResData = e
 		return
 	}

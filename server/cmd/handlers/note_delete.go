@@ -34,7 +34,8 @@ func DeleteNote(ctx *mhttp.Context) {
 		return
 	}
 
-	if e := dal.DeleteNote(req.NoteID); e != nil {
+	e = dal.DeleteNote(req.NoteID)
+	if e != nil {
 		ctx.ResData = e
 		return
 	}

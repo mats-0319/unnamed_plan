@@ -52,7 +52,8 @@ func ModifyUser(ctx *mhttp.Context) {
 		operator.Password = password.GeneratePassword(req.Password)
 	}
 
-	if e := dal.UpdateUser(operator); e != nil {
+	e = dal.UpdateUser(operator)
+	if e != nil {
 		ctx.ResData = e
 		return
 	}

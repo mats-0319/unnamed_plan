@@ -53,7 +53,8 @@ func (hw *HandlerWriter) Write(logBytes []byte) (err error) {
 	hw.mu.Lock()
 	defer hw.mu.Unlock()
 
-	if _, err = hw.Writer.Write(logBytes); err != nil {
+	_, err = hw.Writer.Write(logBytes)
+	if err != nil {
 		return
 	}
 
@@ -102,7 +103,8 @@ func compressFile(fileName string) {
 	}
 	defer srcFile.Close()
 
-	if _, err := io.Copy(gzWriter, srcFile); err != nil {
+	_, err = io.Copy(gzWriter, srcFile)
+	if err != nil {
 		return
 	}
 

@@ -31,7 +31,8 @@ func Login(ctx *mhttp.Context) {
 		return
 	}
 
-	if e := password.VerifyPassword(req.Password, user.Password); e != nil {
+	e = password.VerifyPassword(req.Password, user.Password)
+	if e != nil {
 		mlog.Error(e.String())
 		ctx.ResData = e
 		return

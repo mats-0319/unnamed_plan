@@ -29,7 +29,8 @@ func Register(ctx *mhttp.Context) {
 		Password: password.GeneratePassword(req.Password),
 	}
 
-	if e := dal.CreateUser(user); e != nil {
+	e := dal.CreateUser(user)
+	if e != nil {
 		ctx.ResData = e
 		return
 	}

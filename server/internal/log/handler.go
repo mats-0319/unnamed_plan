@@ -31,7 +31,8 @@ func newHandler(fileName string, maxSize int64, level slog.Level) (*Handler, err
 	}
 
 	maxSize = maxSize << 20 // unit: MB
-	if err := h.HandlerWriter.New(fileName, maxSize); err != nil {
+	err := h.HandlerWriter.New(fileName, maxSize)
+	if err != nil {
 		return nil, err
 	}
 

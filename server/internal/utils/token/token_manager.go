@@ -57,7 +57,8 @@ func DeserializeToken(token string, typ TokenType) (t *Token, e *utils.Error) {
 	}
 
 	t = &Token{}
-	if err := json.Unmarshal(tokenBytes, t); err != nil {
+	err = json.Unmarshal(tokenBytes, t)
+	if err != nil {
 		e = utils.ErrDeserializeToken().WithCause(err)
 		return
 	}

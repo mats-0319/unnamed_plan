@@ -46,7 +46,8 @@ func ModifyNote(ctx *mhttp.Context) {
 	note.Title = req.Title
 	note.Content = req.Content
 
-	if e := dal.UpdateNote(note); e != nil {
+	e = dal.UpdateNote(note)
+	if e != nil {
 		ctx.ResData = e
 		return
 	}

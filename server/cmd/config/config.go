@@ -20,7 +20,8 @@ var config = &Config{}
 func Init() {
 	configBytes := mconfig.GetConfigItem("3e6fe66d-32bb-46b7-9597-8de23a969706")
 
-	if err := json.Unmarshal(configBytes, config); err != nil {
+	err := json.Unmarshal(configBytes, config)
+	if err != nil {
 		log.Fatalln("parse config failed, error: ", err)
 	}
 }

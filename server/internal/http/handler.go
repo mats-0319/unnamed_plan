@@ -30,7 +30,8 @@ func (h *Handler) StartServer() {
 	addr := fmt.Sprintf("0.0.0.0:%d", mconfig.GetInternalConfig().HTTPServerPort)
 	mlog.Info("> Listening at: " + addr)
 
-	if err := http.ListenAndServe(addr, h); err != nil {
+	err := http.ListenAndServe(addr, h)
+	if err != nil {
 		mlog.Error("handlers listen and serve failed", slog.Any("error", err))
 	}
 }
@@ -59,7 +60,8 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		defer func() {
 			mlog.Info(fmt.Sprintf("> Process Request: %s , in %d ms", request.URL.String(), time.Since(startTime).Milliseconds()))
 
-			if err := recover(); err != nil {
+			err := recover()
+			if err != nil {
 				mlog.Error("recover panic", slog.Any("", err))
 			}
 		}()
@@ -70,7 +72,8 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	// middlewares
 	for i := range handlerItemIns.Middlewares {
-		if err := handlerItemIns.Middlewares[i](ctx); err != nil { // log in middleware
+		err := handlerItemIns.Middlewares[i](ctx)
+		if err != nil { // log in middleware
 			ctx.ResData = err
 			return
 		}

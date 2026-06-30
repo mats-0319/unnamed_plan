@@ -30,7 +30,8 @@ func TestBackupRecover(t *testing.T) {
 	mlog.Info("> Backup done.")
 
 	// prepare recover data
-	if err := prepareRecoverData(); err != nil {
+	err := prepareRecoverData()
+	if err != nil {
 		os.Exit(1)
 	}
 
@@ -41,12 +42,14 @@ func TestBackupRecover(t *testing.T) {
 }
 
 func prepareRecoverData() error {
-	if err := os.RemoveAll("./recover/"); err != nil {
+	err := os.RemoveAll("./recover/")
+	if err != nil {
 		mlog.Error("remove dir failed", slog.Any("error", err))
 		return err
 	}
 
-	if err := os.Rename("./backup/", "./recover/"); err != nil {
+	err = os.Rename("./backup/", "./recover/")
+	if err != nil {
 		mlog.Error("rename folder failed", slog.Any("error", err))
 		return err
 	}
@@ -57,11 +60,13 @@ func prepareRecoverData() error {
 func initDB() {
 	db := mdb.InitTestDB()
 
-	if err := db.Migrator().DropTable(model.ModelList...); err != nil {
+	err := db.Migrator().DropTable(model.ModelList...)
+	if err != nil {
 		log.Fatalln("drop db table failed, error: ", err)
 	}
 
-	if err := db.Migrator().CreateTable(model.ModelList...); err != nil {
+	err = db.Migrator().CreateTable(model.ModelList...)
+	if err != nil {
 		log.Fatalln("create db table failed, error: ", err)
 	}
 

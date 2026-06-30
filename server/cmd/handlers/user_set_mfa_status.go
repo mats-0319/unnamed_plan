@@ -34,7 +34,8 @@ func SetMFAStatus(ctx *mhttp.Context) {
 	if !req.EnableMFA {
 		if operator.EnableMFA { // 仅在启用状态下更新数据库，如已是禁用状态，直接返回
 			operator.EnableMFA = false
-			if e := dal.UpdateUser(operator); e != nil {
+			e := dal.UpdateUser(operator)
+			if e != nil {
 				ctx.ResData = e
 				return
 			}
@@ -61,14 +62,16 @@ func SetMFAStatus(ctx *mhttp.Context) {
 			return
 		}
 
-		if e := mfa.VerifyTOTPCode(req.TOTPCode, decryptedKey); e != nil {
+		e = mfa.VerifyTOTPCode(req.TOTPCode, decryptedKey)
+		if e != nil {
 			ctx.ResData = e
 			return
 		}
 	}
 
 	operator.EnableMFA = true
-	if e := dal.UpdateUser(operator); e != nil {
+	e = dal.UpdateUser(operator)
+	if e != nil {
 		ctx.ResData = e
 		return
 	}

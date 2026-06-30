@@ -52,7 +52,8 @@ func maintainTOTPKey(userName string, code string, encryptKey string) (key strin
 		return
 	}
 
-	if e = VerifyTOTPCode(code, decryptedKeyBytes); e != nil {
+	e = VerifyTOTPCode(code, decryptedKeyBytes)
+	if e != nil {
 		return
 	}
 

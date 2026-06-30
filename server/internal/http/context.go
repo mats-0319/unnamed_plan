@@ -39,7 +39,8 @@ func (ctx *Context) ParseParams(obj any) bool {
 		return false
 	}
 
-	if err := json.Unmarshal(bodyBytes, obj); err != nil {
+	err = json.Unmarshal(bodyBytes, obj)
+	if err != nil {
 		e := utils.ErrDeserializeReqParam().WithCause(err)
 		mlog.Error(e.String())
 		ctx.ResData = e
@@ -82,7 +83,8 @@ func (ctx *Context) response() {
 	// write res
 	ctx.writer.WriteHeader(httpCode)
 
-	if _, err := ctx.writer.Write(resBytes); err != nil {
+	_, err = ctx.writer.Write(resBytes)
+	if err != nil {
 		mlog.Error("response failed", slog.Any("error", err))
 		return
 	}
