@@ -54,3 +54,5 @@ pnpm常用功能：
   下载对应的声明文件，例如`import CryptoJs from "crypto-js"`出现该错误，则安装`@types/crypto-js`为开发依赖即可
 - 样式优先级：class < style < important class
   在同一个组件上，使用style直接定义的样式会覆盖class中的样式；而使用`class xxx !important`定义的样式又会覆盖style样式
+- 在vue代码中使用代码(`src`)以外的值（例如`package.json`中的`version`配置项）：声明和赋值分开
+  在`global.d.ts`中声明变量名和类型，在`vite.config.ts`为变量赋值
