@@ -68,12 +68,12 @@ func registerHandlers(h *mhttp.Handler) {
 	h.AddHandler(uriPrefix+api.URI_UploadGameScore, handlers.UploadGameScore, middleware.OptionalVerifyAPIAccessToken)
 }
 
-const dayMilliSeconds = 24 * 60 * 60 * 1000
-
 func autoBackup(ctx context.Context, brm *backup.BRManager) {
 	time.Sleep(500 * time.Millisecond)
 
 	mlog.Info("> Goroutine: Auto Backup Start.")
+
+	const dayMilliSeconds = 24 * 60 * 60 * 1000
 
 	for {
 		// timestamp, unit: millisecond

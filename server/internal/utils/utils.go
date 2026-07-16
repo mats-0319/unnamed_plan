@@ -88,7 +88,7 @@ func Decrypt[T string | []byte](cipherHex string, key T) (message []byte, e *Err
 }
 
 const charactersLibrary = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-const useBits = 6 // 6个bit位可以表示全部字符库中的字符
+const useBits = 6 // 6个bit位可以表示字符库中的全部字符
 
 // GenerateRandomBytes generate random readable Bytes
 func GenerateRandomBytes[T string | []byte](length int) T {

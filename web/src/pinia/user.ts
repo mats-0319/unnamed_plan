@@ -5,8 +5,14 @@ import CryptoJs from "crypto-js"
 import { userAxios } from "@/axios/ts/user.http.ts"
 import { log } from "@/ts/log.ts"
 
+export enum UserStatus {
+    placeholder = -1,
+    exit = 1,
+}
+
 export const useUserStore = defineStore("user", () => {
     const user = ref<User>(new User()) // current user
+    const userStatus = ref<UserStatus>(UserStatus.placeholder)
 
     const count = ref<number>(0) // list users
     const users = ref<Array<User>>(new Array<User>())
@@ -90,13 +96,17 @@ export const useUserStore = defineStore("user", () => {
 
     function isLogin(): boolean { return user.value.user_name.length > 0 }
 
+    function setUserStatus(status: UserStatus): void {
+        userStatus.value = status
+    }
+
     function exitLogin(): void {
         user.value = new User()
         localStorage.removeItem("access_token")
         localStorage.removeItem("login_data")
     }
 
-    return { user, count, users, isLogin, exitLogin,
+    return { user, userStatus, count, users, isLogin, setUserStatus, exitLogin,
         register, login, loginMFA, modify, list, applyTOTPKey, setMFAStatus }
 })
 

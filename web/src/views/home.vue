@@ -26,14 +26,12 @@
 <script lang="ts" setup>
 import Bottom from "@/views/components/bottom.vue"
 import { onMounted } from "vue"
-import { useUserStore } from "@/pinia/user.ts"
-import { useFlagStore } from "@/pinia/flag.ts"
+import { UserStatus, useUserStore } from "@/pinia/user.ts"
 
 const userStore = useUserStore()
-const flagStore = useFlagStore()
 
 onMounted(() => {
-    if (flagStore.routeParam == "401") {
+    if (userStore.userStatus == UserStatus.exit) {
         userStore.exitLogin() // 配合http拦截器，如果是401错误，则退出登录
     }
 })

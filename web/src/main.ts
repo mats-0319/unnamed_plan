@@ -9,11 +9,11 @@ import "./index.less"
 
 // axios init interceptors
 import { initInterceptors } from "@/axios/ts/config_extend.ts"
-import { useFlagStore } from "@/pinia/flag.ts"
+import { UserStatus, useUserStore } from "@/pinia/user.ts"
 
 initInterceptors((): void => {
-    const flagStore = useFlagStore()
-    flagStore.setRouteParam("401")
+    const userStore = useUserStore()
+    userStore.setUserStatus(UserStatus.exit)
 
     router.replace({ name: "home" })
 })

@@ -1,7 +1,5 @@
 # 未命名计划
 
-[//]: # ([![Go Reference]&#40;https://pkg.go.dev/badge/github.com/mats0319/unnamed_plan.svg&#41;]&#40;https://pkg.go.dev/github.com/mats0319/unnamed_plan&#41;)
-
 一个web项目，用来学习web开发和部署，项目会部署到公网，如果[公网地址](https://115.190.167.134)
 不可用，多半是我买的云服务器到期了 ^_^ （2026.9.25）
 
