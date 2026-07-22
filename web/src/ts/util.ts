@@ -25,3 +25,18 @@ export function randomVisitorName(): string {
 
     return "游客" + array[0].toString().padStart(10, "0").slice(0, 10)
 }
+
+import QRCode from "qrcode"
+import { log } from "@/ts/log.ts"
+
+export async function generateQRCode(text: string): Promise<string> {
+    let res = ""
+
+    try {
+        res = await QRCode.toDataURL(text)
+    } catch(e) {
+        log.fail("generate QR Code", e as string)
+    }
+
+    return res
+}

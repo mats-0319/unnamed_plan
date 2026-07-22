@@ -1,23 +1,28 @@
 <template>
   <el-form v-model="setMFAStatusReq" class="set-mfa-status" labelWidth="20%" size="large">
     <el-form-item label="是否启用MFA">
-      <el-switch v-model="setMFAStatusReq.enable_mfa" />&emsp;
+      <el-switch v-model="setMFAStatusReq.enable_mfa"/>&emsp;
       {{ setMFAStatusReq.enable_mfa ? "是" : "否" }}
     </el-form-item>
 
     <template v-if="setMFAStatusReq.enable_mfa">
       <el-form-item label="TOTP密钥">
-        <span v-if="setMFAStatusReq.apply_new_key_flag">{{ totpKey }}</span>
-        <template v-else>
-          <span class="flex">
-            <b v-if="userStore.user.has_totp_key"><i>[继续使用历史密钥]&emsp;</i></b>
-            <elevatedButton :onClick="applyNewTOTPKey">申请新的密钥</elevatedButton>
+        <div class="item">
+          <span v-if="setMFAStatusReq.apply_new_key_flag">
+            <div>{{ totpKey }}</div>
+            <img :src="qrCodeText" alt="loading..."/>
           </span>
-        </template>
+
+          <span v-else-if="userStore.user.has_totp_key">
+            <b><i>[&nbsp;继续使用历史密钥&nbsp;]&emsp;</i></b>
+          </span>
+
+          <elevatedButton :onClick="applyNewTOTPKey">申请新的密钥</elevatedButton>
+        </div>
       </el-form-item>
 
       <el-form-item label="TOTP Code">
-        <el-input-otp v-model="setMFAStatusReq.totp_code" type="filled" />
+        <el-input-otp v-model="setMFAStatusReq.totp_code" type="filled"/>
       </el-form-item>
     </template>
 
@@ -32,8 +37,11 @@ import { useUserStore } from "@/pinia/user.ts"
 import { SetMFAStatusReq } from "@/axios/ts/user.go.ts"
 import { onMounted, ref } from "vue"
 import ElevatedButton from "@/components/elevated_button.vue"
+import { generateQRCode } from "@/ts/util.ts"
 
 const userStore = useUserStore()
+
+const qrCodeText = ref<string>("")
 
 const totpKey = ref<string>("")
 const setMFAStatusReq = ref<SetMFAStatusReq>(new SetMFAStatusReq())
@@ -48,6 +56,8 @@ async function applyNewTOTPKey() {
 
     totpKey.value = res.totp_key
     setMFAStatusReq.value.apply_new_key_flag = true
+
+    qrCodeText.value = await generateQRCode(totpKey.value)
 }
 
 async function setMFAStatus() {
@@ -61,9 +71,9 @@ async function setMFAStatus() {
 
 <style lang="less" scoped>
 .set-mfa-status {
-  .flex {
-    display: flex;
+  .item {
     font-size: 1.2rem;
+    width: 100%;
   }
 
   .tips {
