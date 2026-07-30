@@ -50,6 +50,7 @@ var (
 	ErrInvalidGameName = newBusinessError(20301, "Invalid Game Name")
 )
 
+// 将Err写成函数而不是实例，可以避免多处使用同一变量会继承历史数据的问题，详见测试代码
 func newError(httpCode int, code int, detail string) func() *Error {
 	return func() *Error { return NewError(httpCode, code, detail) }
 }
