@@ -6,7 +6,7 @@ import (
 )
 
 func TestLogStyle(t *testing.T) {
-	e := ErrServerInternalError().WithCause(errors.New("a new error")).
+	e := ErrForTest().WithCause(errors.New("a new error")).
 		WithParam("first param", "first value").
 		WithParam("second param", 10000)
 
@@ -14,8 +14,8 @@ func TestLogStyle(t *testing.T) {
 }
 
 func TestMultiUseOnOneInstance(t *testing.T) {
-	e := ErrServerInternalError().WithParam("key1", "value1")
-	e = ErrServerInternalError().WithParam("key2", "value2")
+	e := ErrForTest().WithParam("key1", "value1")
+	e = ErrForTest().WithParam("key2", "value2")
 
 	t.Log(e.String())
 

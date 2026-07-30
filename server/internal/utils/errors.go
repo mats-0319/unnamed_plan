@@ -6,6 +6,8 @@ package utils
 // - 非业务逻辑错误：第1～3位表示http状态码，4～5位表示错误序号
 // 使用invalid表示结构错误，使用wrong表示数值错误
 var (
+	ErrForTest = newError(0, -1, "test error string")
+
 	// change http code error
 	ErrInvalidAccessToken  = newError(401, 40101, "Invalid Access Token")
 	ErrServerInternalError = newError(500, 50001, "Sever Internal Error")
@@ -50,7 +52,7 @@ var (
 	ErrInvalidGameName = newBusinessError(20301, "Invalid Game Name")
 )
 
-// 将Err写成函数而不是实例，可以避免多处使用同一变量会继承历史数据的问题，详见测试代码
+// 函数返回函数而不是实例，可以避免多处使用同一变量会继承历史数据的问题，详见测试代码
 func newError(httpCode int, code int, detail string) func() *Error {
 	return func() *Error { return NewError(httpCode, code, detail) }
 }
